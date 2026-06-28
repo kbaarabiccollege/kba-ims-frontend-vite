@@ -1,0 +1,75 @@
+/* index.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import './styles/layout.css';
+
+/* ============================================================
+   GLOBAL TOKENS — shared across the entire app
+   Login-specific tokens live inside LoginPage's <style> block.
+   Dashboard/layout tokens live in layout.css and dashboard.css.
+   ============================================================ */
+:root {
+  /* Brand */
+  --color-primary:       #214B86;
+  --color-primary-hover: #183A6D;
+  --color-primary-soft:  #3567A8;
+  --color-white:         #ffffff;
+
+  /* Typography */
+  --font-body:    'Inter', sans-serif;
+  --font-heading: 'Playfair Display', Georgia, serif;
+
+  /* Shared transitions */
+  --transition-fast:   0.2s ease;
+  --transition-medium: 0.25s ease;
+
+  /* Form inputs — reusable across all pages */
+  --color-input-bg:          #F2F5F9;
+  --color-input-bg-focus:    #EEF3FA;
+  --color-input-border:      #D7DFEA;
+  --color-input-placeholder: #A8B5C8;
+  --color-input-text:        #1E2F4A;
+  --color-focus-ring:        rgba(36, 76, 134, 0.10);
+
+  /* Error / validation states — reusable across all pages */
+  --color-error:        #b91c1c;
+  --color-error-bg:     rgba(254, 242, 242, 0.85);
+  --color-error-border: rgba(254, 202, 202, 0.8);
+
+  /* Radius scale — reusable across all pages */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows — reusable across all pages */
+  --shadow-card:
+    0 1px 0 rgba(255,255,255,0.7) inset,
+    0 25px 60px rgba(0,0,0,0.12),
+    0 10px 30px rgba(0,0,0,0.08);
+
+  --shadow-button:
+    0 4px 18px rgba(33,75,134,0.28),
+    0 1px 0 rgba(255,255,255,0.12) inset;
+
+  --shadow-button-hover:
+    0 8px 28px rgba(33,75,134,0.36),
+    0 1px 0 rgba(255,255,255,0.12) inset;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: #fff;
+}

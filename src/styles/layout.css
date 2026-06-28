@@ -1,0 +1,641 @@
+/* src/styles/layout.css */
+
+/* ============================================================
+   LAYOUT & SHELL TOKENS — sidebar, header, structural vars
+   ============================================================ */
+   :root {
+    /* Sidebar */
+    --sidebar-bg:               #0D1A2E;
+    --sidebar-text:             #c8d5e8;
+    --sidebar-text-muted:       #6b82a0;
+    --sidebar-active-bg:        rgba(79,127,232,0.18);
+    --sidebar-active-text:      #ffffff;
+    --sidebar-active-border:    #4f7fe8;
+    --sidebar-hover-bg:         rgba(255,255,255,0.06);
+    --sidebar-group-title:      #4f7fe8;
+    --sidebar-width:            248px;
+    --sidebar-width-collapsed:  64px;
+  
+    /* Header */
+    --header-bg:                #214B86;
+    --header-text:              #ffffff;
+    --header-icon-hover:        rgba(255,255,255,0.12);
+    --header-height:            64px;
+    --header-dropdown-bg:       #ffffff;
+    --header-dropdown-text:     #1e2f4a;
+    --header-dropdown-border:   #e2e8f0;
+    --header-dropdown-hover:    #f1f5f9;
+    --header-dropdown-danger:   #dc2626;
+  
+    /* Main shell */
+    --main-bg:                  #f0f4fa;
+  
+    /* Shared structural */
+    --color-accent:             #3567A8;
+    --radius-md:                12px;
+    --transition-fast:          0.15s ease;
+    --transition-medium:        0.25s ease;
+  }
+  
+  [data-theme="dark"] {
+    /* Sidebar */
+    --sidebar-bg:               #0D1A2E;
+    --sidebar-text:             #b0c0d8;
+    --sidebar-text-muted:       #566880;
+    --sidebar-active-bg:        rgba(79,127,232,0.25);
+    --sidebar-active-text:      #ffffff;
+    --sidebar-hover-bg:         rgba(255,255,255,0.05);
+    --sidebar-group-title:      #4f7fe8;
+  
+    /* Header */
+    --header-bg:                #111c2d;
+    --header-text:              #e2e8f0;
+  
+    /* Header dropdown */
+    --header-dropdown-bg:       #1a2540;
+    --header-dropdown-text:     #e2e8f0;
+    --header-dropdown-border:   #2a3a55;
+    --header-dropdown-hover:    #253050;
+  
+    /* Main shell */
+    --main-bg:                  #0f1723;
+  }
+  
+  /* ============================================================
+     LAYOUT SHELL
+     ============================================================ */
+    .layout-shell {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .layout-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .layout-toggle {
+      position: absolute;
+      top: 20px;
+      left: 16px;
+      z-index: 100;
+      background: none;
+      border: none;
+      color: var(--header-text);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      opacity: 0.8;
+      transition: opacity var(--transition-fast);
+    }
+    .layout-toggle:hover { opacity: 1; }
+    
+    .layout-main {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--main-bg);
+      transition: background var(--transition-medium);
+    }
+    
+    /* ============================================================
+       SIDEBAR
+       ============================================================ */
+    .layout-sidebar {
+      width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: width var(--transition-medium), min-width var(--transition-medium),
+                  background var(--transition-medium);
+      scrollbar-width: none;
+    }
+    .layout-sidebar::-webkit-scrollbar { display: none; }
+    
+    .layout-sidebar--collapsed {
+      width: var(--sidebar-width-collapsed);
+      min-width: var(--sidebar-width-collapsed);
+    }
+    
+    /* Brand / Logo */
+    .layout-sidebar__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      min-height: 72px;
+    }
+    
+    .layout-sidebar__logo-full {
+      width: 160px;
+      height: 52px;
+      object-fit: contain;
+      object-position: left center;
+      flex-shrink: 0;
+    }
+    
+    .layout-sidebar__logo-emblem {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    
+    /* Nav */
+    .layout-sidebar__nav {
+      flex: 1;
+      padding: 12px 0 16px;
+    }
+    
+    .layout-sidebar__group {
+      margin-bottom: 4px;
+    }
+    
+    .layout-sidebar__group-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--sidebar-group-title);
+      letter-spacing: 0.1em;
+      padding: 14px 16px 6px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    
+    .layout-sidebar__item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 16px;
+      color: var(--sidebar-text);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 400;
+      border-left: 3px solid transparent;
+      transition: background var(--transition-fast), color var(--transition-fast),
+                  border-color var(--transition-fast);
+      white-space: nowrap;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    
+    .layout-sidebar__item:hover {
+      background: var(--sidebar-hover-bg);
+      color: #ffffff;
+    }
+    
+    .layout-sidebar__item--active {
+      background: var(--sidebar-active-bg);
+      color: var(--sidebar-active-text);
+      border-left-color: var(--sidebar-active-border);
+      font-weight: 600;
+    }
+    
+    .layout-sidebar__item-icon {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      width: 20px;
+    }
+    
+    .layout-sidebar__item-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .layout-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: var(--header-height);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0 24px 0 60px;
+      flex-shrink: 0;
+      position: relative;
+      transition: background var(--transition-medium);
+    }
+    
+    .layout-header__title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--header-text);
+      letter-spacing: 0.01em;
+    }
+    
+    .layout-header__actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .layout-header__icon-btn {
+      position: relative;
+      background: none;
+      border: none;
+      color: var(--header-text);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      transition: background var(--transition-fast);
+    }
+    .layout-header__icon-btn:hover { background: var(--header-icon-hover); }
+    
+    .layout-header__badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      border-radius: 10px;
+      min-width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+      line-height: 1;
+    }
+    
+    .layout-header__divider {
+      width: 1px;
+      height: 32px;
+      background: rgba(255,255,255,0.2);
+      margin: 0 8px;
+    }
+    
+    .layout-header__profile {
+      position: relative;
+    }
+    
+    .layout-header__profile-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: none;
+      color: var(--header-text);
+      cursor: pointer;
+      padding: 6px 8px;
+      border-radius: 10px;
+      transition: background var(--transition-fast);
+    }
+    .layout-header__profile-btn:hover { background: var(--header-icon-hover); }
+    
+    .layout-header__avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .layout-header__user-info {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+    
+    .layout-header__user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--header-text);
+      line-height: 1.2;
+    }
+    
+    .layout-header__user-role {
+      font-size: 11px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.2;
+    }
+    
+    .layout-header__chevron {
+      transition: transform var(--transition-fast);
+      opacity: 0.7;
+    }
+    .layout-header__chevron--open { transform: rotate(180deg); }
+    
+    .layout-header__dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: var(--header-dropdown-bg);
+      border: 1px solid var(--header-dropdown-border);
+      border-radius: var(--radius-md);
+      min-width: 200px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.08);
+      z-index: 200;
+      overflow: hidden;
+      animation: dropdownIn 0.15s ease;
+      padding: 4px 0;
+    }
+    
+    @keyframes dropdownIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    
+    .layout-header__dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      color: var(--header-dropdown-text);
+      font-size: 13px;
+      font-family: var(--font-body);
+      cursor: pointer;
+      text-align: left;
+      transition: background var(--transition-fast);
+    }
+    .layout-header__dropdown-item:hover { background: var(--header-dropdown-hover); }
+    .layout-header__dropdown-item--danger { color: var(--color-error); }
+    .layout-header__dropdown-item--danger:hover { background: #fef2f2; }
+    [data-theme="dark"] .layout-header__dropdown-item--danger:hover { background: rgba(220,38,38,0.15); }
+    
+    .layout-header__dropdown-divider {
+      height: 1px;
+      background: var(--header-dropdown-border);
+      margin: 4px 0;
+    }
+    
+    /* Smooth theme transitions */
+    .layout-sidebar,
+    .layout-header {
+      transition-property: background, color, border-color;
+      transition-duration: 0.25s;
+      transition-timing-function: ease;
+    }
+
+
+    /* ============================================================
+   MOBILE DRAWER
+   ============================================================ */
+/* ============================================================
+   GLOBAL — prevent horizontal scroll on all viewports
+   ============================================================ */
+   html,
+   body {
+     overflow-x: hidden;
+     width: 100%;
+   }
+   
+   /* ============================================================
+      HEADER — left section (emblem + title)
+      ============================================================ */
+   .layout-header__left {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+   }
+   
+   /* Institution emblem shown only in mobile header */
+   .layout-header__mobile-emblem {
+     width: 32px;
+     height: 32px;
+     object-fit: contain;
+     border-radius: 6px;
+     flex-shrink: 0;
+   }
+   
+   /* ============================================================
+      PROFILE DROPDOWN — user info block
+      ============================================================ */
+.layout-header__dropdown-user {
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.layout-header__dropdown-user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--header-dropdown-text);
+  line-height: 1.3;
+  margin-bottom: 1px;
+}
+
+.layout-header__dropdown-user-meta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* Tighter dividers to match compact design */
+.layout-header__dropdown-divider {
+  margin: 3px 0;
+}
+   
+/* ── Dropdown items — compact + consistent hover both themes ── */
+.layout-header__dropdown-item {
+  min-height: 36px;
+  padding: 7px 14px;
+  gap: 9px;
+  font-size: 13px;
+  /* Reset any inherited values */
+  background: none;
+  border: none;
+  color: var(--header-dropdown-text);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+/* Light theme hover — explicit so it's never invisible */
+.layout-header__dropdown-item:hover {
+  background: var(--header-dropdown-hover);
+  color: var(--color-text);
+}
+
+/* Dark theme hover override */
+[data-theme="dark"] .layout-header__dropdown-item:hover {
+  background: var(--header-dropdown-hover);
+  color: #ffffff;
+}
+
+/* Danger item (Logout) */
+.layout-header__dropdown-item--danger {
+  color: var(--color-error);
+}
+.layout-header__dropdown-item--danger:hover {
+  background: #fef2f2;
+  color: var(--color-error);
+}
+[data-theme="dark"] .layout-header__dropdown-item--danger:hover {
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+}
+
+/* Mobile touch targets stay large */
+@media (max-width: 767px) {
+  .layout-header__dropdown-item {
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+}
+   
+   /* ============================================================
+      MOBILE DRAWER BACKDROP
+      ============================================================ */
+   .layout-drawer-backdrop {
+     display: none;
+     position: fixed;
+     inset: 0;
+     background: rgba(0, 0, 0, 0.35);
+     backdrop-filter: blur(6px);
+     -webkit-backdrop-filter: blur(6px);
+     z-index: 40;
+     opacity: 0;
+     transition: opacity 0.3s ease;
+   }
+   
+   .layout-drawer-backdrop--visible {
+     display: block;
+     opacity: 1;
+   }
+   
+   /* ============================================================
+      MOBILE DRAWER SIDEBAR
+      ============================================================ */
+.layout-sidebar--drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: min(80vw, 300px);
+  z-index: 50;
+  transform: translateX(-100%);
+  transition: transform 300ms ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+   
+   .layout-sidebar--drawer::-webkit-scrollbar {
+     display: none;
+   }
+   
+   .layout-sidebar--drawer-open {
+     transform: translateX(0);
+   }
+   
+   /* ============================================================
+      MOBILE DRAWER HEADER — logo + name + close (sticky)
+      ============================================================ */
+   .layout-sidebar__brand--mobile {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     padding: 14px 16px;
+     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+     min-height: 64px;
+     /* Stick to top while menu scrolls */
+     position: sticky;
+     top: 0;
+     background: var(--sidebar-bg);
+     z-index: 1;
+   }
+   
+   /* Institution name in drawer header */
+   .layout-sidebar__institution-name {
+     flex: 1;
+     font-size: 14px;
+     font-weight: 600;
+     color: var(--sidebar-active-text);
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+   }
+   
+   /* Close button — 44×44 touch target */
+   .layout-sidebar__close-btn {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     width: 44px;
+     height: 44px;
+     background: rgba(255, 255, 255, 0.08);
+     border: 1px solid rgba(255, 255, 255, 0.12);
+     border-radius: 10px;
+     color: rgba(255, 255, 255, 0.8);
+     cursor: pointer;
+     flex-shrink: 0;
+     transition: background var(--transition-fast);
+   }
+   
+   .layout-sidebar__close-btn:hover {
+     background: rgba(255, 255, 255, 0.16);
+   }
+   
+   /* ============================================================
+      MOBILE SIDEBAR MENU ITEMS — larger font + touch targets
+      ============================================================ */
+   .layout-sidebar__item--mobile {
+     font-size: 17px;
+     font-weight: 500;
+     min-height: 52px;
+     padding: 14px 18px;
+     gap: 14px;
+   }
+   
+   .layout-sidebar__item-icon--mobile {
+     width: 24px;     /* wider icon slot for 20px icons */
+   }
+   
+   /* ============================================================
+      Z-INDEX STACK
+      header(30) < backdrop(40) < drawer(50) < dropdown(60)
+      ============================================================ */
+   .layout-header            { z-index: 30; position: relative; }
+   .layout-drawer-backdrop   { z-index: 40; }
+   .layout-sidebar--drawer   { z-index: 50; }
+   .layout-header__dropdown  { z-index: 60; }
+   
+   /* ============================================================
+      MOBILE RESPONSIVE TWEAKS  (≤767px)
+      ============================================================ */
+   @media (max-width: 767px) {
+     /* Tighter header padding on mobile */
+     .layout-header {
+       padding: 0 12px 0 56px;   /* 56px leaves room for the toggle btn */
+     }
+   
+     /* Profile button: no extra padding — just avatar + chevron */
+     .layout-header__profile-btn {
+       padding: 6px;
+       gap: 6px;
+     }
+   
+     /* Dropdown aligns to right edge on narrow screens */
+     .layout-header__dropdown {
+       right: 0;
+       left: auto;
+       min-width: 210px;
+     }
+   
+     /* Notification badge — keep visible */
+     .layout-header__badge {
+       font-size: 8px;
+       min-width: 14px;
+       height: 14px;
+     }
+   }
