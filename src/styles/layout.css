@@ -24,7 +24,7 @@
     --header-dropdown-bg:       #ffffff;
     --header-dropdown-text:     #1e2f4a;
     --header-dropdown-border:   #e2e8f0;
-    --header-dropdown-hover:    #f1f5f9;
+    --header-dropdown-hover:    #cee5fc;
     --header-dropdown-danger:   #dc2626;
   
     /* Main shell */
@@ -477,7 +477,7 @@
   color: var(--color-error);
 }
 .layout-header__dropdown-item--danger:hover {
-  background: #fef2f2;
+  background: #ffdcdc;
   color: var(--color-error);
 }
 [data-theme="dark"] .layout-header__dropdown-item--danger:hover {

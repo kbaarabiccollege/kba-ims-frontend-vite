@@ -1,6 +1,6 @@
 // src/components/layouts/Header.jsx
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Bell, ChevronDown, LogOut,
   Sun, Moon, User, UserCircle, Settings,
@@ -13,6 +13,7 @@ const Header = ({ portal, isMobile = false }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [dropdownOpen, setDropdownOpen]   = useState(false);
   const [notifOpen, setNotifOpen]         = useState(false);
   const dropdownRef = useRef(null);
@@ -156,7 +157,9 @@ const Header = ({ portal, isMobile = false }) => {
               <button
                 className="layout-header__dropdown-item"
                 onClick={() => {
-                  navigate(`/${portal?.role}/settings`);
+                  navigate(`/${portal?.role}/settings`, {
+                    state: { returnTo: location.pathname },
+                  });
                   setDropdownOpen(false);
                 }}
               >

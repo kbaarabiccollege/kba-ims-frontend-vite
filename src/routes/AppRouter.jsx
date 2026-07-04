@@ -24,7 +24,17 @@ import staffPortal      from "../portals/staffPortal";
 // import other portals similarly…
 
 import NotFound from "../components/common/NotFound";
-import AdminStudents from "../pages/admin/AdminStudents";
+import AdminStudents from "../pages/admin/students/AdminStudents";
+import AdminUsers from "../pages/admin/users/AdminUsers";
+import AdminStaff from "../pages/admin/staff/AdminStaff";
+
+import AdminClassrooms from "../pages/admin/academics/AdminClassrooms";
+import AdminSubjects from "../pages/admin/academics/AdminSubjects";
+
+import SettingsLayout from "../pages/settings/SettingsLayout";
+import SettingsHome from "../pages/settings/SettingsHome";
+import BatchesSettings from "../pages/settings/BatchesSettings";
+import TimetableFormatSettings from "../pages/settings/TimetableFormatSettings";
 
 // Redirects logged-in user to their portal; otherwise to login
 const RootRedirect = () => {
@@ -44,10 +54,24 @@ const AppRouter = () => (
       {/* <Route element={<ProtectedRoute allowedRoles={["admin"]} />}> */}
         <Route element={<Layout portal={adminPortal} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/students" element={<AdminStudents />} />
+          <Route path="/admin/staff" element={<AdminStaff />} />
+
+          <Route path="/admin/classrooms" element={<AdminClassrooms />} />
+          <Route path="/admin/subjects" element={<AdminSubjects />} />
           {/* Add more admin pages here */}
         </Route>
       {/* </Route> */}
+
+      {/* ── Admin Settings — deliberately OUTSIDE <Layout>, so it's a
+          true full-page view without the sidebar/header ── */}
+
+      <Route path="/admin/settings" element={<SettingsLayout />}>
+        <Route index element={<SettingsHome />} />
+        <Route path="batches" element={<BatchesSettings />} />
+        <Route path="timetable-format" element={<TimetableFormatSettings />} />
+      </Route>
 
       {/* ── Super Admin Portal ── */}
       <Route element={<ProtectedRoute allowedRoles={["superadmin"]} />}>

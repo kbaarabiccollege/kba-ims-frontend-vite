@@ -1,5 +1,5 @@
 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 
 const AdminStudents = () => {
   const { user } = useAuth();

@@ -1,0 +1,728 @@
+/* src/styles/AdminUsers.css
+   Built on top of the global tokens defined in index.css
+   (--color-primary, --font-heading, --font-body, --radius-*, --shadow-*).
+   Adds a small set of page-local tokens for badges/status colors.
+
+   Dark theme: the app toggles [data-theme="dark"] on a parent element
+   (same pattern as LoginPage.jsx). All page-local tokens below are
+   re-declared under that selector so the table, cards and modals
+   follow the app theme instead of staying hard-coded to light mode. */
+
+   .um-page {
+    --um-sidebar-dark: #101c30;
+    --um-header-blue: #16345f;
+    --um-bg-page: #f4f6fb;
+    --um-surface: #ffffff;
+    --um-surface-raised: #ffffff;
+    --um-border: #e2e7f0;
+    --um-text-heading: #14213d;
+    --um-text-body: #3a4a63;
+    --um-text-muted: #8592a8;
+    --um-row-hover: #f8fafc;
+    --um-overlay: rgba(16, 28, 48, 0.55);
+    --um-shadow-card: var(--shadow-card);
+  
+    --um-role-superadmin-bg: #1c2b45;
+    --um-role-superadmin-fg: #ffffff;
+    --um-role-admin-bg: #dbe7fb;
+    --um-role-admin-fg: var(--color-primary, #214b86);
+    --um-role-staff-bg: #e4e0fb;
+    --um-role-staff-fg: #5b3fc4;
+    --um-role-student-bg: #dcf3e6;
+    --um-role-student-fg: #1c8a54;
+    --um-role-parent-bg: #fde9d7;
+    --um-role-parent-fg: #b5620f;
+  
+    --um-status-active-fg: #1c8a54;
+    --um-status-active-bg: #e6f7ee;
+    --um-status-inactive-fg: #94a1b5;
+    --um-status-inactive-bg: #eef1f6;
+  
+    --um-icon-btn-bg: #ffffff;
+    --um-icon-btn-fg: #4a5a75;
+    --um-icon-btn-border: var(--um-border);
+    --um-icon-edit-hover-bg: #eef3fa;
+    --um-icon-edit-hover-fg: var(--color-primary, #214b86);
+    --um-icon-key-hover-bg: #fff6e0;
+    --um-icon-key-hover-fg: #b5820f;
+    --um-icon-danger-hover-bg: #fdecec;
+    --um-icon-danger-hover-fg: #d64545;
+  
+    font-family: var(--font-body, "Inter", sans-serif);
+    color: var(--um-text-body);
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    transition: color 0.25s ease;
+  }
+  
+  /* ── Dark mode tokens ── */
+  [data-theme="dark"] .um-page {
+    --um-header-blue: #0d1f38;
+    --um-bg-page: #0a1220;
+    --um-surface: #0f1928;
+    --um-surface-raised: #131f33;
+    --um-border: #26344a;
+    --um-text-heading: #dbe6f5;
+    --um-text-body: #aebed6;
+    --um-text-muted: #6b82a0;
+    --um-row-hover: rgba(79, 127, 232, 0.06);
+    --um-overlay: rgba(5, 10, 20, 0.72);
+    --um-shadow-card:
+      0 1px 0 rgba(79, 127, 232, 0.12) inset,
+      0 25px 60px rgba(0, 0, 0, 0.55),
+      0 10px 30px rgba(0, 0, 0, 0.4);
+  
+    --um-role-superadmin-bg: #0e1830;
+    --um-role-superadmin-fg: #a8c4e8;
+    --um-role-admin-bg: rgba(79, 127, 232, 0.18);
+    --um-role-admin-fg: #7ba3f5;
+    --um-role-staff-bg: rgba(91, 63, 196, 0.25);
+    --um-role-staff-fg: #b9a6f0;
+    --um-role-student-bg: rgba(28, 138, 84, 0.2);
+    --um-role-student-fg: #5fd399;
+    --um-role-parent-bg: rgba(181, 98, 15, 0.22);
+    --um-role-parent-fg: #f0a75c;
+  
+    --um-status-active-fg: #5fd399;
+    --um-status-active-bg: rgba(28, 138, 84, 0.18);
+    --um-status-inactive-fg: #8a9bb5;
+    --um-status-inactive-bg: rgba(107, 130, 160, 0.15);
+  
+    --um-icon-btn-bg: #131f33;
+    --um-icon-btn-fg: #9db3d6;
+    --um-icon-btn-border: var(--um-border);
+    --um-icon-edit-hover-bg: rgba(79, 127, 232, 0.15);
+    --um-icon-edit-hover-fg: #7ba3f5;
+    --um-icon-key-hover-bg: rgba(240, 167, 92, 0.15);
+    --um-icon-key-hover-fg: #f0a75c;
+    --um-icon-danger-hover-bg: rgba(214, 69, 69, 0.16);
+    --um-icon-danger-hover-fg: #ff8a8a;
+  }
+  
+  /* ---------- header ---------- */
+  
+  .um-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .um-title-block h1 {
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--um-text-heading);
+    margin: 0 0 0.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: color 0.25s ease;
+  }
+  
+  .um-title-icon {
+    font-size: 1.5rem;
+  }
+  
+  .um-title-meta {
+    margin: 0;
+    color: var(--um-text-muted);
+    font-size: 0.9rem;
+    transition: color 0.25s ease;
+  }
+  
+  /* ---------- buttons ---------- */
+  
+  .um-btn {
+    font-family: var(--font-body, "Inter", sans-serif);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm, 8px);
+    padding: 0.65rem 1.15rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: var(--transition-fast, 0.2s ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  
+  .um-btn-primary {
+    background: var(--color-primary, #214b86);
+    color: #fff;
+    box-shadow: var(--shadow-button);
+  }
+  
+  .um-btn-primary:hover:not(:disabled) {
+    background: var(--color-primary-hover, #183a6d);
+    box-shadow: var(--shadow-button-hover);
+  }
+  
+  .um-btn-primary:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  
+  .um-btn-ghost {
+    background: var(--um-surface-raised, #fff);
+    color: var(--um-text-body);
+    border-color: var(--um-border);
+  }
+  
+  .um-btn-ghost:hover {
+    background: var(--um-row-hover, #f5f7fb);
+  }
+  
+  .um-btn-danger {
+    background: #d64545;
+    color: #fff;
+  }
+  
+  .um-btn-danger:hover {
+    background: #b93636;
+  }
+  
+  .um-btn-add {
+    align-self: flex-start;
+  }
+  
+  /* ---------- card / toolbar ---------- */
+  
+  .um-card {
+    background: var(--um-surface, #fff);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: var(--um-shadow-card, var(--shadow-card));
+    overflow: hidden;
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+  }
+  
+  .um-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--um-border);
+    transition: border-color 0.25s ease;
+  }
+  
+  .um-search {
+    position: relative;
+    flex: 1 1 320px;
+    min-width: 240px;
+  }
+  
+  .um-search-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    font-size: 0.85rem;
+  }
+  
+  .um-search input {
+    width: 100%;
+    padding: 0.65rem 0.9rem 0.65rem 2.3rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.9rem;
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .um-search input::placeholder {
+    color: var(--color-input-placeholder, #a8b5c8);
+  }
+  
+  .um-search input:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .um-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  
+  .um-filters select {
+    padding: 0.6rem 2rem 0.6rem 0.9rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  
+  .um-result-count {
+    font-size: 0.85rem;
+    color: var(--um-text-muted);
+    white-space: nowrap;
+  }
+  
+  .um-error-banner {
+    margin: 1rem 1.5rem 0;
+    padding: 0.75rem 1rem;
+    background: var(--color-error-bg, rgba(254, 242, 242, 0.85));
+    border: 1px solid var(--color-error-border, rgba(254, 202, 202, 0.8));
+    color: var(--color-error, #b91c1c);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 0.85rem;
+  }
+  
+  /* ---------- table ---------- */
+  
+  .um-table-wrap {
+    overflow-x: auto;
+  }
+  
+  .um-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  
+  /* All headers are centered by default; Name / Email opt back to the left
+     via .um-col-left so long free-text values stay easy to scan. */
+  .um-table thead th {
+    background: var(--um-header-blue);
+    color: #eaf0fb;
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.9rem 1.25rem;
+    white-space: nowrap;
+    transition: background 0.25s ease;
+  }
+  
+  .um-table tbody td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--um-border);
+    vertical-align: middle;
+    text-align: center;
+    transition: border-color 0.25s ease;
+  }
+  
+  .um-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .um-table tbody tr:hover {
+    background: var(--um-row-hover);
+  }
+  
+  .um-col-left,
+  .um-user-name,
+  .um-user-email {
+    text-align: left;
+  }
+  
+  .um-col-num {
+    width: 48px;
+    color: var(--um-text-muted);
+  }
+  
+  .um-col-actions {
+    width: 140px;
+  }
+  
+  .um-user-id {
+    font-weight: 700;
+    color: var(--um-text-heading);
+  }
+  
+  .um-user-name {
+    font-weight: 600;
+    color: var(--um-text-heading);
+  }
+  
+  .um-user-email {
+    color: var(--um-text-muted);
+  }
+  
+  .um-state-cell {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--um-text-muted);
+  }
+  
+  /* ---------- badges ---------- */
+  
+  .um-badge {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  
+  .um-role-superadmin {
+    background: var(--um-role-superadmin-bg);
+    color: var(--um-role-superadmin-fg);
+  }
+  
+  .um-role-admin {
+    background: var(--um-role-admin-bg);
+    color: var(--um-role-admin-fg);
+  }
+  
+  .um-role-staff {
+    background: var(--um-role-staff-bg);
+    color: var(--um-role-staff-fg);
+  }
+  
+  .um-role-student {
+    background: var(--um-role-student-bg);
+    color: var(--um-role-student-fg);
+  }
+  
+  .um-role-parent {
+    background: var(--um-role-parent-bg);
+    color: var(--um-role-parent-fg);
+  }
+  
+  .um-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .um-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  
+  .um-status-active {
+    background: var(--um-status-active-bg);
+    color: var(--um-status-active-fg);
+  }
+  
+  .um-status-inactive {
+    background: var(--um-status-inactive-bg);
+    color: var(--um-status-inactive-fg);
+  }
+  
+  /* ---------- actions ---------- */
+  
+  .um-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  
+  .um-icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--um-icon-btn-border);
+    background: var(--um-icon-btn-bg);
+    color: var(--um-icon-btn-fg);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .um-icon-btn:hover {
+    background: var(--um-icon-edit-hover-bg);
+    border-color: var(--color-primary, #214b86);
+    color: var(--um-icon-edit-hover-fg);
+  }
+  
+  .um-icon-btn-key:hover {
+    background: var(--um-icon-key-hover-bg);
+    border-color: var(--um-icon-key-hover-fg);
+    color: var(--um-icon-key-hover-fg);
+  }
+  
+  .um-icon-btn-danger:hover {
+    background: var(--um-icon-danger-hover-bg);
+    border-color: #d64545;
+    color: var(--um-icon-danger-hover-fg);
+  }
+  
+  /* ---------- pagination ---------- */
+  
+  .um-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--um-border);
+    transition: border-color 0.25s ease;
+  }
+  
+  .um-pagination-summary {
+    font-size: 0.85rem;
+    color: var(--um-text-muted);
+  }
+  
+  .um-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .um-per-page {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--um-text-muted);
+  }
+  
+  .um-per-page select {
+    padding: 0.35rem 1.5rem 0.35rem 0.6rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--um-border);
+    background: var(--um-surface-raised, #fff);
+    color: var(--um-text-body);
+  }
+  
+  .um-page-nav {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--um-border);
+    background: var(--um-surface-raised, #fff);
+    color: var(--um-text-body);
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .um-page-nav:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  
+  .um-page-current {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: var(--color-primary, #214b86);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  
+  /* ---------- modals ---------- */
+  
+  .um-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--um-overlay, rgba(16, 28, 48, 0.55));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 1000;
+  }
+  
+  .um-modal-panel {
+    background: var(--um-surface, #fff);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: var(--um-shadow-card, var(--shadow-card));
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .um-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--um-border);
+  }
+  
+  .um-modal-header h2 {
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 1.3rem;
+    color: var(--um-text-heading);
+    margin: 0;
+  }
+  
+  .um-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--um-text-muted);
+    cursor: pointer;
+  }
+  
+  .um-modal-body {
+    padding: 1.5rem;
+  }
+  
+  .um-modal-subtext {
+    font-size: 0.9rem;
+    color: var(--um-text-body);
+    margin: 0 0 1rem 0;
+  }
+  
+  .um-delete-note {
+    font-size: 0.8rem;
+    color: var(--um-text-muted);
+    background: var(--um-surface-raised, #f5f7fb);
+    border-radius: var(--radius-sm, 8px);
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .um-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .um-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .um-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  
+  .um-field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--um-text-heading);
+  }
+  
+  .um-required {
+    color: var(--color-error, #b91c1c);
+  }
+  
+  .um-field input,
+  .um-field select {
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.9rem;
+  }
+  
+  .um-field input::placeholder {
+    color: var(--color-input-placeholder, #a8b5c8);
+  }
+  
+  .um-field input:focus,
+  .um-field select:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .um-field-error {
+    font-size: 0.75rem;
+    color: var(--color-error, #b91c1c);
+  }
+  
+  /* Validation banner: bold "Validation failed" headline from the
+     backend's `message`, with per-field messages shown under each input. */
+  .um-form-error-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--color-error-bg, rgba(254, 242, 242, 0.85));
+    border: 1px solid var(--color-error-border, rgba(254, 202, 202, 0.8));
+    color: var(--color-error, #b91c1c);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 0.85rem;
+  }
+  
+  .um-form-error-title {
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  
+  /* Password field with an eye-toggle button, mirroring LoginPage.jsx */
+  .um-input-wrap {
+    position: relative;
+  }
+  
+  .um-input-has-toggle {
+    width: 100%;
+    padding-right: 44px;
+  }
+  
+  .um-eye-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--color-input-placeholder, #a8b5c8);
+    display: flex;
+    align-items: center;
+    line-height: 0;
+    transition: color 0.2s ease;
+  }
+  
+  .um-eye-btn:hover {
+    color: var(--color-primary, #214b86);
+  }
+  
+  .um-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* ---------- responsive ---------- */
+  
+  @media (max-width: 640px) {
+    .um-page {
+      padding: 1.25rem;
+    }
+    .um-field-row {
+      grid-template-columns: 1fr;
+    }
+    .um-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .um-pagination {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }

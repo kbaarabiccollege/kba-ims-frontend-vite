@@ -1,5 +1,4 @@
 /* index.css */
-
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap');
 @import './styles/layout.css';
 
@@ -47,14 +46,51 @@
     0 1px 0 rgba(255,255,255,0.7) inset,
     0 25px 60px rgba(0,0,0,0.12),
     0 10px 30px rgba(0,0,0,0.08);
-
   --shadow-button:
     0 4px 18px rgba(33,75,134,0.28),
     0 1px 0 rgba(255,255,255,0.12) inset;
-
   --shadow-button-hover:
     0 8px 28px rgba(33,75,134,0.36),
     0 1px 0 rgba(255,255,255,0.12) inset;
+}
+
+/* ============================================================
+   DARK THEME — global overrides
+   Applied whenever [data-theme="dark"] is set on a parent
+   (html/body/#root), same convention LoginPage.jsx already uses
+   for its own scoped tokens. Any page using the tokens above
+   (inputs, errors, shadows) automatically follows the app theme.
+   ============================================================ */
+[data-theme="dark"] {
+  --color-primary-hover: #3567c0;
+  --color-primary-soft:  #4f7fe8;
+
+  --color-input-bg:          #1a2535;
+  --color-input-bg-focus:    #1e2d40;
+  --color-input-border:      #2a3a52;
+  --color-input-placeholder: #4a6080;
+  --color-input-text:        #e2e8f0;
+  --color-focus-ring:        rgba(79, 127, 232, 0.18);
+
+  --color-error:        #f87171;
+  --color-error-bg:     rgba(127, 29, 29, 0.35);
+  --color-error-border: rgba(185, 28, 28, 0.4);
+
+  --shadow-card:
+    0 1px 0 rgba(79,127,232,0.12) inset,
+    0 25px 60px rgba(0,0,0,0.55),
+    0 10px 30px rgba(0,0,0,0.40);
+  --shadow-button:
+    0 4px 18px rgba(45,95,168,0.45),
+    0 1px 0 rgba(255,255,255,0.06) inset;
+  --shadow-button-hover:
+    0 8px 28px rgba(45,95,168,0.60),
+    0 1px 0 rgba(255,255,255,0.06) inset;
+}
+
+[data-theme="dark"] body {
+  background: #0a1220;
+  color: #dbe6f5;
 }
 
 *,
@@ -72,4 +108,5 @@ html, body, #root {
 body {
   font-family: var(--font-body);
   background: #fff;
+  transition: background 0.25s ease, color 0.25s ease;
 }

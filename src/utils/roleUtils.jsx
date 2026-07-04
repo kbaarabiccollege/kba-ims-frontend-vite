@@ -1,3 +1,5 @@
+// src/utils/roleUtils.jsx
+
 // Maps each role string (from API) to its home dashboard route
 export const ROLE_HOME = {
     superadmin: "/superadmin/dashboard",
