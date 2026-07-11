@@ -31,10 +31,11 @@ import AdminStaff from "../pages/admin/staff/AdminStaff";
 import AdminClassrooms from "../pages/admin/academics/AdminClassrooms";
 import AdminSubjects from "../pages/admin/academics/AdminSubjects";
 
-import SettingsLayout from "../pages/settings/SettingsLayout";
-import SettingsHome from "../pages/settings/SettingsHome";
-import BatchesSettings from "../pages/settings/BatchesSettings";
-import TimetableFormatSettings from "../pages/settings/TimetableFormatSettings";
+import SettingsLayout from "../pages/admin/settings/SettingsLayout";
+import SettingsHome from "../pages/admin/settings/SettingsHome";
+// import BatchesSettings from "../pages/admin/settings/batches/BatchesSettings";
+import Batches from "../pages/admin/settings/batches/Batches";
+import TimetableFormatSettings from "../pages/admin/settings/TimetableFormatSettings";
 
 // Redirects logged-in user to their portal; otherwise to login
 const RootRedirect = () => {
@@ -51,7 +52,7 @@ const AppRouter = () => (
       <Route path="/"      element={<RootRedirect />} />
 
       {/* ── Admin Portal ── */}
-      {/* <Route element={<ProtectedRoute allowedRoles={["admin"]} />}> */}
+      <Route element={<ProtectedRoute allowedRoles={["admin", "superadmin"]} />}>
         <Route element={<Layout portal={adminPortal} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
@@ -62,14 +63,14 @@ const AppRouter = () => (
           <Route path="/admin/subjects" element={<AdminSubjects />} />
           {/* Add more admin pages here */}
         </Route>
-      {/* </Route> */}
+      </Route>
 
       {/* ── Admin Settings — deliberately OUTSIDE <Layout>, so it's a
           true full-page view without the sidebar/header ── */}
 
       <Route path="/admin/settings" element={<SettingsLayout />}>
         <Route index element={<SettingsHome />} />
-        <Route path="batches" element={<BatchesSettings />} />
+        <Route path="batches" element={<Batches />} />
         <Route path="timetable-format" element={<TimetableFormatSettings />} />
       </Route>
 

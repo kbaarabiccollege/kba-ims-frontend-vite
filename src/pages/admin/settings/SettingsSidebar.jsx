@@ -1,4 +1,4 @@
-// src/pages/settings/SettingsSidebar.jsx
+// src/pages/admin/settings/SettingsSidebar.jsx
 //
 // Left nav for the Settings area. Deliberately styled differently from
 // the dashboard's dark-navy Sidebar.jsx (light, tinted-blue panel with a
@@ -10,7 +10,7 @@
 // "All Settings" link at the top always takes you back to that grid.
 
 import { Link, NavLink } from "react-router-dom";
-import { AllSettingsIcon } from "../../components/common/Icons";
+import { AllSettingsIcon } from "../../../components/common/Icons";
 import { SETTINGS_SECTIONS } from "./settingsNav";
 
 

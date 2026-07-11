@@ -1,10 +1,10 @@
-// src/pages/settings/settingsNav.js
+// src/pages/admin/settings/settingsNav.js
 //
 // Single source of truth for what's in Settings. Both SettingsSidebar
 // (left-hand nav list) and SettingsHome (landing grid) read from this,
 // so adding a new setting later is a one-place change.
 
-import { BatchesIcon, TimetableIcon } from "../../components/common/Icons";
+import { BatchesIcon, TimetableIcon } from "../../../components/common/Icons";
 
 export const SETTINGS_SECTIONS = [
   {

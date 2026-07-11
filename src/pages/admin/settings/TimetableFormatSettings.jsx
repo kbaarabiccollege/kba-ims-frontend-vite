@@ -1,4 +1,4 @@
-// src/pages/settings/TimetableFormatSettings.jsx
+// src/pages/admin/settings/TimetableFormatSettings.jsx
 //
 // Placeholder — if a Timetable Format page/feature already exists
 // elsewhere in the app, point the /settings/timetable-format route at

@@ -1,4 +1,4 @@
-// src/pages/settings/SettingsLayout.jsx
+// src/pages/admin/settings/SettingsLayout.jsx
 //
 // Full-page shell for the whole Settings area — mirrors how Zoho Books'
 // settings takes over the entire viewport instead of living inside the
@@ -20,9 +20,9 @@
 // grid — matching the "All settings page should have no sidebar" ask.
 
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeftIcon, CloseIcon } from "../../components/common/Icons";
+import { ArrowLeftIcon, CloseIcon } from "../../../components/common/Icons";
 import SettingsSidebar from "./SettingsSidebar";
-import "../../styles/settings.css";
+import "../../../styles/settings.css";
 
 const SettingsLayout = () => {
   const navigate = useNavigate();

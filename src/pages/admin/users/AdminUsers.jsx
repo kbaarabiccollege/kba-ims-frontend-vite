@@ -174,7 +174,9 @@ const AdminUsers = () => {
           </p>
         </div>
         <button type="button" className="um-btn um-btn-primary um-btn-add" onClick={openCreateModal}>
-          <span aria-hidden="true">+</span> Add New User
+          <span aria-hidden="true">+</span>
+          <span className="um-btn-add-label-full">Add New User</span>
+          <span className="um-btn-add-label-short">Add</span>
         </button>
       </div>
 

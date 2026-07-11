@@ -1,4 +1,4 @@
-// src/pages/settings/SettingsHome.jsx
+// src/pages/admin/settings/SettingsHome.jsx
 //
 // The Settings landing screen (route: /settings, index route inside
 // SettingsLayout). Laid out as grouped tile-grids, the same pattern
@@ -11,7 +11,7 @@
 // SettingsLayout in AppRouter.
 
 import { useNavigate } from "react-router-dom";
-import { ChevronRightIcon } from "../../components/common/Icons";
+import { ChevronRightIcon } from "../../../components/common/Icons";
 import { SETTINGS_SECTIONS } from "./settingsNav";
 
 const SettingsHome = () => {

@@ -19,7 +19,6 @@
     --um-text-body: #3a4a63;
     --um-text-muted: #8592a8;
     --um-row-hover: #f8fafc;
-    --um-overlay: rgba(16, 28, 48, 0.55);
     --um-shadow-card: var(--shadow-card);
   
     --um-role-superadmin-bg: #1c2b45;
@@ -67,7 +66,6 @@
     --um-text-body: #aebed6;
     --um-text-muted: #6b82a0;
     --um-row-hover: rgba(79, 127, 232, 0.06);
-    --um-overlay: rgba(5, 10, 20, 0.72);
     --um-shadow-card:
       0 1px 0 rgba(79, 127, 232, 0.12) inset,
       0 25px 60px rgba(0, 0, 0, 0.55),
@@ -187,6 +185,10 @@
   
   .um-btn-add {
     align-self: flex-start;
+  }
+
+  .um-btn-add-label-short {
+    display: none;
   }
   
   /* ---------- card / toolbar ---------- */
@@ -532,55 +534,9 @@
   }
   
   /* ---------- modals ---------- */
-  
-  .um-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--um-overlay, rgba(16, 28, 48, 0.55));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-    z-index: 1000;
-  }
-  
-  .um-modal-panel {
-    background: var(--um-surface, #fff);
-    border-radius: var(--radius-lg, 16px);
-    box-shadow: var(--um-shadow-card, var(--shadow-card));
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  
-  .um-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--um-border);
-  }
-  
-  .um-modal-header h2 {
-    font-family: var(--font-heading, "Playfair Display", serif);
-    font-size: 1.3rem;
-    color: var(--um-text-heading);
-    margin: 0;
-  }
-  
-  .um-modal-close {
-    background: none;
-    border: none;
-    font-size: 1.4rem;
-    line-height: 1;
-    color: var(--um-text-muted);
-    cursor: pointer;
-  }
-  
-  .um-modal-body {
-    padding: 1.5rem;
-  }
-  
+  /* Overlay/panel/header/close/body shell moved to Modal.css —
+     it's rendered by the shared Modal.jsx component, not by this page. */
+
   .um-modal-subtext {
     font-size: 0.9rem;
     color: var(--um-text-body);
@@ -709,20 +665,103 @@
   }
   
   /* ---------- responsive ---------- */
-  
+
   @media (max-width: 640px) {
     .um-page {
-      padding: 1.25rem;
+      padding: 1rem;
     }
-    .um-field-row {
-      grid-template-columns: 1fr;
+
+    /* Header: keep title and button on the same row, button compact
+       and right-aligned — matches the reference mobile layout. */
+    .um-page-header {
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.75rem;
     }
+
+    .um-title-block {
+      min-width: 0;
+    }
+
+    .um-title-block h1 {
+      font-size: 1.3rem;
+    }
+
+    .um-title-meta {
+      font-size: 0.8rem;
+    }
+
+    .um-btn-add {
+      align-self: center;
+      flex-shrink: 0;
+      padding: 0.55rem 0.9rem;
+      white-space: nowrap;
+    }
+
+    .um-btn-add-label-full {
+      display: none;
+    }
+
+    .um-btn-add-label-short {
+      display: inline;
+    }
+
+    /* Toolbar: search + filters stack, each full width */
     .um-toolbar {
       flex-direction: column;
       align-items: stretch;
+      padding: 1rem;
     }
+
+    .um-search {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .um-filters {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .um-filters select {
+      width: 100%;
+    }
+
+    .um-result-count {
+      text-align: center;
+    }
+
+    /* Table: force a minimum width so columns don't collapse to nothing —
+       this is what was causing rows to look blank/crushed on narrow
+       screens. The wrapper scrolls horizontally instead. */
+    .um-table-wrap {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .um-table {
+      min-width: 640px;
+    }
+
+    /* Pagination: stack summary and controls, controls wrap and center */
     .um-pagination {
       flex-direction: column;
-      align-items: flex-start;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+
+    .um-pagination-summary {
+      text-align: center;
+    }
+
+    .um-pagination-controls {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Forms inside modals: single column on mobile */
+    .um-field-row {
+      grid-template-columns: 1fr;
     }
   }

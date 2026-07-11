@@ -1,0 +1,82 @@
+/* src/components/common/Modal.css
+   Self-contained styling for the shared Modal shell.
+   Does NOT depend on page-level tokens (--um-*, --bm-*) so it renders
+   correctly no matter which page mounts it. Dark mode is driven by the
+   same [data-theme="dark"] attribute the app already toggles higher up
+   the tree (see LoginPage.jsx) — this just doesn't require a specific
+   page class as an intermediary. */
+
+   .modal-overlay {
+    --modal-overlay-bg: rgba(16, 28, 48, 0.55);
+    --modal-surface: #ffffff;
+    --modal-border: #e2e7f0;
+    --modal-text-heading: #14213d;
+    --modal-text-muted: #8592a8;
+    --modal-shadow: var(--shadow-card, 0 25px 60px rgba(0, 0, 0, 0.15));
+  
+    position: fixed;
+    inset: 0;
+    background: var(--modal-overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 1000;
+  }
+  
+  [data-theme="dark"] .modal-overlay {
+    --modal-overlay-bg: rgba(5, 10, 20, 0.72);
+    --modal-surface: #131f33;
+    --modal-border: #26344a;
+    --modal-text-heading: #dbe6f5;
+    --modal-text-muted: #6b82a0;
+    --modal-shadow:
+      0 1px 0 rgba(79, 127, 232, 0.12) inset,
+      0 25px 60px rgba(0, 0, 0, 0.55),
+      0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+  
+  .modal-panel {
+    background: var(--modal-surface);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: var(--modal-shadow);
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+  }
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--modal-border);
+    transition: border-color 0.25s ease;
+  }
+  
+  .modal-header h2 {
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 1.3rem;
+    color: var(--modal-text-heading);
+    margin: 0;
+    transition: color 0.25s ease;
+  }
+  
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--modal-text-muted);
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .modal-close:hover {
+    color: var(--modal-text-heading);
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
