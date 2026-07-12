@@ -1,0 +1,199 @@
+/* src/styles/SearchableDropdown.css
+   Styling for the reusable SearchableDropdown component
+   (src/components/common/SearchableDropdown.jsx).
+
+   Self-contained: defines its own small set of tokens (falling back to
+   the global --color-primary / --radius-* / --shadow-* / --color-input-*
+   tokens from index.css) so it can be dropped into any page — filters,
+   forms, wherever — without extra setup. */
+
+   .sd-dropdown {
+    --sd-surface: #ffffff;
+    --sd-border: #e2e7f0;
+    --sd-text: #3a4a63;
+    --sd-text-muted: #8592a8;
+    --sd-shadow-popover: 0 12px 32px rgba(20, 33, 61, 0.16), 0 2px 8px rgba(20, 33, 61, 0.08);
+  
+    position: relative;
+    font-family: var(--font-body, "Inter", sans-serif);
+    width: 100%;
+  }
+  
+  [data-theme="dark"] .sd-dropdown {
+    --sd-surface: #131f33;
+    --sd-border: #26344a;
+    --sd-text: #aebed6;
+    --sd-text-muted: #6b82a0;
+    --sd-shadow-popover: 0 16px 40px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+  
+  .sd-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 150px;
+    box-sizing: border-box;
+  }
+  
+  .sd-trigger-open,
+  .sd-trigger:focus-visible {
+    outline: none;
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .sd-trigger-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .sd-caret {
+    opacity: 0.6;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+  
+  .sd-panel {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 0.5rem);
+    width: 240px;
+    max-width: 90vw;
+    background: var(--sd-surface);
+    border: 1px solid var(--sd-border);
+    border-radius: var(--radius-md, 10px);
+    box-shadow: var(--sd-shadow-popover);
+    z-index: 30;
+    overflow: hidden;
+  }
+  
+  .sd-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--sd-border);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--sd-text-muted);
+  }
+  
+  .sd-fetch-btn {
+    border: none;
+    background: none;
+    color: var(--color-primary, #214b86);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: normal;
+    cursor: pointer;
+    padding: 0.15rem 0.4rem;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  
+  .sd-fetch-btn:hover:not(:disabled) {
+    background: rgba(33, 75, 134, 0.1);
+  }
+  
+  [data-theme="dark"] .sd-fetch-btn:hover:not(:disabled) {
+    background: rgba(79, 127, 232, 0.15);
+  }
+  
+  .sd-fetch-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .sd-search {
+    position: relative;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--sd-border);
+  }
+  
+  .sd-search-icon {
+    position: absolute;
+    left: 1.05rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    font-size: 0.8rem;
+    pointer-events: none;
+  }
+  
+  .sd-search input {
+    width: 100%;
+    padding: 0.5rem 0.7rem 0.5rem 2rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.83rem;
+    box-sizing: border-box;
+  }
+  
+  .sd-search input::placeholder {
+    color: var(--color-input-placeholder, #a8b5c8);
+  }
+  
+  .sd-search input:focus {
+    outline: none;
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 3px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .sd-options {
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 0.35rem;
+  }
+  
+  .sd-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.55rem 0.7rem;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    font-size: 0.85rem;
+    color: var(--sd-text);
+    cursor: pointer;
+  }
+  
+  .sd-option:hover,
+  .sd-option:focus-visible {
+    background: var(--color-primary, #214b86);
+    color: #fff;
+    outline: none;
+  }
+  
+  .sd-option-active {
+    font-weight: 700;
+    color: var(--color-primary, #214b86);
+  }
+  
+  .sd-option-active:hover {
+    color: #fff;
+  }
+  
+  .sd-empty {
+    padding: 0.75rem 0.7rem;
+    font-size: 0.8rem;
+    color: var(--sd-text-muted);
+    text-align: center;
+  }

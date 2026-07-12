@@ -1,0 +1,973 @@
+/* src/styles/AdminStudents.css
+   Built on top of the global tokens defined in index.css
+   (--color-primary, --font-heading, --font-body, --radius-*, --shadow-*).
+   Mirrors the token / dark-mode structure of AdminUsers.css so the two
+   pages stay visually consistent, but keeps its own "st-" prefixed
+   classes so neither page's styles leak into the other.
+
+   NOTE: the custom Classroom/Batch/Status dropdown markup now lives in
+   the shared <SearchableDropdown> component — its styling moved out of
+   this file into src/styles/SearchableDropdown.css so it can be reused
+   on other pages too. Import both stylesheets on this page. */
+
+   .st-page {
+    --st-header-blue: #16345f;
+    --st-surface: #ffffff;
+    --st-surface-raised: #ffffff;
+    --st-border: #e2e7f0;
+    --st-text-heading: #14213d;
+    --st-text-body: #3a4a63;
+    --st-text-muted: #8592a8;
+    --st-row-hover: #f8fafc;
+    --st-row-inactive-bg: #f3f4f7;
+    --st-shadow-card: var(--shadow-card);
+    --st-shadow-popover: 0 12px 32px rgba(20, 33, 61, 0.16), 0 2px 8px rgba(20, 33, 61, 0.08);
+    --st-row-shadow: 0 1px 2px rgba(20, 33, 61, 0.09);
+  
+    --st-status-inactive-fg: #94a1b5;
+    --st-status-inactive-bg: #eef1f6;
+  
+    --st-icon-btn-bg: #ffffff;
+    --st-icon-btn-fg: #4a5a75;
+    --st-icon-btn-border: var(--st-border);
+    --st-icon-edit-hover-bg: #eef3fa;
+    --st-icon-edit-hover-fg: var(--color-primary, #214b86);
+    --st-icon-danger-hover-bg: #fdecec;
+    --st-icon-danger-hover-fg: #d64545;
+  
+    --st-avatar-bg: #dbe7fb;
+    --st-avatar-fg: var(--color-primary, #214b86);
+  
+    --st-bulk-bar-bg: #eef3fc;
+    --st-bulk-bar-border: #cfe0f7;
+  
+    --st-overlay-bg: rgba(15, 23, 42, 0.45);
+  
+    --st-menu-hover-bg: var(--color-primary, #214b86);
+    --st-menu-hover-fg: #ffffff;
+
+    /* Adjust this to match your actual top bar height so the page fills
+       exactly to the bottom of the viewport. */
+    --st-topbar-height: 72px;
+  
+    font-family: var(--font-body, "Inter", sans-serif);
+    color: var(--st-text-body);
+    padding: 1.5rem 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - var(--st-topbar-height));
+    overflow-x: hidden;
+    transition: color 0.25s ease;
+  }
+  
+  /* ── Dark mode tokens ── */
+  [data-theme="dark"] .st-page {
+    --st-header-blue: #0d1f38;
+    --st-surface: #0f1928;
+    --st-surface-raised: #131f33;
+    --st-border: #26344a;
+    --st-text-heading: #dbe6f5;
+    --st-text-body: #aebed6;
+    --st-text-muted: #6b82a0;
+    --st-row-hover: rgba(79, 127, 232, 0.06);
+    --st-row-inactive-bg: rgba(107, 130, 160, 0.08);
+    --st-shadow-card:
+      0 1px 0 rgba(79, 127, 232, 0.12) inset,
+      0 25px 60px rgba(0, 0, 0, 0.55),
+      0 10px 30px rgba(0, 0, 0, 0.4);
+    --st-shadow-popover: 0 16px 40px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
+    --st-row-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  
+    --st-status-inactive-fg: #8a9bb5;
+    --st-status-inactive-bg: rgba(107, 130, 160, 0.15);
+  
+    --st-icon-btn-bg: #131f33;
+    --st-icon-btn-fg: #9db3d6;
+    --st-icon-btn-border: var(--st-border);
+    --st-icon-edit-hover-bg: rgba(79, 127, 232, 0.15);
+    --st-icon-edit-hover-fg: #7ba3f5;
+    --st-icon-danger-hover-bg: rgba(214, 69, 69, 0.16);
+    --st-icon-danger-hover-fg: #ff8a8a;
+  
+    --st-avatar-bg: rgba(79, 127, 232, 0.18);
+    --st-avatar-fg: #7ba3f5;
+  
+    --st-bulk-bar-bg: rgba(79, 127, 232, 0.1);
+    --st-bulk-bar-border: rgba(79, 127, 232, 0.25);
+  
+    --st-overlay-bg: rgba(0, 0, 0, 0.6);
+  
+    --st-menu-hover-bg: #2f5aa8;
+    --st-menu-hover-fg: #ffffff;
+  }
+  
+  /* ---------- header ---------- */
+  
+  .st-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    padding: 0 1.5rem;
+  }
+  
+  .st-title-block h1 {
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--st-text-heading);
+    margin: 0 0 0.25rem 0;
+    transition: color 0.25s ease;
+  }
+  
+  .st-title-meta {
+    margin: 0;
+    color: var(--st-text-muted);
+    font-size: 0.9rem;
+    transition: color 0.25s ease;
+  }
+  
+  .st-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  
+  /* ---------- buttons ---------- */
+  
+  .st-btn {
+    font-family: var(--font-body, "Inter", sans-serif);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm, 8px);
+    padding: 0.65rem 1.15rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: var(--transition-fast, 0.2s ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  
+  .st-btn-primary {
+    background: var(--color-primary, #214b86);
+    color: #fff;
+    box-shadow: var(--shadow-button);
+  }
+  
+  .st-btn-primary:hover:not(:disabled) {
+    background: var(--color-primary-hover, #183a6d);
+    box-shadow: var(--shadow-button-hover);
+  }
+  
+  .st-btn-primary:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  
+  .st-btn-ghost {
+    background: var(--st-surface-raised, #fff);
+    color: var(--st-text-body);
+    border-color: var(--st-border);
+  }
+  
+  .st-btn-ghost:hover:not(:disabled) {
+    background: var(--st-row-hover, #f5f7fb);
+  }
+  
+  .st-btn-success {
+    color: #1c8a54;
+    border-color: #1c8a54;
+  }
+  [data-theme="dark"] .st-btn-success {
+    color: #5fd399;
+    border-color: #5fd399;
+  }
+  
+  .st-btn-success:hover:not(:disabled) {
+    background: #e6f7ee;
+  }
+  [data-theme="dark"] .st-btn-success:hover:not(:disabled) {
+    background: rgba(28, 138, 84, 0.18);
+  }
+  
+  .st-btn-danger {
+    color: #d64545;
+    border-color: #d64545;
+  }
+  
+  .st-btn-danger:hover:not(:disabled) {
+    background: #fdecec;
+  }
+  
+  [data-theme="dark"] .st-btn-danger:hover:not(:disabled) {
+    background: rgba(214, 69, 69, 0.16);
+  }
+  
+  .st-btn-danger-solid {
+    background: #d64545;
+    color: #fff;
+  }
+  
+  .st-btn-danger-solid:hover:not(:disabled) {
+    background: #b93636;
+  }
+  
+  .st-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* ---------- refresh icon ---------- */
+  
+  .st-refresh-btn {
+    font-size: 1.05rem;
+  }
+  
+  .st-refresh-spinning {
+    animation: st-spin 0.8s linear infinite;
+  }
+  
+  @keyframes st-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* ---------- "..." page menu ---------- */
+  
+  .st-menu-wrap {
+    position: relative;
+  }
+  
+  .st-more-btn {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  
+  .st-more-btn-active {
+    background: var(--st-icon-edit-hover-bg);
+    border-color: var(--color-primary, #214b86);
+    color: var(--st-icon-edit-hover-fg);
+  }
+  
+  .st-dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    min-width: 190px;
+    background: var(--st-surface-raised, #fff);
+    border: 1px solid var(--st-border);
+    border-radius: var(--radius-md, 10px);
+    box-shadow: var(--st-shadow-popover);
+    overflow: hidden;
+    padding: 0.35rem;
+    z-index: 20;
+  }
+  
+  .st-dropdown-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--st-text-body);
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  
+  .st-dropdown-menu button:hover,
+  .st-dropdown-menu button:focus-visible {
+    background: var(--st-menu-hover-bg);
+    color: var(--st-menu-hover-fg);
+    outline: none;
+  }
+  
+  /* ---------- card / toolbar ---------- */
+  
+  .st-card {
+    background: var(--st-surface, #fff);
+    box-shadow: var(--st-shadow-card, var(--shadow-card));
+    overflow: hidden;
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  
+  .st-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--st-border);
+    transition: border-color 0.25s ease;
+    position: relative;
+    z-index: 5;
+  }
+
+  .st-search-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 320px;
+    min-width: 240px;
+  }
+  
+  .st-search {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  
+  .st-search-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    font-size: 0.85rem;
+  }
+  
+  .st-search input {
+    width: 100%;
+    padding: 0.65rem 0.9rem 0.65rem 2.3rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .st-search input::placeholder {
+    color: var(--color-input-placeholder, #a8b5c8);
+  }
+  
+  .st-search input:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+
+  /* Filter funnel icon — mobile only (see media query below) */
+  .st-filter-toggle-btn {
+    display: none;
+    flex-shrink: 0;
+  }
+
+  .st-filter-toggle-btn-active {
+    background: var(--st-icon-edit-hover-bg);
+    border-color: var(--color-primary, #214b86);
+    color: var(--st-icon-edit-hover-fg);
+  }
+  
+  .st-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Desktop is unaffected by the mobile filter toggle: the funnel icon
+     never shows and filters are always visible, regardless of state.
+     Toolbar is forced to a single row here so search + all filters
+     line up together instead of wrapping onto their own line. */
+  @media (min-width: 641px) {
+    .st-filter-toggle-btn {
+      display: none !important;
+    }
+
+    .st-toolbar {
+      flex-wrap: nowrap;
+    }
+
+    .st-search-row {
+      flex: 1 1 auto;
+      min-width: 140px;
+    }
+
+    .st-filters {
+      display: flex !important;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+
+    .st-filters-row {
+      flex-shrink: 0;
+    }
+
+    .st-result-count {
+      flex-shrink: 0;
+    }
+  }
+
+  .st-filters-row {
+    display: contents;
+  }
+
+  .st-filters-row .sd-dropdown {
+    width: auto;
+  }
+  
+  .st-filters select {
+    padding: 0.6rem 2rem 0.6rem 0.9rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  
+  .st-result-count {
+    font-size: 0.85rem;
+    color: var(--st-text-muted);
+    white-space: nowrap;
+  }
+  
+  .st-error-banner {
+    margin: 1rem 1.5rem 0;
+    padding: 0.75rem 1rem;
+    background: var(--color-error-bg, rgba(254, 242, 242, 0.85));
+    border: 1px solid var(--color-error-border, rgba(254, 202, 202, 0.8));
+    color: var(--color-error, #b91c1c);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 0.85rem;
+  }
+  
+  /* ---------- bulk action bar ---------- */
+  
+  .st-bulk-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.9rem 1.5rem;
+    background: var(--st-bulk-bar-bg);
+    border-bottom: 1px solid var(--st-bulk-bar-border);
+  }
+  
+  .st-bulk-count {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--st-text-heading);
+  }
+  
+  .st-bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  
+  /* ---------- table ---------- */
+  
+  .st-table-wrap {
+    overflow-x: auto;
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  .st-table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  
+  .st-table thead th {
+    background: var(--st-header-blue);
+    color: #eaf0fb;
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.9rem 1.25rem;
+    white-space: nowrap;
+    transition: background 0.25s ease;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  .st-table tbody td {
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--st-border);
+    box-shadow: var(--st-row-shadow);
+    vertical-align: middle;
+    text-align: center;
+    transition: border-color 0.25s ease, background 0.15s ease;
+  }
+  
+  .st-table tbody tr:last-child td {
+    border-bottom: none;
+    box-shadow: none;
+  }
+  
+  .st-table tbody tr:hover td {
+    background: var(--st-row-hover);
+  }
+  
+  .st-table tbody tr.st-row-inactive td {
+    background: var(--st-row-inactive-bg);
+    color: var(--st-text-muted);
+    opacity: 0.75;
+  }
+  
+  .st-table tbody tr.st-row-inactive:hover td {
+    background: var(--st-row-inactive-bg);
+  }
+  
+  .st-col-left {
+    text-align: left;
+  }
+  
+  .st-col-checkbox {
+    width: 44px;
+  }
+  
+  .st-col-num {
+    width: 48px;
+    color: var(--st-text-muted);
+  }
+  
+  .st-col-actions {
+    width: 160px;
+  }
+  
+  .st-state-cell {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--st-text-muted);
+  }
+  
+  /* ---------- student cell (photo + name + roll number) ---------- */
+  
+  .st-student-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .st-student-photo,
+  .st-student-photo-fallback {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+  
+  .st-student-photo-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--st-avatar-bg);
+    color: var(--st-avatar-fg);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  
+  .st-student-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  
+  .st-student-name {
+    font-weight: 600;
+    color: var(--st-text-heading);
+    font-size: 0.95rem;
+  }
+  
+  .st-student-roll {
+    font-size: 0.78rem;
+    color: var(--st-text-muted);
+  }
+  
+  /* ---------- inline "Inactive" tag (Actions cell) ---------- */
+  
+  .st-inactive-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--st-status-inactive-fg);
+    background: var(--st-status-inactive-bg);
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    margin-left: 0.35rem;
+    white-space: nowrap;
+  }
+  
+  /* ---------- actions ---------- */
+  
+  .st-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
+  }
+  
+  .st-icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--st-icon-btn-border);
+    background: var(--st-icon-btn-bg);
+    color: var(--st-icon-btn-fg);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast, 0.2s ease);
+    flex-shrink: 0;
+  }
+  
+  .st-icon-btn:hover:not(:disabled) {
+    background: var(--st-icon-edit-hover-bg);
+    border-color: var(--color-primary, #214b86);
+    color: var(--st-icon-edit-hover-fg);
+  }
+  
+  .st-icon-btn-danger:hover:not(:disabled) {
+    background: var(--st-icon-danger-hover-bg);
+    border-color: #d64545;
+    color: var(--st-icon-danger-hover-fg);
+  }
+  
+  /* ---------- pagination ---------- */
+  
+  .st-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--st-border);
+    transition: border-color 0.25s ease;
+  }
+  
+  .st-pagination-summary {
+    font-size: 0.85rem;
+    color: var(--st-text-muted);
+  }
+  
+  .st-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .st-per-page {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--st-text-muted);
+  }
+  
+  .st-per-page select {
+    padding: 0.35rem 1.5rem 0.35rem 0.6rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--st-border);
+    background: var(--st-surface-raised, #fff);
+    color: var(--st-text-body);
+  }
+  
+  .st-page-nav {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--st-border);
+    background: var(--st-surface-raised, #fff);
+    color: var(--st-text-body);
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .st-page-nav:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  
+  .st-page-current {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: var(--color-primary, #214b86);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  
+  /* ---------- bulk actions / delete modal (self-contained) ---------- */
+  
+  .st-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--st-overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 100;
+  }
+  
+  .st-modal-panel {
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--st-surface-raised, #fff);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: var(--st-shadow-card, var(--shadow-card));
+  }
+  
+  .st-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--st-border);
+  }
+  
+  .st-modal-header h2 {
+    margin: 0;
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 1.2rem;
+    color: var(--st-text-heading);
+  }
+  
+  .st-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--st-text-muted);
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .st-modal-close:hover {
+    color: var(--st-text-heading);
+  }
+  
+  .st-modal-body {
+    padding: 1.5rem;
+  }
+  
+  .st-modal-subtext {
+    font-size: 0.9rem;
+    color: var(--st-text-body);
+    margin: 0 0 1rem 0;
+  }
+  
+  .st-modal-confirm-text {
+    font-size: 0.95rem;
+    color: var(--st-text-body);
+    margin: 0 0 1.25rem 0;
+  }
+  
+  .st-bulk-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .st-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  
+  .st-field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--st-text-heading);
+  }
+  
+  .st-field select {
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.9rem;
+  }
+  
+  .st-field select:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .st-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+  
+  /* ---------- create/edit placeholder page ---------- */
+  
+  .st-form-placeholder {
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: var(--st-text-muted);
+  }
+  
+  /* ---------- responsive ---------- */
+  
+  @media (max-width: 640px) {
+    .st-page {
+      padding: 1rem 0;
+    }
+
+    .st-page-header {
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0 1rem;
+    }
+  
+    .st-title-block {
+      min-width: 0;
+    }
+  
+    .st-title-block h1 {
+      font-size: 1.3rem;
+    }
+  
+    .st-title-meta {
+      font-size: 0.8rem;
+    }
+  
+    .st-header-actions {
+      flex-shrink: 0;
+      gap: 0.4rem;
+    }
+  
+    .st-btn-add {
+      padding: 0.55rem 0.8rem;
+      white-space: nowrap;
+    }
+  
+    .st-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 1rem;
+    }
+  
+    .st-search-row {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: 100%;
+    }
+
+    /* Show the funnel icon only on mobile */
+    .st-filter-toggle-btn {
+      display: inline-flex;
+    }
+
+    /* Filters are hidden by default on mobile, shown only once the
+       funnel icon has been tapped (st-filters-open, set via JS state) */
+    .st-filters {
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      margin-top: 0.75rem;
+      gap: 0.6rem;
+    }
+
+    .st-filters.st-filters-open {
+      display: flex;
+    }
+
+    /* Classroom + Batch share one row at reduced width on mobile */
+    .st-filters-row {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .st-filters-row .sd-dropdown {
+      flex: 1 1 0;
+      min-width: 0;
+      width: auto;
+    }
+  
+    .st-result-count {
+      text-align: center;
+    }
+  
+    .st-bulk-bar {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0.9rem 1rem;
+    }
+  
+    .st-bulk-actions {
+      flex-direction: column;
+    }
+  
+    .st-bulk-actions .st-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  
+    .st-table-wrap {
+      -webkit-overflow-scrolling: touch;
+    }
+  
+    .st-table {
+      min-width: 680px;
+    }
+  
+    .st-pagination {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+  
+    .st-pagination-summary {
+      text-align: center;
+    }
+  
+    .st-pagination-controls {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  
+    .st-modal-panel {
+      max-width: 100%;
+    }
+  }

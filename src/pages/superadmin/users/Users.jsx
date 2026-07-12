@@ -32,7 +32,7 @@ import DeleteConfirmModal from "../../../components/common/DeleteConfirmModal";
 import { EditIcon, KeyIcon, TrashIcon } from "../../../components/common/Icons";
 import "../../../styles/AdminUsers.css";
 
-const AdminUsers = () => {
+const Users = () => {
   const { role: authRole } = useAuth();
   const isDev = authRole === "dev";
 
@@ -401,4 +401,4 @@ const AdminUsers = () => {
   );
 };
 
-export default AdminUsers;
+export default Users;

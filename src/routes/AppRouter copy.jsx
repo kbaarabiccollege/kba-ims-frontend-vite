@@ -58,8 +58,6 @@ const AppRouter = () => (
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/students" element={<Students />} />
           <Route path="/admin/students/new" element={<StudentForm />} />
-          <Route path="/admin/students/:id" element={<StudentForm />} />
-          <Route path="/admin/students/:id/edit" element={<StudentForm />} />
           <Route path="/admin/staff" element={<Staff />} />
 
           <Route path="/admin/classrooms" element={<AdminClassrooms />} />
@@ -83,9 +81,6 @@ const AppRouter = () => (
           <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
           <Route path="/superadmin/users" element={<Users />} />
           <Route path="/superadmin/students" element={<Students />} />
-          <Route path="/superadmin/students/new" element={<StudentForm />} />
-          <Route path="/superadmin/students/:id" element={<StudentForm />} />
-          <Route path="/superadmin/students/:id/edit" element={<StudentForm />} />
           <Route path="/superadmin/staff" element={<Staff />} />
           {/* superadmin/admins, etc. */}
         </Route>

@@ -121,3 +121,15 @@ export const AllSettingsIcon = (props) => (
     <rect x="14" y="14" width="7" height="7" rx="1.5" />
   </svg>
 );
+
+export const FilterFunnelIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M4 5h16l-6.2 7.2v5.3l-3.6 2V12.2L4 5z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+      strokeLinecap="round"
+    />
+  </svg>
+);
