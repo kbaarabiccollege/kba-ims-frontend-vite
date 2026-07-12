@@ -1,6 +1,6 @@
 // src/components/common/Badges.jsx
 
-import { roleLabel, statusLabel } from "../../pages/admin/users/constants";
+import { roleLabel, statusLabel } from "../../pages/superadmin/users/constants";
 
 export const RoleBadge = ({ role }) => (
   <span className={`um-badge um-role-${role}`}>{roleLabel(role)}</span>

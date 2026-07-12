@@ -25,7 +25,7 @@ import staffPortal      from "../portals/staffPortal";
 
 import NotFound from "../components/common/NotFound";
 import AdminStudents from "../pages/admin/students/AdminStudents";
-import AdminUsers from "../pages/admin/users/AdminUsers";
+import AdminUsers from "../pages/superadmin/users/AdminUsers";
 import AdminStaff from "../pages/admin/staff/AdminStaff";
 
 import AdminClassrooms from "../pages/admin/academics/AdminClassrooms";
@@ -33,7 +33,6 @@ import AdminSubjects from "../pages/admin/academics/AdminSubjects";
 
 import SettingsLayout from "../pages/admin/settings/SettingsLayout";
 import SettingsHome from "../pages/admin/settings/SettingsHome";
-// import BatchesSettings from "../pages/admin/settings/batches/BatchesSettings";
 import Batches from "../pages/admin/settings/batches/Batches";
 import TimetableFormatSettings from "../pages/admin/settings/TimetableFormatSettings";
 
@@ -75,9 +74,12 @@ const AppRouter = () => (
       </Route>
 
       {/* ── Super Admin Portal ── */}
-      <Route element={<ProtectedRoute allowedRoles={["superadmin"]} />}>
+      <Route element={<ProtectedRoute allowedRoles={["superadmin", "dev"]} />}>
         <Route element={<Layout portal={superAdminPortal} />}>
           <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
+          <Route path="/superadmin/users" element={<AdminUsers />} />
+          <Route path="/superadmin/students" element={<AdminStudents />} />
+          <Route path="/superadmin/staff" element={<AdminStaff />} />
           {/* superadmin/admins, etc. */}
         </Route>
       </Route>

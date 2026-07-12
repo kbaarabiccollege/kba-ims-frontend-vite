@@ -7,6 +7,8 @@ export const ROLE_OPTIONS = [
     { value: "staff", label: "Staff" },
     { value: "student", label: "Student" },
     { value: "parent", label: "Parent" },
+    { value: "dev", label: "Dev" },
+    { value: "accountant", label: "Accountant" },
   ];
   
   // Mirrors the `status` ENUM on the users table.

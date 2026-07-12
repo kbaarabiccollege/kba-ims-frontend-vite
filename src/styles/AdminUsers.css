@@ -31,6 +31,10 @@
     --um-role-student-fg: #1c8a54;
     --um-role-parent-bg: #fde9d7;
     --um-role-parent-fg: #b5620f;
+    --um-role-dev-bg: #e2e8f0;
+    --um-role-dev-fg: #334155;
+    --um-role-accountant-bg: #ffe4e6;
+    --um-role-accountant-fg: #be123c;
   
     --um-status-active-fg: #1c8a54;
     --um-status-active-bg: #e6f7ee;
@@ -394,6 +398,16 @@
   .um-role-parent {
     background: var(--um-role-parent-bg);
     color: var(--um-role-parent-fg);
+  }
+
+  .um-role-dev {
+    background: var(--um-role-dev-bg);
+    color: var(--um-role-dev-fg);
+  }
+
+  .um-role-accountant {
+    background: var(--um-role-accountant-bg);
+    color: var(--um-role-accountant-fg);
   }
   
   .um-status-pill {

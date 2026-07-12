@@ -42,7 +42,12 @@ const Batches = () => {
     try {
       const res = await getBatches({ q: debouncedSearch, page, limit, course });
       setBatches(res?.data ?? res?.batches ?? []);
-      setTotal(res?.total ?? res?.count ?? (res?.data ?? res?.batches ?? []).length);
+      setTotal(
+        res?.pagination?.total ??
+          res?.total ??
+          res?.count ??
+          (res?.data ?? res?.batches ?? []).length
+      );
     } catch (err) {
       setError(
         err?.response?.data?.message || "Couldn't load batches. Please try again in a moment."

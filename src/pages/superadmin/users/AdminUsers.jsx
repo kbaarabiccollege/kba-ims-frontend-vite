@@ -1,5 +1,5 @@
 // src/pages/admin/users/AdminUsers.jsx
-//
+
 // Users list page (User Management > Users).
 // Talks to GET/POST/PUT /api/users via src/api/usersApi.js.
 //
@@ -14,10 +14,16 @@
 // `message` (e.g. "Validation failed.") is shown as the banner headline
 // inside the modal; `errors` is passed down so each field can show its
 // own message.
+//
+// NOTE on role scoping: dev users see the full Users list and can
+// filter by any role. Superadmins land on the same page (labelled
+// "Employees") but are scoped to role=admin,accountant by default,
+// and don't get a role filter to override that.
 
 import { useCallback, useEffect, useState } from "react";
 import { getUsers, createUser, updateUser, updateUserPassword } from "../../../api/usersApi";
 import useDebouncedValue from "../../../hooks/useDebouncedValue";
+import { useAuth } from "../../../context/AuthContext";
 import { ROLE_FILTER_OPTIONS, STATUS_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
 import { RoleBadge, StatusPill } from "../../../components/common/Badges";
 import UserFormModal from "./components/UserFormModal";
@@ -27,6 +33,13 @@ import { EditIcon, KeyIcon, TrashIcon } from "../../../components/common/Icons";
 import "../../../styles/AdminUsers.css";
 
 const AdminUsers = () => {
+  const { role: authRole } = useAuth();
+  const isDev = authRole === "dev";
+
+  // Dev sees everyone by default and can filter by role.
+  // Superadmin is scoped to admin+accountant only, with no override in the UI.
+  const DEFAULT_ROLE_FILTER = isDev ? "all" : "admin,accountant";
+
   // ---- list state ----
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
@@ -37,7 +50,7 @@ const AdminUsers = () => {
 
   // ---- filters ----
   const [search, setSearch] = useState("");
-  const [role, setRole] = useState("all");
+  const [role, setRole] = useState(DEFAULT_ROLE_FILTER);
   const [status, setStatus] = useState("active"); // active by default, per spec
   const debouncedSearch = useDebouncedValue(search, 400);
 
@@ -56,7 +69,12 @@ const AdminUsers = () => {
       const res = await getUsers({ q: debouncedSearch, page, limit, role, status });
       // Adjust here if your API's response shape differs.
       setUsers(res?.data ?? res?.users ?? []);
-      setTotal(res?.total ?? res?.count ?? (res?.data ?? res?.users ?? []).length);
+      setTotal(
+        res?.pagination?.total ??
+          res?.total ??
+          res?.count ??
+          (res?.data ?? res?.users ?? []).length
+      );
     } catch (err) {
       setError(
         err?.response?.data?.message || "Couldn't load users. Please try again in a moment."
@@ -191,18 +209,20 @@ const AdminUsers = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, ID or email…"
-              aria-label="Search users"
+              aria-label={`Search users`}
             />
           </div>
 
           <div className="um-filters">
-            <select value={role} onChange={(e) => setRole(e.target.value)} aria-label="Filter by role">
-              {ROLE_FILTER_OPTIONS.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
+            {isDev && (
+              <select value={role} onChange={(e) => setRole(e.target.value)} aria-label="Filter by role">
+                {ROLE_FILTER_OPTIONS.map((r) => (
+                  <option key={r.value} value={r.value}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
+            )}
 
             <select
               value={status}

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, GraduationCap, UserCog, CalendarCheck, Clock, School, BookOpen, 
+import { LayoutDashboard, Users, GraduationCap, IdCard, CalendarCheck, Clock, School, BookOpen, 
   FileText, CalendarDays, ClipboardList, BarChart2, Bell, } from "lucide-react";
 
 const adminPortal = {
@@ -21,7 +21,7 @@ const adminPortal = {
       items: [
         { label: "Users",    path: "/admin/users",    icon: Users },
         { label: "Students", path: "/admin/students", icon: GraduationCap },
-        { label: "Staff",    path: "/admin/staff",    icon: UserCog },
+        { label: "Staff",    path: "/admin/staff",    icon: IdCard },
       ],
     },
     {

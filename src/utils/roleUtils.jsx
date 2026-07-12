@@ -8,6 +8,7 @@ export const ROLE_HOME = {
     student:    "/student/dashboard",
     parent:     "/parent/dashboard",
     accountant: "/accountant/dashboard",
+    dev: "/superadmin/dashboard",
   };
   
   // All valid roles

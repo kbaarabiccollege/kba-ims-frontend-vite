@@ -4,6 +4,9 @@ import {
   School,
   BarChart2,
   Bell,
+  GraduationCap,
+  IdCard,
+  ShieldCheck
 } from "lucide-react";
 
 const superAdminPortal = {
@@ -18,9 +21,16 @@ const superAdminPortal = {
       ],
     },
     {
+      title: "User Management",
+      items: [
+        { label: "Users",    path: "/superadmin/users",    icon: Users },
+        { label: "Students", path: "/superadmin/students", icon: GraduationCap },
+        { label: "Staff",    path: "/superadmin/staff",    icon: IdCard },
+      ],
+    },
+    {
       title: "Management",
       items: [
-        { label: "Admins",      path: "/superadmin/admins",      icon: Users  },
         { label: "Institutions",path: "/superadmin/institutions", icon: School },
       ],
     },
