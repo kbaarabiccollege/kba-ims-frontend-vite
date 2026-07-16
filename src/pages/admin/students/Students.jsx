@@ -13,12 +13,12 @@
 // NOTE on search: a single search box covers name / roll_number / rrn,
 // sent as one `q` param (same convention as the Users page).
 //
-// NOTE on classroom/batch filters: these still do NOT auto-load their full
-// list on page mount. Each now uses the shared <SearchableDropdown>, which
-// keeps the original "Fetch"/"↻ Refresh" button (nothing loads until it's
-// clicked) and adds a search box next to it. The button always fetches
-// using whatever's typed; once a list has been fetched at least once,
-// further typing auto-refreshes it (debounced) via `?q=` (e.g.
+// NOTE on classroom/batch filters: these now auto-load their full list on
+// page mount (a single `searchClassrooms("")` / `searchBatches("")` call
+// each — see the mount effect below). Each uses the shared
+// <SearchableDropdown> with `hideFetchButton`, so no manual Fetch/Refresh
+// button is shown; once the initial load resolves, further typing in the
+// dropdown auto-refreshes it (debounced) via `?q=` (e.g.
 // /api/batches?q=2026, /api/classrooms?q=2026).
 // Because the visible option list changes as you search, we keep a
 // separate id->label index (classroomsIndex / batchesIndex) that only
@@ -66,6 +66,7 @@ import useDebouncedValue from "../../../hooks/useDebouncedValue";
 import { STATUS_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
 import BulkActionsModal from "./components/BulkActionsModal";
 import SearchableDropdown from "../../../components/common/SearchableDropdown";
+import { getCourseLabel } from "../../../components/common/courses";
 import { EditIcon, EyeIcon, TrashIcon } from "../../../components/common/Icons";
 import "../../../styles/AdminStudents.css";
 
@@ -147,6 +148,9 @@ const Students = () => {
   const [deleteSubmitting, setDeleteSubmitting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
+  // ---- profile picture preview ----
+  const [previewStudent, setPreviewStudent] = useState(null);
+
   // ---- "..." page menu (next to + New) ----
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -166,7 +170,9 @@ const Students = () => {
     try {
       const res = await getClassrooms({ isActive: 1, q });
       const list = res?.data ?? [];
-      setClassroomOptions(list.map((c) => ({ id: c.id, label: c.name })));
+      setClassroomOptions(
+        list.map((c) => ({ id: c.id, label: c.name, meta: getCourseLabel(c.course) }))
+      );
       setClassroomsIndex((prev) => {
         const next = { ...prev };
         list.forEach((c) => {
@@ -202,6 +208,14 @@ const Students = () => {
     } finally {
       setBatchesLoading(false);
     }
+  }, []);
+
+  // ---- auto-load classroom + batch lists once, on page mount, so the
+  // filters are ready without needing a manual "Fetch" click. ----
+  useEffect(() => {
+    searchClassrooms("");
+    searchBatches("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ---- status filter options, reshaped for SearchableDropdown ----
@@ -436,7 +450,7 @@ const Students = () => {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name, roll number or RRN…"
+                placeholder="Search by Name, Roll Number or RRN"
                 aria-label="Search students"
               />
             </div>
@@ -466,6 +480,7 @@ const Students = () => {
                 onFetch={searchClassrooms}
                 loaded={classroomsLoaded}
                 loading={classroomsLoading}
+                hideFetchButton
                 selectedLabel={classroomsIndex[classroomId]}
                 placeholder="Search classrooms…"
               />
@@ -480,6 +495,7 @@ const Students = () => {
                 onFetch={searchBatches}
                 loaded={batchesLoaded}
                 loading={batchesLoading}
+                hideFetchButton
                 selectedLabel={batchesIndex[batchId]}
                 placeholder="Search batches…"
               />
@@ -501,23 +517,29 @@ const Students = () => {
           <div className="st-bulk-bar">
             <span className="st-bulk-count">{selectedIds.size} selected</span>
             <div className="st-bulk-actions">
-              <button type="button" className="st-btn st-btn-ghost" onClick={() => openBulkModal("update")}>
+              <button
+                type="button"
+                className="st-btn st-btn-ghost st-btn-update"
+                onClick={() => openBulkModal("update")}
+              >
                 Bulk Update
               </button>
-              <button
-                type="button"
-                className="st-btn st-btn-ghost st-btn-success"
-                onClick={() => openBulkModal("activate")}
-              >
-                Mark as Active
-              </button>
-              <button
-                type="button"
-                className="st-btn st-btn-ghost st-btn-danger"
-                onClick={() => openBulkModal("deactivate")}
-              >
-                Mark as Inactive
-              </button>
+              <div className="st-bulk-actions-pair">
+                <button
+                  type="button"
+                  className="st-btn st-btn-ghost st-btn-success"
+                  onClick={() => openBulkModal("activate")}
+                >
+                  Mark as Active
+                </button>
+                <button
+                  type="button"
+                  className="st-btn st-btn-ghost st-btn-danger"
+                  onClick={() => openBulkModal("deactivate")}
+                >
+                  Mark as Inactive
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -528,7 +550,7 @@ const Students = () => {
           <table className="st-table">
             <thead>
               <tr>
-                <th className="st-col-checkbox">
+                <th className="st-col-num">
                   <input
                     type="checkbox"
                     aria-label="Select all students on this page"
@@ -539,7 +561,6 @@ const Students = () => {
                     onChange={toggleSelectAll}
                   />
                 </th>
-                <th className="st-col-num">#</th>
                 <th className="st-col-left">Student</th>
                 <th>RRN</th>
                 <th>Batch</th>
@@ -550,13 +571,13 @@ const Students = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="st-state-cell">
+                  <td colSpan={6} className="st-state-cell">
                     Loading students…
                   </td>
                 </tr>
               ) : students.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="st-state-cell">
+                  <td colSpan={6} className="st-state-cell">
                     No students match your search or filters.
                   </td>
                 </tr>
@@ -565,33 +586,66 @@ const Students = () => {
                   const isInactive = student.status === "inactive";
                   return (
                     <tr key={student.id} className={isInactive ? "st-row-inactive" : ""}>
-                      <td className="st-col-checkbox">
-                        <input
-                          type="checkbox"
-                          aria-label={`Select ${student.name}`}
-                          checked={selectedIds.has(student.id)}
-                          onChange={() => toggleSelectOne(student.id)}
-                        />
+                      <td
+                        className={`st-col-num${
+                          selectedIds.has(student.id) ? " st-col-num-selected" : ""
+                        }`}
+                        onClick={() => toggleSelectOne(student.id)}
+                        role="button"
+                        tabIndex={0}
+                        aria-pressed={selectedIds.has(student.id)}
+                        aria-label={
+                          selectedIds.has(student.id)
+                            ? `Deselect ${student.name}`
+                            : `Select ${student.name}`
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            toggleSelectOne(student.id);
+                          }
+                        }}
+                      >
+                        {selectedIds.has(student.id) ? (
+                          <span className="st-col-num-check" aria-hidden="true">
+                            ✓
+                          </span>
+                        ) : (
+                          (page - 1) * limit + idx + 1
+                        )}
                       </td>
-                      <td className="st-col-num">{(page - 1) * limit + idx + 1}</td>
                       <td className="st-col-left">
                         <div className="st-student-cell">
-                          {student.photo_url ? (
-                            <img
-                              className="st-student-photo"
-                              src={student.photo_url}
-                              alt={student.name}
-                              onError={(e) => {
-                                e.currentTarget.style.display = "none";
-                                e.currentTarget.nextSibling.style.display = "flex";
-                              }}
-                            />
-                          ) : null}
                           <div
-                            className="st-student-photo-fallback"
-                            style={{ display: student.photo_url ? "none" : "flex" }}
+                            className="st-student-avatar"
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Preview photo of ${student.name}`}
+                            onClick={() => setPreviewStudent(student)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setPreviewStudent(student);
+                              }
+                            }}
                           >
-                            {initials(student.name)}
+                            {student.photo_url ? (
+                              <img
+                                className="st-student-photo"
+                                src={student.photo_url}
+                                alt={student.name}
+                                onError={(e) => {
+                                  e.currentTarget.style.display = "none";
+                                  e.currentTarget.nextSibling.style.display = "flex";
+                                }}
+                              />
+                            ) : null}
+                            <div
+                              className="st-student-photo-fallback"
+                              style={{ display: student.photo_url ? "none" : "flex" }}
+                            >
+                              {initials(student.name)}
+                            </div>
                           </div>
                           <div className="st-student-text">
                             <span className="st-student-name">{student.name || "—"}</span>
@@ -631,7 +685,6 @@ const Students = () => {
                           >
                             <TrashIcon />
                           </button>
-                          {isInactive && <span className="st-inactive-tag">Inactive</span>}
                         </div>
                       </td>
                     </tr>
@@ -747,6 +800,50 @@ const Students = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {previewStudent && (
+        <div
+          className="st-modal-overlay st-preview-overlay"
+          role="presentation"
+          onClick={() => setPreviewStudent(null)}
+        >
+          <div
+            className="st-preview-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Photo of ${previewStudent.name}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="st-modal-close st-preview-close"
+              aria-label="Close preview"
+              onClick={() => setPreviewStudent(null)}
+            >
+              ×
+            </button>
+            {previewStudent.photo_url ? (
+              <img
+                className="st-preview-photo"
+                src={previewStudent.photo_url}
+                alt={previewStudent.name}
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  e.currentTarget.nextSibling.style.display = "flex";
+                }}
+              />
+            ) : null}
+            <div
+              className="st-preview-photo-fallback"
+              style={{ display: previewStudent.photo_url ? "none" : "flex" }}
+            >
+              {initials(previewStudent.name)}
+            </div>
+            <div className="st-preview-name">{previewStudent.name || "—"}</div>
+            <div className="st-preview-roll">{previewStudent.roll_number || "—"}</div>
           </div>
         </div>
       )}

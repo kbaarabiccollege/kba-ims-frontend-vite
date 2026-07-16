@@ -45,9 +45,10 @@ const SearchableDropdown = ({
   value, // selected id, or 'all'
   onChange,
   searchable = false,
-  onFetch, // (query: string) => void — Fetch/Refresh button handler
-  loaded = true, // set to false for on-demand lists (classroom/batch)
+  onFetch, // (query: string) => void — used for live search-as-you-type; parent now loads the initial list on mount
+  loaded = true, // set to false for on-demand lists (classroom/batch) until the parent's initial load resolves
   loading = false,
+  hideFetchButton = false, // true for lists the parent auto-loads on page mount (classroom/batch)
   placeholder = "Search…",
   className = "",
   searchDebounceMs = 350,
@@ -109,10 +110,10 @@ const SearchableDropdown = ({
 
       {open && (
         <div className="sd-panel" role="menu">
-          {(label || onFetch) && (
+          {(label || (onFetch && !hideFetchButton)) && (
             <div className="sd-panel-header">
               <span>{label}</span>
-              {onFetch && (
+              {onFetch && !hideFetchButton && (
                 <button
                   type="button"
                   className="sd-fetch-btn"
@@ -122,6 +123,9 @@ const SearchableDropdown = ({
                 >
                   {loading ? "Fetching…" : loaded ? "↻ Refresh" : "⇩ Fetch"}
                 </button>
+              )}
+              {onFetch && hideFetchButton && loading && (
+                <span className="sd-fetch-status">Refreshing…</span>
               )}
             </div>
           )}
@@ -151,7 +155,11 @@ const SearchableDropdown = ({
             </button>
 
             {!loaded && !loading && onFetch && (
-              <div className="sd-empty">Hit fetch to load {(label || "options").toLowerCase()}s</div>
+              <div className="sd-empty">
+                {hideFetchButton
+                  ? `Loading ${(label || "options").toLowerCase()}s…`
+                  : `Hit fetch to load ${(label || "options").toLowerCase()}s`}
+              </div>
             )}
 
             {loading && <div className="sd-empty">Loading…</div>}
@@ -171,7 +179,8 @@ const SearchableDropdown = ({
                   }`}
                   onClick={() => handleSelect(o.id)}
                 >
-                  {o.label}
+                  <span className="sd-option-label">{o.label}</span>
+                  {o.meta && <span className="sd-option-meta">{o.meta}</span>}
                 </button>
               ))}
           </div>

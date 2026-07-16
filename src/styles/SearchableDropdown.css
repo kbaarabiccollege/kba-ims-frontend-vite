@@ -91,6 +91,14 @@
     letter-spacing: 0.03em;
     color: var(--sd-text-muted);
   }
+
+  .sd-fetch-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--sd-text-muted);
+    text-transform: none;
+    letter-spacing: normal;
+  }
   
   .sd-fetch-btn {
     border: none;
@@ -163,7 +171,9 @@
   }
   
   .sd-option {
-    display: block;
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
     width: 100%;
     text-align: left;
     padding: 0.55rem 0.7rem;
@@ -173,6 +183,23 @@
     font-size: 0.85rem;
     color: var(--sd-text);
     cursor: pointer;
+  }
+
+  .sd-option-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sd-option-meta {
+    font-size: 0.72rem;
+    color: var(--sd-text-muted);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .sd-option:hover .sd-option-meta {
+    color: rgba(255, 255, 255, 0.75);
   }
   
   .sd-option:hover,
