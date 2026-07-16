@@ -68,7 +68,7 @@ import BulkActionsModal from "./components/BulkActionsModal";
 import SearchableDropdown from "../../../components/common/SearchableDropdown";
 import { getCourseLabel } from "../../../components/common/courses";
 import { EditIcon, EyeIcon, TrashIcon } from "../../../components/common/Icons";
-import "../../../styles/AdminStudents.css";
+import "../../../styles/Students.css";
 
 const initials = (name) =>
   (name || "")
@@ -651,6 +651,7 @@ const Students = () => {
                             <span className="st-student-name">{student.name || "—"}</span>
                             <span className="st-student-roll">{student.roll_number || "—"}</span>
                           </div>
+                          {isInactive && <span className="st-inactive-tag">Inactive</span>}
                         </div>
                       </td>
                       <td>{student.rrn || "—"}</td>

@@ -11,7 +11,7 @@
 //   <Route path="/admin/students/:id/edit" element={<StudentForm />} />
 
 import { useParams, useNavigate } from "react-router-dom";
-import "../../../styles/AdminStudents.css";
+import "../../../styles/Students.css";
 
 const StudentForm = () => {
   const { id } = useParams();
