@@ -14,6 +14,8 @@ import { SECTIONS, ROLE_BASE_PATHS, GENDER_OPTIONS, BLOOD_GROUP_OPTIONS,
   FAMILY_ROWS, QUALIFICATION_ROWS, ADDRESS_ROWS, QUALIFICATION_LEVELS, 
   ACADEMIC_STATUS_OPTIONS, DRIVE_FOLDERS, ADDRESS_TYPES, emptyAddress, 
   emptyQualification, } from "./constants";
+import { useToast } from "../../../context/ToastContext";
+import { crudMessage } from "../../../utils/toastMessages";
 import "../../../styles/Students.css";
 import "../../../styles/StudentForm.css";
 
@@ -86,6 +88,7 @@ const initialState = () => ({
 
 const StudentForm = () => {
   const { id } = useParams();
+  const toast = useToast();
   const navigate = useNavigate();
   const { role: authRole } = useAuth();
   const basePath = ROLE_BASE_PATHS[authRole] || "/admin";
@@ -516,6 +519,7 @@ const StudentForm = () => {
     try {
       const payload = buildSectionPayload(activeSection);
       await updateStudent(id, payload);
+      toast.success(crudMessage("update", "Student", "success"));
       if (close) {
         navigate(`${basePath}/students`);
       }
@@ -537,11 +541,14 @@ const StudentForm = () => {
     try {
       const payload = buildPayload();
       await createStudent(payload);
+      toast.success(crudMessage("create", "Student", "success"));
       navigate(`${basePath}/students`);
     } catch (err) {
+      const fallback = crudMessage("create", "Student", "error");
       setSaveError(
         err?.response?.data?.message || "Couldn't save this student. Please check the form and try again."
       );
+      toast.error(err?.response?.data?.message || fallback);
     } finally {
       setSavingSave(false);
     }

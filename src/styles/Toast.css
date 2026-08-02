@@ -1,0 +1,207 @@
+/* src/styles/Toast.css
+   Colors are exposed as CSS variables (with sane fallbacks) so this
+   drops into any module's theme without edits. Override the variables
+   in index.css / a root stylesheet if you want to match your palette
+   exactly. */
+
+   .toast-viewport {
+    position: fixed;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+    width: calc(100% - 32px);
+    pointer-events: none;
+  }
+  
+  .toast-viewport-top-right {
+    top: 20px;
+    right: 16px;
+    align-items: flex-end;
+  }
+  
+  .toast-viewport-top-left {
+    top: 20px;
+    left: 16px;
+    align-items: flex-start;
+  }
+  
+  .toast-viewport-bottom-right {
+    bottom: 20px;
+    right: 16px;
+    align-items: flex-end;
+  }
+  
+  .toast-viewport-bottom-left {
+    bottom: 20px;
+    left: 16px;
+    align-items: flex-start;
+  }
+  
+  .toast-viewport-top-center {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+  }
+  
+.toast-item {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--toast-bg, #ffffff);
+  border: 1px solid var(--toast-border, #e5e7eb);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--toast-text, #1f2937);
+  animation: toast-in 0.22s ease-out;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+[data-theme="dark"] .toast-item {
+  background: #131f33;
+  border-color: #26344a;
+  color: #aebed6;
+  box-shadow: 0 1px 0 rgba(79, 127, 232, 0.12) inset, 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+  
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+.toast-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .toast-icon {
+  color: var(--toast-icon-dark-fg, currentColor);
+}
+  
+  .toast-message {
+    flex: 1;
+    padding-top: 1px;
+    word-break: break-word;
+  }
+  
+  .toast-close {
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--toast-close, #9ca3af);
+    padding: 0 0 0 4px;
+  }
+  
+  .toast-close:hover {
+    color: var(--toast-close-hover, #4b5563);
+  }
+
+  [data-theme="dark"] .toast-close {
+    color: #6b82a0;
+  }
+  
+  [data-theme="dark"] .toast-close:hover {
+    color: #aebed6;
+  }
+  
+  /* type accents */
+  .toast-success {
+    border-left: 3px solid var(--toast-success, #16a34a);
+  }
+  .toast-success .toast-icon {
+    background: var(--toast-success, #16a34a);
+  }
+  
+  .toast-error {
+    border-left: 3px solid var(--toast-error, #dc2626);
+  }
+  .toast-error .toast-icon {
+    background: var(--toast-error, #dc2626);
+  }
+  
+  .toast-warning {
+    border-left: 3px solid var(--toast-warning, #d97706);
+  }
+  .toast-warning .toast-icon {
+    background: var(--toast-warning, #d97706);
+  }
+  
+  .toast-info {
+    border-left: 3px solid var(--toast-info, #2563eb);
+  }
+  .toast-info .toast-icon {
+    background: var(--toast-info, #2563eb);
+  }
+
+  /* dark theme — swap solid saturated fills for muted rgba tints,
+   same pattern as the role/status badges in AdminUsers.css */
+[data-theme="dark"] .toast-success {
+  border-left-color: #5fd399;
+}
+[data-theme="dark"] .toast-success .toast-icon {
+  background: rgba(28, 138, 84, 0.22);
+  color: #5fd399;
+}
+
+[data-theme="dark"] .toast-error {
+  border-left-color: #ff8a8a;
+}
+[data-theme="dark"] .toast-error .toast-icon {
+  background: rgba(214, 69, 69, 0.2);
+  color: #ff8a8a;
+}
+
+[data-theme="dark"] .toast-warning {
+  border-left-color: #f0a75c;
+}
+[data-theme="dark"] .toast-warning .toast-icon {
+  background: rgba(181, 98, 15, 0.22);
+  color: #f0a75c;
+}
+
+[data-theme="dark"] .toast-info {
+  border-left-color: #7ba3f5;
+}
+[data-theme="dark"] .toast-info .toast-icon {
+  background: rgba(79, 127, 232, 0.2);
+  color: #7ba3f5;
+}
+  
+  @media (max-width: 480px) {
+    .toast-viewport {
+      left: 50% !important;
+      right: auto !important;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .toast-item {
+      animation: none;
+    }
+  }

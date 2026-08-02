@@ -23,7 +23,7 @@
   min-width: 0;
   height: 100%;
   overflow: hidden;
-  background: #fff;
+  background: var(--st-surface, #fff);
 }
 
 /* ---------- sidebar: photo, name, pills, section nav ---------- */
@@ -321,7 +321,7 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   box-shadow: none;
-  background: #fff;
+  background: var(--st-surface, #fff);
 }
 
 /* ---------- stat / field grids ---------- */
@@ -495,7 +495,7 @@
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   border-top: 1px solid var(--st-border);
-  background: #fff;
+  background: var(--st-surface, #fff);
   box-shadow: 0 -2px 10px rgba(20, 33, 61, 0.08);
   z-index: 5;
 }
@@ -632,7 +632,7 @@
     padding: 1.25rem 1rem;
     margin: 0 0 0.75rem;
     text-align: center;
-    background: #fff;
+    background: var(--st-surface, #fff);
     border: 1px solid var(--st-border);
     border-radius: var(--radius-md, 12px);
     box-shadow: 0 2px 10px rgba(20, 33, 61, 0.06);

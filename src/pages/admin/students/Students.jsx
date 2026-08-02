@@ -62,6 +62,8 @@ import {
 } from "../../../api/studentsApi";
 import { getClassrooms } from "../../../api/classroomsApi";
 import { getBatches } from "../../../api/batchesApi";
+import { useToast } from "../../../context/ToastContext";
+import { crudMessage } from "../../../utils/toastMessages";
 import useDebouncedValue from "../../../hooks/useDebouncedValue";
 import { STATUS_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
 import BulkActionsModal from "./components/BulkActionsModal";
@@ -105,6 +107,7 @@ const ROLE_BASE_PATHS = {
 const Students = () => {
   const navigate = useNavigate();
   const { role: authRole } = useAuth();
+  const toast = useToast();
   const basePath = ROLE_BASE_PATHS[authRole] || "/admin";
 
   // ---- list state ----
@@ -355,9 +358,12 @@ const Students = () => {
     setPasswordError("");
     try {
       await updateUserPassword(passwordModal.id, password);
+      toast.success(crudMessage("update", "Password", "success"));
       setPasswordModal(null);
     } catch (err) {
+      const fallback = crudMessage("update", "Password", "error");
       setPasswordError(err?.response?.data?.message || "Couldn't update password.");
+      toast.error(err?.response?.data?.message || fallback);
     } finally {
       setPasswordSubmitting(false);
     }

@@ -1,10 +1,8 @@
 // src/components/layouts/Header.jsx
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Bell, ChevronDown, LogOut,
-  Sun, Moon, User, UserCircle, Settings,
-} from "lucide-react";
+import { Bell, ChevronDown, LogOut,
+  Sun, Moon, User, UserCircle, Settings, } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import NotificationsPanel from "./NotificationsPanel";
@@ -96,7 +94,7 @@ const Header = ({ portal, isMobile = false }) => {
             {!isMobile && (
               <div className="layout-header__user-info">
                 <span className="layout-header__user-name">
-                  {user?.name || "User"}
+                  {user?.user_id || "User"}
                 </span>
                 <span className="layout-header__user-role">{roleDisplay}</span>
               </div>
@@ -116,26 +114,26 @@ const Header = ({ portal, isMobile = false }) => {
                 {isMobile ? (
                   <>
                     <span className="layout-header__dropdown-user-name">
-                      {user?.name || "Administrator"}
+                      {user?.user_id}
+                    </span>
+                    {/* <span className="layout-header__dropdown-user-meta">
+                      {user?.id}
+                    </span> */}
+                    <span className="layout-header__dropdown-user-meta">
+                      {user?.email}
                     </span>
                     <span className="layout-header__dropdown-user-meta">
-                      {user?.id || "ADM001"}
-                    </span>
-                    <span className="layout-header__dropdown-user-meta">
-                      {user?.email || "admin@example.com"}
-                    </span>
-                    <span className="layout-header__dropdown-user-meta">
-                      {roleDisplay || "Admin"}
+                      {roleDisplay}
                     </span>
                   </>
                 ) : (
-                  /* Desktop: id + email only (name+role already in header btn) */
+                  /* Desktop: user_id + email only (name+role already in header btn) */
                   <>
                     <span className="layout-header__dropdown-user-meta">
-                      {user?.id || "ADM001"}
+                      {user?.user_id}
                     </span>
                     <span className="layout-header__dropdown-user-meta">
-                      {user?.email || "admin@example.com"}
+                      {user?.email}
                     </span>
                   </>
                 )}

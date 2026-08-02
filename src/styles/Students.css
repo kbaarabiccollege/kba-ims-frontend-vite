@@ -69,6 +69,22 @@
   }
   
   /* ── Dark mode tokens ── */
+  /* PasswordModal is shared with the Users page and its Cancel button
+     uses .um-btn-ghost (styled in AdminUsers.css, scoped to .um-page).
+     Since this page uses .st-page instead, those --um-* tokens are
+     never defined here, so the button falls back to its hardcoded
+     white default in dark mode. Override it using this page's own
+     dark-mode tokens instead. */
+  [data-theme="dark"] .um-btn-ghost {
+    background: var(--st-surface-raised, #131f33);
+    color: var(--st-text-body, #aebed6);
+    border-color: var(--st-border, #26344a);
+  }
+
+  [data-theme="dark"] .um-btn-ghost:hover:not(:disabled) {
+    background: var(--st-row-hover, rgba(79, 127, 232, 0.06));
+  }
+
   [data-theme="dark"] .st-page {
     --st-header-blue: #0d1f38;
     --st-surface: #0f1928;

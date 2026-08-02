@@ -30,11 +30,14 @@ import UserFormModal from "./components/UserFormModal";
 import PasswordModal from "./components/PasswordModal";
 import DeleteConfirmModal from "../../../components/common/DeleteConfirmModal";
 import { EditIcon, KeyIcon, TrashIcon } from "../../../components/common/Icons";
+import { useToast } from "../../../context/ToastContext";
+import { crudMessage } from "../../../utils/toastMessages";
 import "../../../styles/AdminUsers.css";
 
 const Users = () => {
   const { role: authRole } = useAuth();
   const isDev = authRole === "dev";
+  const toast = useToast();
 
   // Dev sees everyone by default and can filter by role.
   // Superadmin is scoped to admin+accountant only, with no override in the UI.
@@ -125,17 +128,19 @@ const Users = () => {
     try {
       if (formModal.mode === "edit") {
         await updateUser(formModal.user.id, payload);
+        toast.success(crudMessage("update", "User", "success"));
       } else {
         await createUser(payload);
+        toast.success(crudMessage("create", "User", "success"));
       }
       setFormModal(null);
       fetchUsers();
     } catch (err) {
       const data = err?.response?.data;
-      setModalError(
-        data?.message || (formModal.mode === "edit" ? "Couldn't save changes." : "Couldn't create user.")
-      );
+      const fallback = crudMessage(formModal.mode === "edit" ? "update" : "create", "User", "error");
+      setModalError(data?.message || fallback);
       setModalFieldErrors(data?.errors || {});
+      toast.error(data?.message || fallback);
     } finally {
       setSubmitting(false);
     }
@@ -159,11 +164,14 @@ const Users = () => {
     setModalFieldErrors({});
     try {
       await updateUserPassword(passwordModal.id, password);
+      toast.success(crudMessage("update", "Password", "success"));
       setPasswordModal(null);
     } catch (err) {
       const data = err?.response?.data;
-      setModalError(data?.message || "Couldn't update password.");
+      const fallback = crudMessage("update", "Password", "error");
+      setModalError(data?.message || fallback);
       setModalFieldErrors(data?.errors || {});
+      toast.error(data?.message || fallback);
     } finally {
       setSubmitting(false);
     }

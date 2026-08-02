@@ -234,3 +234,30 @@ export const ExternalLinkIcon = () => (
     />
   </svg>
 );
+
+// ---- tiny inline icons for the bottom quick-stats strip ----
+export const IconClassroom = () => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M3 18h18M3 10V7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+export const IconBatch = () => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="9" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.6" />
+    <circle cx="16" cy="9" r="2" stroke="currentColor" strokeWidth="1.6" />
+    <path d="M4 18c.5-2.8 2.4-4.5 5-4.5s4.5 1.7 5 4.5M14.5 18c.4-2 1.6-3.4 3.5-3.4s3 1.2 3.4 3.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+export const IconUserId = () => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.6" />
+    <path d="M5 19c.7-3.4 3.3-5.4 7-5.4s6.3 2 7 5.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+export const IconChevronRight = () => (
+  <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
