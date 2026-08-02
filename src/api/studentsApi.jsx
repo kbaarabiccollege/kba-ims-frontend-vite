@@ -65,7 +65,7 @@ export async function createStudent(payload) {
  * PUT /api/students/:id
  */
 export async function updateStudent(id, payload) {
-  const { data } = await axiosInstance.put(`${BASE}/${id}`, payload);
+  const { data } = await axiosInstance.patch(`${BASE}/${id}`, payload);
   return data;
 }
 

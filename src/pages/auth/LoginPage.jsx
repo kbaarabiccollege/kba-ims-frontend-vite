@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import axiosInstance from "../../api/axiosInstance";
 import { getHomeForRole } from "../../utils/roleUtils";
-import { EyeIcon, EyeOffIcon, ArrowRightIcon } from "../../components/common/Icons";
+import { ArrowRightIcon } from "../../components/common/Icons";
+import PasswordInput from "../../components/common/PasswordInput";
 import '../../styles/login.css';
 
 const LoginPage = () => {
@@ -13,7 +14,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({ user_id: "", password: "" });
-  const [showPassword, setShowPassword] = useState(false);
+  
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -132,27 +133,15 @@ const LoginPage = () => {
 
               <div className="auth-field">
                 <label className="auth-label" htmlFor="password">Password</label>
-                <div className="auth-input-wrap">
-                  <input
-                    className="auth-input has-toggle"
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    autoComplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="auth-eye-btn"
-                    onClick={() => setShowPassword((v) => !v)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                  </button>
-                </div>
+                <PasswordInput
+  id="password"
+  name="password"
+  className="auth-input"
+  value={formData.password}
+  onChange={handleChange}
+  placeholder="Enter your password"
+  required
+/>
               </div>
 
               <div className="auth-options-row">

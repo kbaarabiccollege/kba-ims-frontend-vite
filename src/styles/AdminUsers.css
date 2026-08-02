@@ -641,36 +641,6 @@
     text-transform: uppercase;
   }
   
-  /* Password field with an eye-toggle button, mirroring LoginPage.jsx */
-  .um-input-wrap {
-    position: relative;
-  }
-  
-  .um-input-has-toggle {
-    width: 100%;
-    padding-right: 44px;
-  }
-  
-  .um-eye-btn {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    color: var(--color-input-placeholder, #a8b5c8);
-    display: flex;
-    align-items: center;
-    line-height: 0;
-    transition: color 0.2s ease;
-  }
-  
-  .um-eye-btn:hover {
-    color: var(--color-primary, #214b86);
-  }
-  
   .um-modal-actions {
     display: flex;
     justify-content: flex-end;

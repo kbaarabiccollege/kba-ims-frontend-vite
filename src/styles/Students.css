@@ -34,6 +34,8 @@
     --st-icon-btn-border: var(--st-border);
     --st-icon-edit-hover-bg: #eef3fa;
     --st-icon-edit-hover-fg: var(--color-primary, #214b86);
+    --st-icon-key-hover-bg: #fff6e0;
+    --st-icon-key-hover-fg: #b5820f;
     --st-icon-danger-hover-bg: #fdecec;
     --st-icon-danger-hover-fg: #d64545;
   
@@ -54,7 +56,7 @@
   
     font-family: var(--font-body, "Inter", sans-serif);
     color: var(--st-text-body);
-    padding: 1.5rem 0;
+    padding: 0.3rem 0 0;
     width: 100%;
     max-width: 100%;
     margin: 0;
@@ -92,6 +94,8 @@
     --st-icon-btn-border: var(--st-border);
     --st-icon-edit-hover-bg: rgba(79, 127, 232, 0.15);
     --st-icon-edit-hover-fg: #7ba3f5;
+    --st-icon-key-hover-bg: rgba(240, 167, 92, 0.15);
+    --st-icon-key-hover-fg: #f0a75c;
     --st-icon-danger-hover-bg: rgba(214, 69, 69, 0.16);
     --st-icon-danger-hover-fg: #ff8a8a;
   
@@ -111,10 +115,10 @@
   
   .st-page-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: .3rem;
     flex-wrap: wrap;
     padding: 0 1.5rem;
   }
@@ -648,7 +652,7 @@
   }
   
   .st-col-actions {
-    width: 160px;
+    width: 200px;
   }
   
   .st-state-cell {
@@ -764,6 +768,12 @@
     color: var(--st-icon-edit-hover-fg);
   }
   
+  .st-icon-btn-key:hover:not(:disabled) {
+    background: var(--st-icon-key-hover-bg);
+    border-color: var(--st-icon-key-hover-fg);
+    color: var(--st-icon-key-hover-fg);
+  }
+
   .st-icon-btn-danger:hover:not(:disabled) {
     background: var(--st-icon-danger-hover-bg);
     border-color: #d64545;
@@ -1039,7 +1049,7 @@
   
   @media (max-width: 640px) {
     .st-page {
-      padding: 1rem 0;
+      padding: 0.3rem 0 0;
     }
 
     .st-page-header {

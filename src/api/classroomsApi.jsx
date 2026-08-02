@@ -25,4 +25,15 @@ export async function getClassrooms({ isActive = 1, q } = {}) {
   return data;
 }
 
-export default { getClassrooms };
+/**
+ * Fetch a single classroom by id.
+ * GET /api/classrooms/:id
+ *
+ * res.data: { id, name, room_no, term, semester, batch_id, course, is_active, ... }
+ */
+export async function getClassroom(id) {
+  const { data } = await axiosInstance.get(`${BASE}/${id}`);
+  return data;
+}
+
+export default { getClassrooms, getClassroom };

@@ -133,3 +133,104 @@ export const FilterFunnelIcon = () => (
     />
   </svg>
 );
+
+export const IconPersonal = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="8" r="3.4" stroke="currentColor" strokeWidth="1.7" />
+    <path d="M5 19c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+  </svg>
+);
+
+export const IconOther = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M8 6h11M8 12h11M8 18h11" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    <circle cx="4.2" cy="6" r="1.2" fill="currentColor" />
+    <circle cx="4.2" cy="12" r="1.2" fill="currentColor" />
+    <circle cx="4.2" cy="18" r="1.2" fill="currentColor" />
+  </svg>
+);
+
+export const IconCap = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 4.5 2.5 9 12 13.5 21.5 9 12 4.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    <path d="M6 11v4.2c0 1.4 2.7 2.8 6 2.8s6-1.4 6-2.8V11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M21.5 9v6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+  </svg>
+);
+
+export const IconFamily = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="8.5" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.6" />
+    <circle cx="16" cy="8.6" r="2.1" stroke="currentColor" strokeWidth="1.6" />
+    <path d="M3.5 19c0.9-3.3 2.9-5 5-5s4.1 1.7 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    <path d="M13.8 14.4c2 .2 3.6 1.8 4.3 4.6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+  </svg>
+);
+
+export const IconAddress = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M12 21s7-6.1 7-11.6A7 7 0 0 0 5 9.4C5 14.9 12 21 12 21Z"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+    <circle cx="12" cy="9.4" r="2.4" stroke="currentColor" strokeWidth="1.6" />
+  </svg>
+);
+
+export const IconAdmission = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="3.5" y="5.5" width="17" height="13" rx="1.8" stroke="currentColor" strokeWidth="1.6" />
+    <circle cx="8.3" cy="11" r="1.7" stroke="currentColor" strokeWidth="1.4" />
+    <path d="M5.8 15.3c.5-1.4 1.4-2.1 2.5-2.1s2 .7 2.5 2.1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    <path d="M14 9.5h4M14 12.5h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+  </svg>
+);
+
+export const IconLinks = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M9.5 14.5 14.5 9.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    <path
+      d="M8.2 15.8 6 18a3 3 0 0 1-4.2-4.2l3-3A3 3 0 0 1 9 10.2"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+    />
+    <path
+      d="M15.8 8.2 18 6a3 3 0 1 1 4.2 4.2l-3 3A3 3 0 0 1 15 13.8"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+export const FolderIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M3.5 6.5a1.5 1.5 0 0 1 1.5-1.5h4.6l1.7 2h7.2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 3.5 17.5v-11Z"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const  PlusIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+  </svg>
+);
+
+export const ExternalLinkIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M14 5h5v5M19 5l-8 8M8 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);

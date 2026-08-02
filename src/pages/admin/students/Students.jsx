@@ -65,9 +65,11 @@ import { getBatches } from "../../../api/batchesApi";
 import useDebouncedValue from "../../../hooks/useDebouncedValue";
 import { STATUS_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
 import BulkActionsModal from "./components/BulkActionsModal";
+import PasswordModal from "../../superadmin/users/components/PasswordModal";
+import { updateUserPassword } from "../../../api/usersApi";
 import SearchableDropdown from "../../../components/common/SearchableDropdown";
 import { getCourseLabel } from "../../../components/common/courses";
-import { EditIcon, EyeIcon, TrashIcon } from "../../../components/common/Icons";
+import { EditIcon, EyeIcon, KeyIcon, TrashIcon } from "../../../components/common/Icons";
 import "../../../styles/Students.css";
 
 const initials = (name) =>
@@ -147,6 +149,11 @@ const Students = () => {
   const [deleteTarget, setDeleteTarget] = useState(null); // student
   const [deleteSubmitting, setDeleteSubmitting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+
+  // ---- password change ----
+  const [passwordModal, setPasswordModal] = useState(null); // student
+  const [passwordSubmitting, setPasswordSubmitting] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   // ---- profile picture preview ----
   const [previewStudent, setPreviewStudent] = useState(null);
@@ -331,6 +338,28 @@ const Students = () => {
       setDeleteError(err?.response?.data?.message || "Couldn't delete this student.");
     } finally {
       setDeleteSubmitting(false);
+    }
+  };
+
+  // ---- password change ----
+  const openPasswordModal = (student) => {
+    setPasswordError("");
+    setPasswordModal(student);
+  };
+  const closePasswordModal = () => {
+    if (passwordSubmitting) return;
+    setPasswordModal(null);
+  };
+  const handlePasswordSubmit = async (password) => {
+    setPasswordSubmitting(true);
+    setPasswordError("");
+    try {
+      await updateUserPassword(passwordModal.id, password);
+      setPasswordModal(null);
+    } catch (err) {
+      setPasswordError(err?.response?.data?.message || "Couldn't update password.");
+    } finally {
+      setPasswordSubmitting(false);
     }
   };
 
@@ -679,6 +708,15 @@ const Students = () => {
                           </button>
                           <button
                             type="button"
+                            className="st-icon-btn st-icon-btn-key"
+                            title="Change password"
+                            aria-label={`Change password for ${student.name}`}
+                            onClick={() => openPasswordModal(student)}
+                          >
+                            <KeyIcon />
+                          </button>
+                          <button
+                            type="button"
                             className="st-icon-btn st-icon-btn-danger"
                             title="Delete student"
                             aria-label={`Delete ${student.name}`}
@@ -803,6 +841,17 @@ const Students = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {passwordModal && (
+        <PasswordModal
+          user={passwordModal}
+          onClose={closePasswordModal}
+          onSubmit={handlePasswordSubmit}
+          submitting={passwordSubmitting}
+          serverError={passwordError}
+          serverFieldErrors={{}}
+        />
       )}
 
       {previewStudent && (

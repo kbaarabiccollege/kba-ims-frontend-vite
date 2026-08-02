@@ -26,6 +26,7 @@ import staffPortal      from "../portals/staffPortal";
 import NotFound from "../components/common/NotFound";
 import Students from "../pages/admin/students/Students";
 import StudentForm from "../pages/admin/students/StudentForm";
+import StudentView from "../pages/admin/students/StudentView";
 import Users from "../pages/superadmin/users/Users";
 import Staff from "../pages/admin/staff/Staff";
 
@@ -58,7 +59,7 @@ const AppRouter = () => (
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/students" element={<Students />} />
           <Route path="/admin/students/new" element={<StudentForm />} />
-          <Route path="/admin/students/:id" element={<StudentForm />} />
+          <Route path="/admin/students/:id" element={<StudentView />} />
           <Route path="/admin/students/:id/edit" element={<StudentForm />} />
           <Route path="/admin/staff" element={<Staff />} />
 
@@ -71,10 +72,29 @@ const AppRouter = () => (
       {/* ── Admin Settings — deliberately OUTSIDE <Layout>, so it's a
           true full-page view without the sidebar/header ── */}
 
-      <Route path="/admin/settings" element={<SettingsLayout />}>
-        <Route index element={<SettingsHome />} />
-        <Route path="batches" element={<Batches />} />
-        <Route path="timetable-format" element={<TimetableFormatSettings />} />
+{/* ── Admin Settings — deliberately OUTSIDE <Layout>, so it's a
+          true full-page view without the sidebar/header. Still wrapped in
+          ProtectedRoute so auth/role checks aren't skipped. ── */}
+
+<Route element={<ProtectedRoute allowedRoles={["admin", "superadmin", "dev"]} />}>
+        <Route path="/admin/settings" element={<SettingsLayout />}>
+          <Route index element={<SettingsHome />} />
+          <Route path="batches" element={<Batches />} />
+          <Route path="timetable-format" element={<TimetableFormatSettings />} />
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={["admin", "superadmin", "dev"]} />}>
+        <Route path="/admin/settings" element={<SettingsLayout />}>
+          <Route index element={<SettingsHome />} />
+          <Route path="batches" element={<Batches />} />
+          <Route path="timetable-format" element={<TimetableFormatSettings />} />
+        </Route>
+        <Route path="/superadmin/settings" element={<SettingsLayout />}>
+          <Route index element={<SettingsHome />} />
+          <Route path="batches" element={<Batches />} />
+          <Route path="timetable-format" element={<TimetableFormatSettings />} />
+        </Route>
       </Route>
 
       {/* ── Super Admin Portal ── */}
@@ -84,7 +104,7 @@ const AppRouter = () => (
           <Route path="/superadmin/users" element={<Users />} />
           <Route path="/superadmin/students" element={<Students />} />
           <Route path="/superadmin/students/new" element={<StudentForm />} />
-          <Route path="/superadmin/students/:id" element={<StudentForm />} />
+          <Route path="/superadmin/students/:id" element={<StudentView />} />
           <Route path="/superadmin/students/:id/edit" element={<StudentForm />} />
           <Route path="/superadmin/staff" element={<Staff />} />
           {/* superadmin/admins, etc. */}

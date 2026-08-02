@@ -248,7 +248,6 @@ const Users = () => {
               <tr>
                 <th className="um-col-num">#</th>
                 <th>User ID</th>
-                <th className="um-col-left">Name</th>
                 <th className="um-col-left">Email</th>
                 <th>Role</th>
                 <th>Status</th>
@@ -258,13 +257,13 @@ const Users = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="um-state-cell">
+                  <td colSpan={6} className="um-state-cell">
                     Loading users…
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="um-state-cell">
+                  <td colSpan={6} className="um-state-cell">
                     No users match your search or filters.
                   </td>
                 </tr>
@@ -275,7 +274,6 @@ const Users = () => {
                     <td>
                       <span className="um-user-id">{user.user_id}</span>
                     </td>
-                    <td className="um-user-name">{user.name || "—"}</td>
                     <td className="um-user-email">{user.email || "—"}</td>
                     <td>
                       <RoleBadge role={user.role} />
@@ -289,7 +287,7 @@ const Users = () => {
                           type="button"
                           className="um-icon-btn"
                           title="Edit user"
-                          aria-label={`Edit ${user.name || user.user_id}`}
+                          aria-label={`Edit ${user.user_id}`}
                           onClick={() => openEditModal(user)}
                         >
                           <EditIcon />
@@ -298,7 +296,7 @@ const Users = () => {
                           type="button"
                           className="um-icon-btn um-icon-btn-key"
                           title="Change password"
-                          aria-label={`Change password for ${user.name || user.user_id}`}
+                          aria-label={`Change password for ${user.user_id}`}
                           onClick={() => openPasswordModal(user)}
                         >
                           <KeyIcon />
@@ -307,7 +305,7 @@ const Users = () => {
                           type="button"
                           className="um-icon-btn um-icon-btn-danger"
                           title="Delete user"
-                          aria-label={`Delete ${user.name || user.user_id}`}
+                          aria-label={`Delete ${user.user_id}`}
                           onClick={() => openDeleteModal(user)}
                         >
                           <TrashIcon />

@@ -1,0 +1,801 @@
+/* src/styles/StudentForm.css
+   Layered on top of AdminStudents.css (imported alongside it), reusing
+   the same design tokens (--st-* vars, --color-primary, --radius-*).
+   Prefixed "sf-" so it never collides with the "st-" list-page classes. */
+
+   .sf-page {
+    padding: 0;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    /* Caps the whole page to the viewport, minus the app's top bar,
+       so nothing here relies on the outer page scrolling. Adjust the
+       64px if there's still a gap or a hidden overlap with your top
+       bar — it should match its rendered height. */
+    height: calc(100vh - 64px);
+  }
+
+  /* This page's footer sits at the bottom of a viewport-height card —
+     remove any generic page bottom padding/margin that Students.css
+     applies, so there's no grey gap below the footer. */
+  .st-page.sf-page {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  
+  .sf-page-error {
+    margin: 0 1.5rem 1rem;
+  }
+
+  /* ---------- header action buttons (Refresh + Back) ---------- */
+
+  .sf-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  
+.sf-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 0;
+    /* Fills the remaining space inside .sf-page (which is already
+       capped to the viewport). min-height: 0 is required in a flex
+       column for the child's overflow to actually kick in — without
+       it, .sf-body would just expand the card instead of scrolling. */
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  
+  /* ---------- section tab strip ---------- */
+  
+.sf-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--st-border);
+  background: var(--st-surface-raised, #fff);
+  z-index: 4;
+}
+
+.sf-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--st-text-heading);
+  background: var(--st-surface-raised, #fff);
+  border: 1px solid var(--st-border);
+  border-radius: var(--radius-sm, 8px);
+  padding: 0.75rem 1.1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+  
+.sf-tab svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+  
+  .sf-tab:hover {
+    background: var(--st-row-hover);
+    color: var(--st-text-heading);
+  }
+  
+  .sf-tab-active {
+    background: var(--color-primary, #214b86);
+    border-color: var(--color-primary, #214b86);
+    color: #fff;
+  }
+  
+  .sf-tab-error {
+    box-shadow: 0 0 0 2px var(--color-error, #b91c1c);
+  }
+
+  .sf-mobile-tabs {
+    display: none;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 6;
+    background: var(--st-surface-raised, #fff);
+    border-bottom: 1px solid var(--st-border);
+    padding: 0.75rem 1rem;
+  }
+
+  .sf-mobile-tabs-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--st-border);
+    background: var(--st-row-hover, #f8fafc);
+    color: var(--st-text-heading);
+    font-family: var(--font-body, "Inter", sans-serif);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .sf-mobile-tabs-trigger svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+  }
+
+  .sf-mobile-tabs-trigger[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  .sf-mobile-tabs-list {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    top: 100%;
+    margin-top: 0.5rem;
+    border: 1px solid var(--st-border);
+    border-radius: var(--radius-sm, 8px);
+    overflow: hidden;
+    background: var(--st-surface-raised, #fff);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    z-index: 7;
+  }
+
+  .sf-mobile-tabs-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--st-text-heading);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--st-border);
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .sf-mobile-tabs-option:last-child {
+    border-bottom: none;
+  }
+
+  .sf-mobile-tabs-option:hover {
+    background: var(--st-row-hover, #f8fafc);
+  }
+
+  .sf-mobile-tabs-option-active,
+  .sf-mobile-tabs-option-active:hover {
+    background: var(--color-primary, #214b86);
+    color: #fff;
+  }
+  
+  /* ---------- body / sections ---------- */
+  
+  .sf-body {
+    padding: 1.5rem;
+    padding-bottom: 2rem;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  
+  
+  .sf-section-title {
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 1.15rem;
+    color: var(--st-text-heading);
+    margin: 0 0 1.25rem 0;
+  }
+  
+  .sf-subheading {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-primary, #214b86);
+    margin: 1.5rem 0 0.85rem 0;
+  }
+  
+  .sf-subheading:first-of-type {
+    margin-top: 0;
+  }
+  
+  /* ---------- grid / fields ---------- */
+  
+  .sf-grid {
+    display: grid;
+    gap: 1rem 1.25rem;
+  }
+  
+  .sf-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .sf-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .sf-grid-academic-1 {
+    grid-template-columns: 2fr 2fr 1fr 1fr;
+  }
+  
+  .sf-grid-academic-2 {
+    grid-template-columns: 2fr 2fr 1fr 1fr;
+  }
+  
+  .sf-mt {
+    margin-top: 1rem;
+  }
+  
+  .sf-span-2 {
+    grid-column: span 2;
+  }
+  
+  .sf-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  
+  .sf-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--st-text-heading);
+  }
+  
+  .sf-hint {
+    font-size: 0.72rem;
+    color: var(--st-text-muted);
+  }
+  
+  .sf-input,
+  select.sf-input {
+    padding: 0.45rem 0.65rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-family: var(--font-body, "Inter", sans-serif);
+    font-size: 0.82rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .sf-input:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .sf-textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+  
+  .sf-textarea-sm {
+    min-height: 44px;
+  }
+  
+  /* ---------- Personal Information: main fields (left) + photo /
+     login credentials (right) ---------- */
+  
+  .sf-grid-personal {
+    grid-template-columns: 1fr 260px;
+    align-items: stretch;
+  }
+  
+  .sf-personal-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .sf-personal-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    height: 100%;
+  }
+  
+  .sf-input-compact {
+    padding: 0.45rem 0.65rem;
+    font-size: 0.82rem;
+  }
+  
+  /* ---------- photo block ---------- */
+  
+  .sf-photo-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  
+  .sf-photo-block-compact {
+    flex: 0 0 auto;
+  }
+  
+  .sf-photo-block-compact .sf-drive-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .sf-photo-input-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .sf-photo-input-row .sf-input {
+    flex: 1;
+  }
+  
+  .sf-drive-btn {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--st-icon-btn-border, var(--st-border));
+    background: var(--st-icon-btn-bg, #fff);
+    color: var(--color-primary, #214b86);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .sf-drive-btn:hover {
+    background: var(--st-icon-edit-hover-bg);
+    border-color: var(--color-primary, #214b86);
+  }
+  
+  .sf-photo-preview {
+    margin-top: 0.5rem;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    border-radius: var(--radius-md, 10px);
+    border: 1px dashed var(--st-border);
+    background: var(--st-row-hover, #f8fafc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .sf-photo-preview-compact {
+    max-width: 160px;
+  }
+
+  /* Inline mobile-only photo preview next to the Photo URL field.
+     Hidden elsewhere — desktop/tablet still use the sidebar preview. */
+  .sf-field-photo-preview-mobile {
+    display: none;
+  }
+  
+  .sf-photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .sf-photo-placeholder {
+    font-size: 0.8rem;
+    color: var(--st-text-muted);
+  }
+  
+  /* ---------- login credentials box ---------- */
+  
+  .sf-login-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--st-border);
+    border-radius: var(--radius-md, 10px);
+    background: var(--st-row-hover, #f8fafc);
+    flex: 1 1 auto;
+  }
+  
+  .sf-login-box-title {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-primary, #214b86);
+  }
+  
+  /* ---------- toggle switch ---------- */
+  
+  .sf-toggle-field {
+    justify-content: center;
+  }
+  
+  .sf-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    width: fit-content;
+  }
+  
+  .sf-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .sf-switch-track {
+    width: 40px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--st-border);
+    position: relative;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+  }
+  
+  .sf-switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  }
+  
+  .sf-switch input:checked + .sf-switch-track {
+    background: var(--color-primary, #214b86);
+  }
+  
+  .sf-switch input:checked + .sf-switch-track .sf-switch-thumb {
+    transform: translateX(18px);
+  }
+  
+  .sf-switch-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--st-text-body);
+  }
+  
+  /* ---------- comparison tables (Father/Mother, Present/Permanent,
+     10th/11th/12th) — single label column + N value columns, labels
+     shown once in a header row ---------- */
+  
+  .sf-compare-wrap {
+    margin-bottom: 1.5rem;
+  }
+  
+  .sf-compare-wrap-address {
+    /* Keep the table from stretching edge-to-edge on wide screens —
+       leaves breathing room on the right, like the reference design. */
+    max-width: 800px;
+  }
+  
+  .sf-compare {
+    display: grid;
+    gap: 0.6rem 1rem;
+  }
+  
+  .sf-compare-2col {
+    grid-template-columns: 160px 1fr 1fr;
+  }
+  
+  .sf-compare-3col {
+    grid-template-columns: 160px 1fr 1fr 1fr;
+  }
+
+  /* Family Details: Father/Mother columns match the width of a normal
+     sf-grid-3 field (e.g. Parent Email) by splitting the row into three
+     equal columns — label included — with the same column gap used by
+     sf-grid-3, instead of a fixed 160px label + fixed-width values. */
+  .sf-compare-2col.sf-compare-family {
+    grid-template-columns: 160px 220px 220px;
+    column-gap: 1.25rem;
+  }
+
+  .sf-compare-family .sf-compare-label {
+    align-items: flex-start;
+  }
+  
+  .sf-compare-header {
+    display: contents;
+  }
+  
+  .sf-compare-header > div {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--st-text-muted);
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--st-border);
+  }
+  
+  .sf-compare-label-head {
+    color: var(--st-text-muted);
+  }
+  
+  .sf-compare-header-permanent {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  
+  .sf-same-as-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--st-text-muted);
+    cursor: pointer;
+  }
+  
+  .sf-same-as-checkbox input {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+  }
+  
+  .sf-compare-row {
+    display: contents;
+  }
+  
+  .sf-compare-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--st-text-heading);
+  }
+
+  .sf-compare-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .sf-compare-col-label {
+    display: none;
+  }
+  
+  /* ---------- address / qualification repeating blocks (legacy,
+     still used for spacing between other sub-sections) ---------- */
+  
+  .sf-address-block {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px dashed var(--st-border);
+  }
+  
+  .sf-address-block:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  /* ---------- dynamic (addable) lists ---------- */
+  
+  .sf-dynamic-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  
+  .sf-add-btn {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.85rem;
+  }
+  
+  .sf-dynamic-header-links {
+    justify-content: flex-end;
+  }
+  
+  .sf-empty-hint {
+    font-size: 0.85rem;
+    color: var(--st-text-muted);
+    margin: 0 0 1rem 0;
+  }
+  
+  .sf-dynamic-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    align-items: start;
+    padding: 1rem;
+    border: 1px solid var(--st-border);
+    border-radius: var(--radius-md, 10px);
+    margin-bottom: 0.85rem;
+    background: var(--st-row-hover, #f8fafc);
+  }
+  
+  /* Aligns the trash icon with the folder icon / input row rather than
+     the label row above it. */
+  .sf-row-remove-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  
+  .sf-row-remove-spacer {
+    font-size: 0.8rem;
+    line-height: 1;
+    visibility: hidden;
+  }
+  
+  .sf-row-remove {
+    height: 38px;
+  }
+  
+  /* ---------- footer ----------
+     position: sticky (scoped to this component's own flow — it never
+     overlaps the left nav bar, unlike position: fixed). Sticky needs
+     .sf-card to be a scroll container taller than the viewport for
+     long forms — see .sf-card rule below. */
+  
+  .sf-footer {
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding: 1.1rem 1.5rem .9rem;
+    margin: 0;
+    margin-bottom: 0;
+    border-top: 1px solid var(--st-border);
+    border-bottom: none;
+    background: var(--st-surface-raised, #fff);
+    z-index: 5;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+    position: sticky;
+    bottom: 0;
+  }
+  
+  /* ---------- responsive ---------- */
+  
+  @media (max-width: 900px) {
+    .sf-grid-personal {
+      grid-template-columns: 1fr;
+    }
+    .sf-personal-side {
+      max-width: 260px;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .sf-grid-2,
+    .sf-grid-3,
+    .sf-grid-academic-1,
+    .sf-grid-academic-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .sf-span-2 {
+      grid-column: span 2;
+    }
+    .sf-compare-2col,
+    .sf-compare-3col {
+      grid-template-columns: 1fr;
+    }
+    .sf-compare-header {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+    }
+    .sf-compare-label-head {
+      display: none;
+    }
+    .sf-compare-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px dashed var(--st-border);
+    }
+    .sf-compare-label {
+      grid-column: 1 / -1;
+    }
+    .sf-compare-col-label {
+      display: none;
+    }
+    .sf-dynamic-row {
+      grid-template-columns: 1fr;
+    }
+    .sf-row-remove-wrap {
+      flex-direction: row;
+      align-items: center;
+    }
+    .sf-row-remove-spacer {
+      display: none;
+    }
+    .sf-body {
+      padding: 1rem;
+      padding-bottom: 5.5rem;
+    }
+    .sf-tabs {
+      display: none;
+    }
+    .sf-mobile-tabs {
+      display: block;
+    }
+    .sf-personal-side {
+      max-width: 100%;
+    }
+    .sf-footer {
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    
+
+    /* Other / Academic / Admission Details: extra breathing room
+       between rows on mobile so the page doesn't feel cramped. */
+    .sf-section-loose .sf-grid {
+      row-gap: 1.75rem;
+    }
+    .sf-section-loose .sf-subheading {
+      margin-top: 2rem;
+    }
+
+    /* Family Details: single column on mobile, so the narrower
+       father/mother widths from desktop don't apply here. */
+    .sf-compare-2col.sf-compare-family {
+      grid-template-columns: 1fr;
+    }
+
+    /* Personal Information: flatten the row-wrapper divs into one
+       2-column grid so all fields line up edge-to-edge with no
+       leftover gaps. Photo URL is pushed down after Hostel Student and
+       forced into column 1 — this leaves column 2 of the Hostel
+       Student row blank — then its preview sits beside it in column 2
+       of the next row. */
+    .sf-personal-fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .sf-personal-fields > .sf-grid {
+      display: contents;
+    }
+    .sf-field-photo {
+      order: 100;
+      grid-column: 1;
+    }
+    .sf-field-photo-preview-mobile {
+      order: 101;
+      grid-column: 2;
+      display: flex;
+    }
+
+    /* Avoid showing the photo twice — the sidebar preview is now
+       duplicated inline above; the login box still renders below it. */
+    .sf-personal-side .sf-photo-block {
+      display: none;
+    }
+  }

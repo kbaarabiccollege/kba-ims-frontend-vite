@@ -110,3 +110,52 @@ body {
   background: #fff;
   transition: background 0.25s ease, color 0.25s ease;
 }
+
+/* ============================================
+   Password input show/hide toggle
+   Shared by components/common/PasswordInput.jsx.
+   Used on the login page and any admin form with
+   a password field (create user, change password).
+
+   Note: `.pw-input-wrap input` targets any plain
+   <input> inside the wrapper, so it works whether
+   the surrounding form styles the input via a class
+   (e.g. .auth-input) or via a tag selector
+   (e.g. .um-field input) — no extra class needed
+   on the <input> itself just to make room for the
+   eye button.
+   ============================================ */
+
+   .pw-input-wrap {
+    position: relative;
+  }
+  
+  .pw-input-wrap input {
+    width: 100%;
+    padding-right: 44px;
+  }
+  
+  .pw-eye-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--color-input-placeholder, #a8b5c8);
+    display: flex;
+    align-items: center;
+    line-height: 0;
+    transition: color 0.2s ease;
+  }
+  
+  .pw-eye-btn:hover {
+    color: var(--color-primary, #214b86);
+  }
+  
+  .pw-eye-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }

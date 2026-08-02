@@ -1,4 +1,4 @@
-// src/pages/admin/users/components/UserFormModal.jsx
+// src/pages/superadmin/users/components/UserFormModal.jsx
 //
 // Handles both "Add New User" and "Edit User".
 // Password is only collected here on create — edits go through
@@ -8,12 +8,11 @@
 import { useEffect, useState } from "react";
 import Modal from "../../../../components/common/Modal";
 import { ROLE_OPTIONS, STATUS_OPTIONS } from "../constants";
-import { EyeIcon, EyeOffIcon } from "../../../../components/common/Icons";
+import PasswordInput from "../../../../components/common/PasswordInput";
 import { capitalizeFirst } from "../../../../components/common/formatError";
 
 const emptyForm = {
   user_id: "",
-  name: "",
   email: "",
   role: "student",
   status: "active",
@@ -35,7 +34,6 @@ const UserFormModal = ({
     isEdit
       ? {
           user_id: initialData?.user_id ?? "",
-          name: initialData?.name ?? "",
           email: initialData?.email ?? "",
           role: initialData?.role ?? "student",
           status: initialData?.status ?? "active",
@@ -43,7 +41,6 @@ const UserFormModal = ({
       : { ...emptyForm }
   );
   const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
 
   // Field-level errors returned by the backend (e.g. Joi validation
   // messages). Synced from the prop so a fresh submit always shows the
@@ -64,7 +61,6 @@ const UserFormModal = ({
   const validate = () => {
     const next = {};
     if (!form.user_id.trim()) next.user_id = "User ID is required.";
-    if (!form.name.trim()) next.name = "Name is required.";
     if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) {
       next.email = "Enter a valid email address.";
     }
@@ -85,14 +81,12 @@ const UserFormModal = ({
     const payload = isEdit
       ? {
           user_id: form.user_id.trim(),
-          name: form.name.trim(),
           email: form.email.trim() || null,
           role: form.role,
           status: form.status,
         }
       : {
           user_id: form.user_id.trim(),
-          name: form.name.trim(),
           email: form.email.trim() || null,
           role: form.role,
           status: form.status,
@@ -108,7 +102,7 @@ const UserFormModal = ({
         {serverError && (
           <div className="um-form-error-banner">
             <strong className="um-form-error-title">Validation failed</strong>
-            {serverError.trim().replace(/\.+$/, "").toLowerCase() !== "validation failed" && (  <span>{serverError}</span>  )}
+            {serverError.trim().replace(/\.+$/, "").toLowerCase() !== "validation failed" && (  <span>{serverError}</span>  )}
           </div>
         )}
 
@@ -125,20 +119,6 @@ const UserFormModal = ({
             autoFocus
           />
           {fieldError("user_id") && <span className="um-field-error">{fieldError("user_id")}</span>}
-        </div>
-
-        <div className="um-field">
-          <label htmlFor="name">Name
-          <span className="um-required">*</span>
-          </label>
-          <input
-            id="name"
-            type="text"
-            value={form.name}
-            onChange={setField("name")}
-            placeholder="Full name"
-          />
-          {fieldError("name") && <span className="um-field-error">{fieldError("name")}</span>}
         </div>
 
         <div className="um-field">
@@ -188,25 +168,13 @@ const UserFormModal = ({
             <label htmlFor="password">
               Password <span className="um-required">*</span>
             </label>
-            <div className="um-input-wrap">
-              <input
-                id="password"
-                className="um-input-has-toggle"
-                type={showPassword ? "text" : "password"}
-                value={form.password}
-                onChange={setField("password")}
-                placeholder="Minimum 6 characters"
-                autoComplete="new-password"
-              />
-              <button
-                type="button"
-                className="um-eye-btn"
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-              </button>
-            </div>
+            <PasswordInput
+              id="password"
+              value={form.password}
+              onChange={setField("password")}
+              placeholder="Minimum 6 characters"
+              autoComplete="new-password"
+            />
             {fieldError("password") && <span className="um-field-error">{fieldError("password")}</span>}
           </div>
         )}
