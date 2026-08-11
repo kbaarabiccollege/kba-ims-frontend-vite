@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { getBatches, createBatch, updateBatch } from "../../../../api/batchesApi";
 import useDebouncedValue from "../../../../hooks/useDebouncedValue";
+import SearchableDropdown from "../../../../components/common/SearchableDropdown";
 import { COURSE_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
 import { CourseBadge } from "./components/BatchBadges";
 import BatchFormModal from "./components/BatchFormModal";
@@ -156,13 +157,20 @@ const Batches = () => {
           </div>
 
           <div className="bm-filters">
-            <select value={course} onChange={(e) => setCourse(e.target.value)} aria-label="Filter by course">
-              {COURSE_FILTER_OPTIONS.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+            <div className="bm-filter-dropdown">
+              <SearchableDropdown
+                id="bm-course-filter"
+                label=""
+                allLabel={COURSE_FILTER_OPTIONS.find((c) => c.value === "all")?.label || "All Courses"}
+                options={COURSE_FILTER_OPTIONS.filter((c) => c.value !== "all").map((c) => ({
+                  id: c.value,
+                  label: c.label,
+                }))}
+                value={course}
+                onChange={setCourse}
+                aria-label="Filter by course"
+              />
+            </div>
 
             <span className="bm-result-count">{total} batches</span>
           </div>

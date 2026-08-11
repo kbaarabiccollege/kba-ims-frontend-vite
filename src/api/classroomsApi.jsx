@@ -8,18 +8,23 @@ import axiosInstance from "./axiosInstance";
 const BASE = "/classrooms";
 
 /**
- * Fetch active classrooms, optionally filtered by a search term.
- * GET /api/classrooms?is_active=1&q=2026
+ * Fetch active classrooms, optionally filtered by a search term and/or a
+ * course.
+ * GET /api/classrooms?is_active=1&q=2026&course=1
  *
  * @param {Object} params
  * @param {number|boolean} [params.isActive]  defaults to 1 (active only)
  * @param {string} [params.q]                 search text, sent as `q`
+ * @param {string|number} [params.course]     course id (see components/common/courses.js);
+ *                                             used by the Bulk Add Students modal to scope
+ *                                             the Class dropdown to the selected course.
  * res.data: [{ id, name, room_no, term, semester, batch_id, course, is_active, ... }]
  */
-export async function getClassrooms({ isActive = 1, q } = {}) {
+export async function getClassrooms({ isActive = 1, q, course } = {}) {
   const params = {};
   if (isActive !== undefined && isActive !== null) params.is_active = isActive;
   if (q && q.trim()) params.q = q.trim();
+  if (course !== undefined && course !== null && course !== "") params.course = course;
 
   const { data } = await axiosInstance.get(BASE, { params });
   return data;

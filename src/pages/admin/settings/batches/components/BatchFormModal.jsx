@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from "react";
 import Modal from "../../../../../components/common/Modal";
+import SearchableDropdown from "../../../../../components/common/SearchableDropdown";
 import { COURSE_OPTIONS } from "../constants";
 import { capitalizeFirst } from "../../../../../components/common/formatError";
 
@@ -45,6 +46,14 @@ const BatchFormModal = ({
 
   const setField = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setBackendErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  // SearchableDropdown's onChange passes the selected id directly
+  // (not an event), so it needs its own setter shape.
+  const setDropdownField = (field) => (value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
     setBackendErrors((prev) => ({ ...prev, [field]: undefined }));
   };
@@ -115,13 +124,14 @@ const BatchFormModal = ({
           <label htmlFor="course">
             Course <span className="bm-required">*</span>
           </label>
-          <select id="course" value={form.course} onChange={setField("course")}>
-            {COURSE_OPTIONS.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
+          <SearchableDropdown
+            id="course"
+            label=""
+            allLabel="Select course"
+            options={COURSE_OPTIONS.map((c) => ({ id: c.value, label: c.label }))}
+            value={form.course || "all"}
+            onChange={(v) => setDropdownField("course")(v === "all" ? "" : v)}
+          />
           {fieldError("course") && <span className="bm-field-error">{fieldError("course")}</span>}
         </div>
 

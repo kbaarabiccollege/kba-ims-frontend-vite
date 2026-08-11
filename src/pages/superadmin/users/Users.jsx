@@ -1,4 +1,4 @@
-// src/pages/admin/users/AdminUsers.jsx
+// src/pages/superadmin/users/Users.jsx
 
 // Users list page (User Management > Users).
 // Talks to GET/POST/PUT /api/users via src/api/usersApi.js.
@@ -24,6 +24,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getUsers, createUser, updateUser, updateUserPassword } from "../../../api/usersApi";
 import useDebouncedValue from "../../../hooks/useDebouncedValue";
 import { useAuth } from "../../../context/AuthContext";
+import SearchableDropdown from "../../../components/common/SearchableDropdown";
 import { ROLE_FILTER_OPTIONS, STATUS_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
 import { RoleBadge, StatusPill } from "../../../components/common/Badges";
 import UserFormModal from "./components/UserFormModal";
@@ -56,6 +57,20 @@ const Users = () => {
   const [role, setRole] = useState(DEFAULT_ROLE_FILTER);
   const [status, setStatus] = useState("active"); // active by default, per spec
   const debouncedSearch = useDebouncedValue(search, 400);
+
+  // ROLE_FILTER_OPTIONS is a static local list — SearchableDropdown only
+  // re-filters via onFetch (built for server search), so this acts as
+  // a client-side "fetch": filter the full list by query and hand the
+  // result back as the visible options.
+  const [roleFilterOptions, setRoleFilterOptions] = useState(
+    ROLE_FILTER_OPTIONS.filter((r) => r.value !== "all").map((r) => ({ id: r.value, label: r.label }))
+  );
+  const handleRoleFilterSearch = (q) => {
+    const query = q.trim().toLowerCase();
+    const base = ROLE_FILTER_OPTIONS.filter((r) => r.value !== "all");
+    const filtered = query ? base.filter((r) => r.label.toLowerCase().includes(query)) : base;
+    setRoleFilterOptions(filtered.map((r) => ({ id: r.value, label: r.label })));
+  };
 
   // ---- popups ----
   const [formModal, setFormModal] = useState(null); // { mode: 'create' | 'edit', user? }
@@ -222,27 +237,40 @@ const Users = () => {
           </div>
 
           <div className="um-filters">
+
             {isDev && (
-              <select value={role} onChange={(e) => setRole(e.target.value)} aria-label="Filter by role">
-                {ROLE_FILTER_OPTIONS.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
+              <div className="um-filter-dropdown">
+                <SearchableDropdown
+                  id="um-role-filter"
+                  label=""
+                  allLabel={ROLE_FILTER_OPTIONS.find((r) => r.value === "all")?.label || "All Roles"}
+                  options={roleFilterOptions}
+                  value={role}
+                  onChange={setRole}
+                  searchable
+                  onFetch={handleRoleFilterSearch}
+                  loaded
+                  hideFetchButton
+                  placeholder="Search roles…"
+                  aria-label="Filter by role"
+                />
+              </div>
             )}
 
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              aria-label="Filter by status"
-            >
-              {STATUS_FILTER_OPTIONS.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
+            <div className="um-filter-dropdown">
+              <SearchableDropdown
+                id="um-status-filter"
+                label=""
+                allLabel={STATUS_FILTER_OPTIONS.find((s) => s.value === "all")?.label || "All Statuses"}
+                options={STATUS_FILTER_OPTIONS.filter((s) => s.value !== "all").map((s) => ({
+                  id: s.value,
+                  label: s.label,
+                }))}
+                value={status}
+                onChange={setStatus}
+                aria-label="Filter by status"
+              />
+            </div>
 
             <span className="um-result-count">{total} users</span>
           </div>

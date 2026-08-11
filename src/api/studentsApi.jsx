@@ -92,30 +92,50 @@ export async function deleteStudent(id) {
 }
 
 /**
- * Bulk-update a set of students (the "Bulk Update" action from the list page).
- * PUT /api/students/bulk-update
- * body: { ids: number[], ...fieldsToUpdate }
- *
- * NOTE: endpoint + payload shape assumed — no bulk-update API was provided.
- * Adjust the URL/body here once the real endpoint is confirmed; the modal
- * that calls this doesn't need to change.
+ * Bulk-create a contiguous range of students (the "Bulk Add Students"
+ * action from the "…" menu).
+ * POST /api/students/bulk
+ * body: { classroom_id, batch_id, is_hostel, starting_roll_number, total_students }
  */
-export async function bulkUpdateStudents(ids, changes) {
-  const { data } = await axiosInstance.put(`${BASE}/bulk-update`, { ids, ...changes });
+export async function bulkCreateStudents(payload) {
+  const { data } = await axiosInstance.post(`${BASE}/bulk`, payload);
+  return data;
+}
+
+/**
+ * Bulk-update a set of students (the "Bulk Update" action from the list page).
+ * PATCH /api/students/bulk
+ * body: { student_ids, classroom_id, batch_id, status, is_hostel,
+ *          academic_status, madhab_id, yoj, madras_course, madras_joining_year }
+ * Only fields explicitly present in `changes` are sent as their real
+ * value; everything else goes as null, per the API contract ("pass null
+ * if not provided").
+ */
+export async function bulkUpdateStudents(ids, changes = {}) {
+  const body = {
+    student_ids: ids,
+    classroom_id: changes.classroom_id ?? null,
+    batch_id: changes.batch_id ?? null,
+    status: changes.status ?? null,
+    is_hostel: changes.is_hostel ?? null,
+    academic_status: changes.academic_status ?? null,
+    madhab_id: changes.madhab_id ?? null,
+    yoj: changes.yoj ?? null,
+    madras_course: changes.madras_course ?? null,
+    madras_joining_year: changes.madras_joining_year ?? null,
+  };
+  const { data } = await axiosInstance.patch(`${BASE}/bulk`, body);
   return data;
 }
 
 /**
  * Bulk mark a set of students active/inactive
  * (the "Mark as Active" / "Mark as Inactive" actions from the list page).
- * PUT /api/students/bulk-status
- * body: { ids: number[], status: 'active' | 'inactive' }
- *
- * NOTE: endpoint assumed — same caveat as bulkUpdateStudents above.
+ * Thin wrapper around bulkUpdateStudents — same PATCH /students/bulk
+ * endpoint, with only `status` set and every other field null.
  */
 export async function bulkUpdateStudentStatus(ids, status) {
-  const { data } = await axiosInstance.put(`${BASE}/bulk-status`, { ids, status });
-  return data;
+  return bulkUpdateStudents(ids, { status });
 }
 
 export default {
@@ -124,6 +144,7 @@ export default {
   updateStudent,
   getStudent,
   deleteStudent,
+  bulkCreateStudents,
   bulkUpdateStudents,
   bulkUpdateStudentStatus,
 };

@@ -262,10 +262,15 @@ const StudentForm = () => {
     if (checked) {
       setForm((prev) => {
         const present = prev.addresses.find((a) => a.address_type === 0);
+        const permanent = prev.addresses.find((a) => a.address_type === 1);
         return {
           ...prev,
+          // Copy present's field values onto permanent, but keep permanent's
+          // own id/address_type so the PATCH updates the correct DB row.
           addresses: prev.addresses.map((a) =>
-            a.address_type === 1 ? { ...present, address_type: 1 } : a
+            a.address_type === 1
+              ? { ...present, address_type: 1, id: permanent.id }
+              : a
           ),
         };
       });
@@ -467,18 +472,21 @@ const StudentForm = () => {
           },
         };
       case "address": {
+        // Address rows are a fixed 2-row set (present/permanent) created
+        // once at student creation — a PATCH always targets an existing
+        // row by id, so only rows that were actually loaded (have an id)
+        // are sent. A row with no id means the backend hasn't created it
+        // yet (see bulkCreateStudents) and can't be updated via this form.
         const addresses = form.addresses
-          .filter((a) =>
-            Object.entries(a).some(([k, v]) => k !== "address_type" && String(v || "").trim())
-          )
+          .filter((a) => a.id)
           .map((a) => ({ ...a, address_type: Number(a.address_type) }));
         return { address: addresses };
       }
       case "qualifications": {
+        // Same rationale as address: fixed 3-row set (10th/11th/12th),
+        // update-only by id.
         const qualifications = form.qualifications
-          .filter((q) =>
-            Object.entries(q).some(([k, v]) => k !== "level" && String(v || "").trim())
-          )
+          .filter((q) => q.id)
           .map((q) => ({
             ...q,
             passing_year: num(q.passing_year),
@@ -736,19 +744,15 @@ const StudentForm = () => {
                       />
                     </div>
                     <div className="sf-field">
-                      <label className="sf-label">Gender</label>
-                      <select
-                        className="sf-input"
-                        value={form.personal.gender}
-                        onChange={(e) => setField("personal", "gender", e.target.value)}
-                      >
-                        <option value="">Select gender</option>
-                        {GENDER_OPTIONS.map((g) => (
-                          <option key={g.id} value={g.id}>
-                            {g.label}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="sf-label" htmlFor="sf-gender">Gender</label>
+                      <SearchableDropdown
+                        id="sf-gender"
+                        label=""
+                        allLabel="Select gender"
+                        options={GENDER_OPTIONS}
+                        value={form.personal.gender || "all"}
+                        onChange={(v) => setField("personal", "gender", v === "all" ? "" : v)}
+                      />
                     </div>
                     <div className="sf-field">
                       <label className="sf-label">Roll Number *</label>
@@ -764,19 +768,15 @@ const StudentForm = () => {
                   {/* Row 3: Blood Group, Mother Tongue, Batch */}
                   <div className="sf-grid sf-grid-3">
                     <div className="sf-field">
-                      <label className="sf-label">Blood Group</label>
-                      <select
-                        className="sf-input"
-                        value={form.personal.blood_group}
-                        onChange={(e) => setField("personal", "blood_group", e.target.value)}
-                      >
-                        <option value="">Select blood group</option>
-                        {BLOOD_GROUP_OPTIONS.map((b) => (
-                          <option key={b.id} value={b.id}>
-                            {b.label}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="sf-label" htmlFor="sf-blood-group">Blood Group</label>
+                      <SearchableDropdown
+                        id="sf-blood-group"
+                        label=""
+                        allLabel="Select blood group"
+                        options={BLOOD_GROUP_OPTIONS}
+                        value={form.personal.blood_group || "all"}
+                        onChange={(v) => setField("personal", "blood_group", v === "all" ? "" : v)}
+                      />
                     </div>
                     <div className="sf-field">
                       <label className="sf-label">Mother Tongue</label>
@@ -817,18 +817,15 @@ const StudentForm = () => {
                       />
                     </div>
                     <div className="sf-field">
-                      <label className="sf-label">Academic Status</label>
-                      <select
-                        className="sf-input"
-                        value={form.personal.academic_status}
-                        onChange={(e) => setField("personal", "academic_status", e.target.value)}
-                      >
-                        {ACADEMIC_STATUS_OPTIONS.map((s) => (
-                          <option key={s.id} value={s.id}>
-                            {s.label}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="sf-label" htmlFor="sf-academic-status">Academic Status</label>
+                      <SearchableDropdown
+                        id="sf-academic-status"
+                        label=""
+                        allLabel="Select status"
+                        options={ACADEMIC_STATUS_OPTIONS}
+                        value={form.personal.academic_status || "all"}
+                        onChange={(v) => setField("personal", "academic_status", v === "all" ? "" : v)}
+                      />
                     </div>
                     <div className="sf-field sf-toggle-field">
                       <label className="sf-label">Hostel Student</label>
@@ -900,65 +897,49 @@ const StudentForm = () => {
             <section className="sf-section sf-section-loose">
               <div className="sf-grid sf-grid-3">
                 <div className="sf-field">
-                  <label className="sf-label">Religion</label>
-                  <select
-                    className="sf-input"
-                    value={form.other.religion_id}
-                    onChange={(e) => setField("other", "religion_id", e.target.value)}
-                  >
-                    <option value="">Select religion</option>
-                    {RELIGION_OPTIONS.map((r) => (
-                      <option key={r.id} value={r.id}>
-                        {r.label}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="sf-label" htmlFor="sf-religion">Religion</label>
+                  <SearchableDropdown
+                    id="sf-religion"
+                    label=""
+                    allLabel="Select religion"
+                    options={RELIGION_OPTIONS}
+                    value={form.other.religion_id || "all"}
+                    onChange={(v) => setField("other", "religion_id", v === "all" ? "" : v)}
+                  />
                 </div>
                 <div className="sf-field">
-                  <label className="sf-label">Caste</label>
-                  <select
-                    className="sf-input"
-                    value={form.other.caste_id}
-                    onChange={(e) => setField("other", "caste_id", e.target.value)}
-                  >
-                    <option value="">Select caste</option>
-                    {CASTE_OPTIONS.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="sf-label" htmlFor="sf-caste">Caste</label>
+                  <SearchableDropdown
+                    id="sf-caste"
+                    label=""
+                    allLabel="Select caste"
+                    options={CASTE_OPTIONS}
+                    value={form.other.caste_id || "all"}
+                    onChange={(v) => setField("other", "caste_id", v === "all" ? "" : v)}
+                  />
                 </div>
 
                 <div className="sf-field">
-                  <label className="sf-label">Social Category</label>
-                  <select
-                    className="sf-input"
-                    value={form.other.social_category_id}
-                    onChange={(e) => setField("other", "social_category_id", e.target.value)}
-                  >
-                    <option value="">Select category</option>
-                    {SOCIAL_CATEGORY_OPTIONS.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="sf-label" htmlFor="sf-social-category">Social Category</label>
+                  <SearchableDropdown
+                    id="sf-social-category"
+                    label=""
+                    allLabel="Select category"
+                    options={SOCIAL_CATEGORY_OPTIONS}
+                    value={form.other.social_category_id || "all"}
+                    onChange={(v) => setField("other", "social_category_id", v === "all" ? "" : v)}
+                  />
                 </div>
                 <div className="sf-field">
-                  <label className="sf-label">Madhab</label>
-                  <select
-                    className="sf-input"
-                    value={form.other.madhab_id}
-                    onChange={(e) => setField("other", "madhab_id", e.target.value)}
-                  >
-                    <option value="">Select madhab</option>
-                    {MADHAB_OPTIONS.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.label}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="sf-label" htmlFor="sf-madhab">Madhab</label>
+                  <SearchableDropdown
+                    id="sf-madhab"
+                    label=""
+                    allLabel="Select madhab"
+                    options={MADHAB_OPTIONS}
+                    value={form.other.madhab_id || "all"}
+                    onChange={(v) => setField("other", "madhab_id", v === "all" ? "" : v)}
+                  />
                 </div>
 
                 <div className="sf-field">
@@ -1447,27 +1428,41 @@ const StudentForm = () => {
         {saveError && <div className="st-error-banner sf-page-error">{saveError}</div>}
 
         <div className="sf-footer">
-          <button type="submit" className="st-btn st-btn-primary" disabled={savingSave || savingClose}>
-            {savingSave ? "Saving…" : "Save"}
-          </button>
-          {isEdit && (
+          <div className="sf-footer-actions">
+            <button type="submit" className="st-btn st-btn-primary" disabled={savingSave || savingClose}>
+              {savingSave ? "Saving…" : "Save"}
+            </button>
+            {isEdit && (
+              <button
+                type="button"
+                className="st-btn st-btn-primary"
+                disabled={savingSave || savingClose}
+                onClick={handleSaveAndClose}
+              >
+                {savingClose ? "Saving…" : "Save & Close"}
+              </button>
+            )}
             <button
               type="button"
-              className="st-btn st-btn-primary"
+              className="st-btn st-btn-ghost"
+              onClick={() => navigate(`${basePath}/students`)}
               disabled={savingSave || savingClose}
-              onClick={handleSaveAndClose}
             >
-              {savingClose ? "Saving…" : "Save & Close"}
+              Cancel
             </button>
+          </div>
+          {isEdit && (
+            <span className="sf-footer-note">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="10" cy="10" r="9" fill="currentColor" />
+                <rect x="9" y="8.5" width="2" height="5.5" rx="1" fill="var(--st-surface, #fff)" />
+                <rect x="9" y="5.5" width="2" height="2" rx="1" fill="var(--st-surface, #fff)" />
+              </svg>
+              <span>
+                Only the <strong>{SECTIONS.find((s) => s.key === activeSection)?.label}</strong> section will be updated.
+              </span>
+            </span>
           )}
-          <button
-            type="button"
-            className="st-btn st-btn-ghost"
-            onClick={() => navigate(`${basePath}/students`)}
-            disabled={savingSave || savingClose}
-          >
-            Cancel
-          </button>
         </div>
       </form>
     </div>

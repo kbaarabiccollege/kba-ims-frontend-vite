@@ -13,4 +13,4 @@ export const COURSES = {
     2: "Diploma",
   };
   
-  export const getCourseLabel = (courseId) => COURSES[courseId] ?? "";
+export const getCourseLabel = (courseId) => COURSES[courseId] ?? "";

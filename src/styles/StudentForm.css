@@ -664,7 +664,12 @@
   .sf-footer {
     display: flex;
     flex: 0 0 auto;
-    justify-content: flex-start;
+    /* Two groups on this row: .sf-footer-actions (Save/Save & Close/
+       Cancel) on the left, .sf-footer-note on the right. space-between
+       guarantees the note lands at the far end regardless of how many
+       buttons render before it — no margin-auto/order tricks needed. */
+    justify-content: space-between;
+    align-items: center;
     gap: 0.75rem;
     padding: 1.1rem 1.5rem .9rem;
     margin: 0;
@@ -676,6 +681,13 @@
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
     position: sticky;
     bottom: 0;
+  }
+
+  .sf-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 0 0 auto;
   }
   
   /* ---------- responsive ---------- */

@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from "react";
 import Modal from "../../../../components/common/Modal";
+import SearchableDropdown from "../../../../components/common/SearchableDropdown";
 import { ROLE_OPTIONS, STATUS_OPTIONS } from "../constants";
 import PasswordInput from "../../../../components/common/PasswordInput";
 import { capitalizeFirst } from "../../../../components/common/formatError";
@@ -42,6 +43,21 @@ const UserFormModal = ({
   );
   const [errors, setErrors] = useState({});
 
+  // ROLE_OPTIONS is a static local list — SearchableDropdown only
+  // re-filters via onFetch (built for server search), so this acts as
+  // a client-side "fetch": filter the full list by query and hand the
+  // result back as the visible options.
+  const [roleOptions, setRoleOptions] = useState(
+    ROLE_OPTIONS.map((r) => ({ id: r.value, label: r.label }))
+  );
+  const handleRoleSearch = (q) => {
+    const query = q.trim().toLowerCase();
+    const filtered = query
+      ? ROLE_OPTIONS.filter((r) => r.label.toLowerCase().includes(query))
+      : ROLE_OPTIONS;
+    setRoleOptions(filtered.map((r) => ({ id: r.value, label: r.label })));
+  };
+
   // Field-level errors returned by the backend (e.g. Joi validation
   // messages). Synced from the prop so a fresh submit always shows the
   // latest server response, but cleared per-field as the user edits.
@@ -52,6 +68,14 @@ const UserFormModal = ({
 
   const setField = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setBackendErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  // SearchableDropdown's onChange passes the selected id directly
+  // (not an event), so it needs its own setter shape.
+  const setDropdownField = (field) => (value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
     setBackendErrors((prev) => ({ ...prev, [field]: undefined }));
   };
@@ -138,13 +162,19 @@ const UserFormModal = ({
             <label htmlFor="role">
               Role <span className="um-required">*</span>
             </label>
-            <select id="role" value={form.role} onChange={setField("role")}>
-              {ROLE_OPTIONS.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
+            <SearchableDropdown
+              id="role"
+              label=""
+              allLabel="Select role"
+              options={roleOptions}
+              value={form.role || "all"}
+              onChange={(v) => setDropdownField("role")(v === "all" ? "" : v)}
+              searchable
+              onFetch={handleRoleSearch}
+              loaded
+              hideFetchButton
+              placeholder="Search roles…"
+            />
             {fieldError("role") && <span className="um-field-error">{fieldError("role")}</span>}
           </div>
 
@@ -152,13 +182,14 @@ const UserFormModal = ({
             <label htmlFor="status">
               Status <span className="um-required">*</span>
             </label>
-            <select id="status" value={form.status} onChange={setField("status")}>
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
+            <SearchableDropdown
+              id="status"
+              label=""
+              allLabel="Select status"
+              options={STATUS_OPTIONS.map((s) => ({ id: s.value, label: s.label }))}
+              value={form.status || "all"}
+              onChange={(v) => setDropdownField("status")(v === "all" ? "" : v)}
+            />
             {fieldError("status") && <span className="um-field-error">{fieldError("status")}</span>}
           </div>
         </div>

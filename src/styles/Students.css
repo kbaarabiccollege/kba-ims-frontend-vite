@@ -1031,20 +1031,32 @@
     color: var(--st-text-heading);
   }
   
-  .st-field select {
+  .st-field select,
+  .st-field input {
     padding: 0.65rem 0.85rem;
     border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--color-input-border, #d7dfea);
     background: var(--color-input-bg, #f2f5f9);
     color: var(--color-input-text, #1e2f4a);
     font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .st-field input::placeholder {
+    color: var(--color-input-placeholder, #a8b5c8);
   }
   
-  .st-field select:focus {
+  .st-field select:focus,
+  .st-field input:focus {
     outline: none;
     background: var(--color-input-bg-focus, #eef3fa);
     border-color: var(--color-primary, #214b86);
     box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+
+  .st-bulk-form-grid .st-field {
+    justify-content: flex-end;
   }
   
   .st-modal-actions {
@@ -1059,6 +1071,64 @@
     padding: 2.5rem 1.5rem;
     text-align: center;
     color: var(--st-text-muted);
+  }
+
+  /* ---------- section-save footer note (desktop only) ---------- */
+
+  .sf-footer-note {
+    display: none;
+  }
+
+  @media (min-width: 641px) {
+    /* .sf-footer uses justify-content: space-between with two groups
+       (.sf-footer-actions on the left, this note on the right), so no
+       margin-left: auto or order is needed here. */
+    .sf-footer-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1rem;
+      /* Same radius token as the section tabs (.sf-tab) for a consistent look */
+      border-radius: var(--radius-sm, 8px);
+      background: var(--st-icon-edit-hover-bg, #eef3fa);
+      color: var(--color-primary, #214b86);
+      font-size: 0.85rem;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .sf-footer-note svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--color-primary, #214b86);
+    }
+
+    .sf-footer-note strong {
+      font-weight: 700;
+    }
+  }
+
+  /* ---------- section-save footer note ---------- */
+
+  .sf-footer-note {
+    font-size: 0.82rem;
+    color: var(--st-text-muted);
+    margin-left: 0.25rem;
+    align-self: center;
+  }
+
+  .sf-footer-note strong {
+    color: var(--st-text-heading);
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .sf-footer-note {
+      width: 100%;
+      text-align: center;
+      margin: 0.4rem 0 0;
+    }
   }
   
   /* ---------- responsive ---------- */
@@ -1200,4 +1270,396 @@
     .st-modal-panel {
       max-width: 100%;
     }
+  }
+
+  /* ---------- bulk form: 2 fields per row (Bulk Update) ---------- */
+
+  .st-bulk-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .st-bulk-form-grid .sd-dropdown {
+    width: 100%;
+  }
+
+  /* Bulk Update now has 8 fields — give it a bit more room than the
+     440px default confirm modals use. */
+  .st-modal-panel-wide {
+    max-width: 620px;
+  }
+
+  @media (max-width: 640px) {
+    .st-bulk-form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .st-modal-panel-wide {
+      max-width: 100%;
+    }
+  }
+
+  /* ================================================================
+     Bulk Add Students modal ("ba-" prefixed, self-contained overlay)
+     ================================================================ */
+
+  .ba-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--st-overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 100;
+  }
+
+  .ba-panel {
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--st-surface-raised, #fff);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: var(--st-shadow-card, var(--shadow-card));
+  }
+
+  .ba-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.75rem 1.75rem 1.25rem;
+    border-bottom: 1px solid var(--st-border);
+  }
+
+  .ba-header-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--st-avatar-bg);
+    color: var(--st-avatar-fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ba-header-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ba-header-text h2 {
+    margin: 0 0 0.2rem 0;
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--st-text-heading);
+  }
+
+  .ba-header-text p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--st-text-muted);
+  }
+
+  .ba-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--st-text-muted);
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .ba-close:hover:not(:disabled) {
+    color: var(--st-text-heading);
+  }
+
+  .ba-body {
+    padding: 1.5rem 1.75rem;
+  }
+
+  .ba-fields-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .ba-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .ba-field label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--st-text-heading);
+  }
+
+  .ba-field label svg {
+    color: var(--color-primary, #214b86);
+    flex-shrink: 0;
+  }
+
+  .ba-field select,
+  .ba-field input {
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ba-field select:focus,
+  .ba-field input:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+
+  .ba-field .sd-dropdown {
+    width: 100%;
+  }
+
+  .ba-field-toggle {
+    justify-content: flex-start;
+  }
+
+  .ba-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    height: 100%;
+    padding-top: 0.3rem;
+  }
+
+  .ba-toggle {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    border: none;
+    background: var(--st-border);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+    padding: 0;
+  }
+
+  .ba-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
+  }
+
+  .ba-toggle-on {
+    background: var(--color-primary, #214b86);
+  }
+
+  .ba-toggle-on .ba-toggle-thumb {
+    transform: translateX(18px);
+  }
+
+  .ba-toggle-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--st-text-body);
+  }
+
+  .ba-range-box {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--st-border);
+    border-radius: var(--radius-md, 10px);
+    background: var(--st-surface, #fff);
+  }
+
+  .ba-range-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--st-text-heading);
+    margin-bottom: 1rem;
+  }
+
+  .ba-range-title svg {
+    color: var(--color-primary, #214b86);
+  }
+
+  .ba-range-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .ba-range-preview {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--st-bulk-bar-bg);
+    color: var(--color-primary, #214b86);
+    font-size: 0.85rem;
+    font-weight: 600;
+    /* Always rendered now (see BulkAddModal) so this box reserves its
+       space up front instead of pushing content down once it appears. */
+  }
+
+  .ba-range-preview svg {
+    flex-shrink: 0;
+  }
+
+  .ba-range-preview-hidden {
+    visibility: hidden;
+  }
+
+  .ba-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.25rem 1.75rem 1.75rem;
+  }
+
+  .ba-footer .st-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .ba-header {
+      padding: 1.5rem 1.25rem 1rem;
+    }
+
+    .ba-body {
+      padding: 1.25rem;
+    }
+
+    .ba-fields-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .ba-range-fields {
+      grid-template-columns: 1fr;
+    }
+
+    .ba-footer {
+      padding: 1rem 1.25rem 1.25rem;
+      flex-direction: column-reverse;
+    }
+
+    .ba-footer .st-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* ---------- bulk form: 2 fields per row (Bulk Update / Bulk Add) ---------- */
+
+  .st-bulk-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .st-bulk-form-grid .sd-dropdown {
+    width: 100%;
+  }
+
+  @media (max-width: 640px) {
+    .st-bulk-form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ---------- Bulk Add Students: roll-number range box ---------- */
+
+  .st-bulk-range-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--st-border);
+    border-radius: var(--radius-md, 10px);
+    background: var(--st-surface-raised, #fff);
+  }
+
+  .st-bulk-range-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--st-text-heading);
+    margin-bottom: 0.75rem;
+  }
+
+  .st-bulk-range-preview {
+    margin-top: 0.85rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--st-bulk-bar-bg);
+    color: var(--color-primary, #214b86);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  /* ---------- hostel toggle switch (Bulk Add Students) ---------- */
+
+  .st-field-toggle {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .st-toggle {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    border: none;
+    background: var(--st-border);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+  }
+
+  .st-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
+  }
+
+  .st-toggle-on {
+    background: var(--color-primary, #214b86);
+  }
+
+  .st-toggle-on .st-toggle-thumb {
+    transform: translateX(18px);
   }

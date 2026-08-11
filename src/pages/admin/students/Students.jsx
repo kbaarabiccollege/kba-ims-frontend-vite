@@ -67,6 +67,7 @@ import { crudMessage } from "../../../utils/toastMessages";
 import useDebouncedValue from "../../../hooks/useDebouncedValue";
 import { STATUS_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
 import BulkActionsModal from "./components/BulkActionsModal";
+import BulkAddModal from "./components/BulkAddModal";
 import PasswordModal from "../../superadmin/users/components/PasswordModal";
 import { updateUserPassword } from "../../../api/usersApi";
 import SearchableDropdown from "../../../components/common/SearchableDropdown";
@@ -147,6 +148,7 @@ const Students = () => {
   const [bulkModal, setBulkModal] = useState(null); // 'update' | 'activate' | 'deactivate'
   const [bulkSubmitting, setBulkSubmitting] = useState(false);
   const [bulkError, setBulkError] = useState("");
+  const [showBulkAddModal, setShowBulkAddModal] = useState(false);
 
   // ---- row delete confirm ----
   const [deleteTarget, setDeleteTarget] = useState(null); // student
@@ -384,31 +386,26 @@ const Students = () => {
     setBulkError("");
     try {
       const ids = Array.from(selectedIds);
-      if (bulkModal === "update") {
-        await bulkUpdateStudents(ids, changes);
-      } else {
-        await bulkUpdateStudentStatus(ids, changes.status);
-      }
+      const res =
+        bulkModal === "update"
+          ? await bulkUpdateStudents(ids, changes)
+          : await bulkUpdateStudentStatus(ids, changes.status);
+      // NOTE: adjust `res?.message` if the backend nests it differently
+      // (e.g. res?.data?.message).
+      toast.success(res?.message || "Students updated successfully.");
       setBulkModal(null);
       setSelectedIds(new Set());
       fetchStudents();
     } catch (err) {
-      setBulkError(err?.response?.data?.message || "Couldn't complete this action.");
+      const message = err?.response?.data?.message || "Couldn't complete this action.";
+      setBulkError(message);
+      toast.error(message);
     } finally {
       setBulkSubmitting(false);
     }
   };
 
-  // Arrays reconstructed from the accumulated indexes, for BulkActionsModal
-  // (which previously expected full classrooms/batches arrays).
-  const classroomsForModal = useMemo(
-    () => Object.entries(classroomsIndex).map(([id, name]) => ({ id, name })),
-    [classroomsIndex]
-  );
-  const batchesForModal = useMemo(
-    () => Object.entries(batchesIndex).map(([id, batch_name]) => ({ id, batch_name })),
-    [batchesIndex]
-  );
+  
 
   return (
     <div className="st-page">
@@ -453,7 +450,7 @@ const Students = () => {
                   role="menuitem"
                   onClick={() => {
                     setMenuOpen(false);
-                    // TODO: wire up to the real bulk-add endpoint/flow.
+                    setShowBulkAddModal(true);
                   }}
                 >
                   Bulk Add Students
@@ -790,13 +787,25 @@ const Students = () => {
         <BulkActionsModal
           action={bulkModal}
           count={selectedIds.size}
-          classrooms={classroomsForModal}
-          batches={batchesForModal}
+          classroomOptions={classroomOptions}
+          classroomsIndex={classroomsIndex}
+          classroomsLoading={classroomsLoading}
+          classroomsLoaded={classroomsLoaded}
+          onFetchClassrooms={searchClassrooms}
+          batchOptions={batchOptions}
+          batchesIndex={batchesIndex}
+          batchesLoading={batchesLoading}
+          batchesLoaded={batchesLoaded}
+          onFetchBatches={searchBatches}
           onClose={closeBulkModal}
           onConfirm={handleBulkConfirm}
           submitting={bulkSubmitting}
           error={bulkError}
         />
+      )}
+
+      {showBulkAddModal && (
+        <BulkAddModal onClose={() => setShowBulkAddModal(false)} onCreated={fetchStudents} />
       )}
 
       {deleteTarget && (
