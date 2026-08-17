@@ -816,17 +816,17 @@ const StudentForm = () => {
                         onChange={(e) => setField("personal", "mobile_number", e.target.value)}
                       />
                     </div>
-                    <div className="sf-field">
-                      <label className="sf-label" htmlFor="sf-academic-status">Academic Status</label>
-                      <SearchableDropdown
-                        id="sf-academic-status"
-                        label=""
-                        allLabel="Select status"
-                        options={ACADEMIC_STATUS_OPTIONS}
-                        value={form.personal.academic_status || "all"}
-                        onChange={(v) => setField("personal", "academic_status", v === "all" ? "" : v)}
-                      />
-                    </div>
+                      <div className="sf-field">
+                        <label className="sf-label" htmlFor="sf-academic-status">Academic Status</label>
+                        <SearchableDropdown
+                          id="sf-academic-status"
+                          label=""
+                          allLabel="Select status"
+                          options={ACADEMIC_STATUS_OPTIONS}
+                          value={form.personal.academic_status || "all"}
+                          onChange={(v) => setField("personal", "academic_status", v === "all" ? "" : v)}
+                        />
+                      </div>
                     <div className="sf-field sf-toggle-field">
                       <label className="sf-label">Hostel Student</label>
                       <label className="sf-switch">

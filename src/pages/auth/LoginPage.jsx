@@ -15,7 +15,6 @@ const LoginPage = () => {
 
   const [formData, setFormData] = useState({ user_id: "", password: "" });
   
-  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -145,15 +144,6 @@ const LoginPage = () => {
               </div>
 
               <div className="auth-options-row">
-                <label className="auth-remember">
-                  <input
-                    className="auth-checkbox"
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                  />
-                  <span className="auth-remember-label">Remember me</span>
-                </label>
                 <a href="/forgot-password" className="auth-forgot">Forgot Password?</a>
               </div>
 

@@ -30,7 +30,6 @@
 
       --lp-link:              #3567A8;
       --lp-link-hover:        #18345F;
-      --lp-remember-label:    #6B7C96;
       --lp-eye-btn:           #9AAABF;
       --lp-eye-btn-hover:     #244C86;
 
@@ -90,7 +89,6 @@
 
       --lp-link:              #4f7fe8;
       --lp-link-hover:        #7ba3f5;
-      --lp-remember-label:    #6b82a0;
       --lp-eye-btn:           #4a6080;
       --lp-eye-btn-hover:     #7ba3f5;
 
@@ -396,26 +394,8 @@
     .auth-options-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       margin-top: -6px;
-    }
-    .auth-remember {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .auth-checkbox {
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-      accent-color: #214B86;
-    }
-    .auth-remember-label {
-      font-size: 0.83rem;
-      color: var(--lp-remember-label);
-      transition: color 0.25s ease;
     }
     .auth-forgot {
       font-size: 0.83rem;

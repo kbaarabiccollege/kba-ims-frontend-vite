@@ -290,14 +290,14 @@ const BulkAddModal = ({ onClose, onCreated }) => {
               <label htmlFor="ba-course">
                 <BookIcon /> Course
               </label>
-              <select id="ba-course" value={course} onChange={(e) => setCourse(e.target.value)}>
-                <option value="">Select Course</option>
-                {COURSE_OPTIONS.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
+              <SearchableDropdown
+                id="ba-course"
+                label=""
+                allLabel="Select Course"
+                options={COURSE_OPTIONS}
+                value={course || "all"}
+                onChange={(v) => setCourse(v === "all" ? "" : v)}
+              />
             </div>
 
             <div className="ba-field">
