@@ -21,7 +21,7 @@
 // and don't get a role filter to override that.
 
 import { useCallback, useEffect, useState } from "react";
-import { getUsers, createUser, updateUser, updateUserPassword } from "../../../api/usersApi";
+import { getUsers, createUser, updateUser, updateUserPassword, bulkUpdateUserStatus } from "../../../api/usersApi";
 import useDebouncedValue from "../../../hooks/useDebouncedValue";
 import { useAuth } from "../../../context/AuthContext";
 import SearchableDropdown from "../../../components/common/SearchableDropdown";
@@ -29,11 +29,18 @@ import { ROLE_FILTER_OPTIONS, STATUS_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from ".
 import { RoleBadge, StatusPill } from "../../../components/common/Badges";
 import UserFormModal from "./components/UserFormModal";
 import PasswordModal from "./components/PasswordModal";
-import DeleteConfirmModal from "../../../components/common/DeleteConfirmModal";
-import { EditIcon, KeyIcon, TrashIcon } from "../../../components/common/Icons";
+import {
+  SelectAllCheckbox,
+  SelectableRowCell,
+  ActionButtonsCell,
+  ListPageHeader,
+  Pagination,
+} from "../../../components/common/ListPageControls";
+import { DeleteConfirmModal, BulkStatusConfirmModal } from "../../../components/common/ListPageModals";
 import { useToast } from "../../../context/ToastContext";
 import { crudMessage } from "../../../utils/toastMessages";
-import "../../../styles/AdminUsers.css";
+import "../../../styles/Users.css";
+import "../../../styles/UserList.css";
 
 const Users = () => {
   const { role: authRole } = useAuth();
@@ -51,6 +58,7 @@ const Users = () => {
   const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   // ---- filters ----
   const [search, setSearch] = useState("");
@@ -80,6 +88,12 @@ const Users = () => {
   const [modalError, setModalError] = useState("");
   const [modalFieldErrors, setModalFieldErrors] = useState({});
 
+  // ---- row selection + bulk status (Mark as Active / Mark as Inactive) ----
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  const [bulkModal, setBulkModal] = useState(null); // 'activate' | 'deactivate'
+  const [bulkSubmitting, setBulkSubmitting] = useState(false);
+  const [bulkError, setBulkError] = useState("");
+
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -108,15 +122,72 @@ const Users = () => {
     fetchUsers();
   }, [fetchUsers]);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchUsers();
+    setRefreshing(false);
+  };
+
   // Reset to page 1 whenever a filter changes (not on page/limit changes themselves)
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, role, status]);
 
-  const activeCount = users.filter((u) => u.status === "active").length;
+  // Clear selection whenever the underlying page of users changes
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [users]);
+
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const rangeStart = total === 0 ? 0 : (page - 1) * limit + 1;
   const rangeEnd = Math.min(page * limit, total);
+
+  const allOnPageSelected = users.length > 0 && selectedIds.size === users.length;
+  const someOnPageSelected = selectedIds.size > 0 && !allOnPageSelected;
+
+  const toggleSelectAll = () => {
+    setSelectedIds(allOnPageSelected ? new Set() : new Set(users.map((u) => u.id ?? u.user_id)));
+  };
+  const toggleSelectOne = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const openBulkModal = (action) => {
+    setBulkError("");
+    setBulkModal(action);
+  };
+  const closeBulkModal = () => {
+    if (bulkSubmitting) return;
+    setBulkModal(null);
+  };
+  const handleBulkConfirm = async () => {
+    setBulkSubmitting(true);
+    setBulkError("");
+    try {
+      const ids = Array.from(selectedIds);
+      const newStatus = bulkModal === "activate" ? "active" : "inactive";
+      await bulkUpdateUserStatus(ids, newStatus);
+      setBulkModal(null);
+      setSelectedIds(new Set());
+      fetchUsers();
+    } catch (err) {
+      // TEMP: full diagnostic dump — remove once the real cause is found
+      console.error("Bulk status update failed:", {
+        message: err?.message,
+        status: err?.response?.status,
+        responseData: err?.response?.data,
+        request: err?.request,
+        config: err?.config,
+      });
+      setBulkError(err?.response?.data?.message || `Couldn't complete this action.${err?.response?.status ? ` (HTTP ${err.response.status})` : " (no response received)"}`);
+    } finally {
+      setBulkSubmitting(false);
+    }
+  };
 
   // ---- create / edit ----
   const openCreateModal = () => {
@@ -201,204 +272,168 @@ const Users = () => {
   };
 
   return (
-    <div className="um-page">
-      <div className="um-page-header">
-        <div className="um-title-block">
-          <h1>
-            <span className="um-title-icon" aria-hidden="true">
-              👥
-            </span>
-            Users
-          </h1>
-          <p className="um-title-meta">
-            {total} total &middot; {activeCount} active on this page
-          </p>
-        </div>
-        <button type="button" className="um-btn um-btn-primary um-btn-add" onClick={openCreateModal}>
-          <span aria-hidden="true">+</span>
-          <span className="um-btn-add-label-full">Add New User</span>
-          <span className="um-btn-add-label-short">Add</span>
-        </button>
-      </div>
+    <div className="st-page um-page">
+      <ListPageHeader
+        title="Users"
+        total={total}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+        onCreate={openCreateModal}
+      />
 
-      <div className="um-card">
-        <div className="um-toolbar">
-          <div className="um-search">
-            <span className="um-search-icon" aria-hidden="true">
-              🔍
-            </span>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, ID or email…"
-              aria-label={`Search users`}
-            />
-          </div>
-
-          <div className="um-filters">
-
-            {isDev && (
-              <div className="um-filter-dropdown">
-                <SearchableDropdown
-                  id="um-role-filter"
-                  label=""
-                  allLabel={ROLE_FILTER_OPTIONS.find((r) => r.value === "all")?.label || "All Roles"}
-                  options={roleFilterOptions}
-                  value={role}
-                  onChange={setRole}
-                  searchable
-                  onFetch={handleRoleFilterSearch}
-                  loaded
-                  hideFetchButton
-                  placeholder="Search roles…"
-                  aria-label="Filter by role"
-                />
-              </div>
-            )}
-
-            <div className="um-filter-dropdown">
-              <SearchableDropdown
-                id="um-status-filter"
-                label=""
-                allLabel={STATUS_FILTER_OPTIONS.find((s) => s.value === "all")?.label || "All Statuses"}
-                options={STATUS_FILTER_OPTIONS.filter((s) => s.value !== "all").map((s) => ({
-                  id: s.value,
-                  label: s.label,
-                }))}
-                value={status}
-                onChange={setStatus}
-                aria-label="Filter by status"
+      <div className="st-card">
+        <div className="st-toolbar">
+          <div className="st-search-row">
+            <div className="st-search">
+              <span className="st-search-icon" aria-hidden="true">
+                🔍
+              </span>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by name, ID or email…"
+                aria-label="Search users"
               />
             </div>
+          </div>
 
-            <span className="um-result-count">{total} users</span>
+          <div className="st-filters">
+            {isDev && (
+              <SearchableDropdown
+                label="Role"
+                allLabel={ROLE_FILTER_OPTIONS.find((r) => r.value === "all")?.label || "All Roles"}
+                options={roleFilterOptions}
+                value={role}
+                onChange={setRole}
+                searchable
+                onFetch={handleRoleFilterSearch}
+                loaded
+                hideFetchButton
+                placeholder="Search roles…"
+              />
+            )}
+
+            <SearchableDropdown
+              label="Status"
+              allLabel={STATUS_FILTER_OPTIONS.find((s) => s.value === "all")?.label || "All Statuses"}
+              options={STATUS_FILTER_OPTIONS.filter((s) => s.value !== "all").map((s) => ({
+                id: s.value,
+                label: s.label,
+              }))}
+              value={status}
+              onChange={setStatus}
+            />
+
+            <span className="st-result-count">{total} users</span>
           </div>
         </div>
 
-        {error && <div className="um-error-banner">{error}</div>}
+        {error && <div className="st-error-banner">{error}</div>}
 
-        <div className="um-table-wrap">
-          <table className="um-table">
+        {selectedIds.size > 0 && (
+          <div className="st-bulk-bar">
+            <span className="st-bulk-count">{selectedIds.size} selected</span>
+            <div className="st-bulk-actions">
+              <div className="st-bulk-actions-pair">
+                <button
+                  type="button"
+                  className="st-btn st-btn-ghost st-btn-success"
+                  onClick={() => openBulkModal("activate")}
+                >
+                  Mark as Active
+                </button>
+                <button
+                  type="button"
+                  className="st-btn st-btn-ghost st-btn-danger"
+                  onClick={() => openBulkModal("deactivate")}
+                >
+                  Mark as Inactive
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="st-table-wrap">
+          <table className="st-table">
             <thead>
               <tr>
-                <th className="um-col-num">#</th>
+                <th className="st-col-num">
+                  <SelectAllCheckbox
+                    checked={allOnPageSelected}
+                    indeterminate={someOnPageSelected}
+                    onChange={toggleSelectAll}
+                    label="Select all users on this page"
+                  />
+                </th>
                 <th>User ID</th>
-                <th className="um-col-left">Email</th>
+                <th className="st-col-left">Email</th>
                 <th>Role</th>
                 <th>Status</th>
-                <th className="um-col-actions">Actions</th>
+                <th className="st-col-actions">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="um-state-cell">
+                  <td colSpan={6} className="st-state-cell">
                     Loading users…
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="um-state-cell">
+                  <td colSpan={6} className="st-state-cell">
                     No users match your search or filters.
                   </td>
                 </tr>
               ) : (
-                users.map((user, idx) => (
-                  <tr key={user.id ?? user.user_id}>
-                    <td className="um-col-num">{(page - 1) * limit + idx + 1}</td>
-                    <td>
-                      <span className="um-user-id">{user.user_id}</span>
-                    </td>
-                    <td className="um-user-email">{user.email || "—"}</td>
-                    <td>
-                      <RoleBadge role={user.role} />
-                    </td>
-                    <td>
-                      <StatusPill status={user.status} />
-                    </td>
-                    <td>
-                      <div className="um-actions">
-                        <button
-                          type="button"
-                          className="um-icon-btn"
-                          title="Edit user"
-                          aria-label={`Edit ${user.user_id}`}
-                          onClick={() => openEditModal(user)}
-                        >
-                          <EditIcon />
-                        </button>
-                        <button
-                          type="button"
-                          className="um-icon-btn um-icon-btn-key"
-                          title="Change password"
-                          aria-label={`Change password for ${user.user_id}`}
-                          onClick={() => openPasswordModal(user)}
-                        >
-                          <KeyIcon />
-                        </button>
-                        <button
-                          type="button"
-                          className="um-icon-btn um-icon-btn-danger"
-                          title="Delete user"
-                          aria-label={`Delete ${user.user_id}`}
-                          onClick={() => openDeleteModal(user)}
-                        >
-                          <TrashIcon />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                users.map((user, idx) => {
+                  const rowId = user.id ?? user.user_id;
+                  return (
+                    <tr key={rowId}>
+                      <SelectableRowCell
+                        id={rowId}
+                        index={(page - 1) * limit + idx + 1}
+                        selected={selectedIds.has(rowId)}
+                        onToggle={toggleSelectOne}
+                        name={user.user_id}
+                      />
+                      <td>{user.user_id}</td>
+                      <td className="st-col-left">{user.email || "—"}</td>
+                      <td>
+                        <RoleBadge role={user.role} />
+                      </td>
+                      <td>
+                        <StatusPill status={user.status} />
+                      </td>
+                      <td>
+                        <ActionButtonsCell
+                          name={user.user_id}
+                          onEdit={() => openEditModal(user)}
+                          onPassword={() => openPasswordModal(user)}
+                          onDelete={() => openDeleteModal(user)}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
 
-        <div className="um-pagination">
-          <span className="um-pagination-summary">
-            {total === 0 ? "No results" : `Showing ${rangeStart}-${rangeEnd} of ${total}`}
-          </span>
-
-          <div className="um-pagination-controls">
-            <label className="um-per-page">
-              Per page:
-              <select
-                value={limit}
-                onChange={(e) => {
-                  setLimit(Number(e.target.value));
-                  setPage(1);
-                }}
-              >
-                {PAGE_SIZE_OPTIONS.map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <button
-              type="button"
-              className="um-page-nav"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              aria-label="Previous page"
-            >
-              ‹
-            </button>
-            <span className="um-page-current">{page}</span>
-            <button
-              type="button"
-              className="um-page-nav"
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              aria-label="Next page"
-            >
-              ›
-            </button>
-          </div>
-        </div>
+        <Pagination
+          page={page}
+          setPage={setPage}
+          limit={limit}
+          setLimit={setLimit}
+          total={total}
+          totalPages={totalPages}
+          rangeStart={rangeStart}
+          rangeEnd={rangeEnd}
+          pageSizeOptions={PAGE_SIZE_OPTIONS}
+        />
       </div>
 
       {formModal && (
@@ -421,6 +456,18 @@ const Users = () => {
           submitting={submitting}
           serverError={modalError}
           serverFieldErrors={modalFieldErrors}
+        />
+      )}
+
+      {bulkModal && (
+        <BulkStatusConfirmModal
+          action={bulkModal}
+          count={selectedIds.size}
+          itemLabel="user"
+          onClose={closeBulkModal}
+          onConfirm={handleBulkConfirm}
+          submitting={bulkSubmitting}
+          error={bulkError}
         />
       )}
 

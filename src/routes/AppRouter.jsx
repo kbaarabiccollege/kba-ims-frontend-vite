@@ -29,6 +29,9 @@ import StudentForm from "../pages/admin/students/StudentForm";
 import StudentView from "../pages/admin/students/StudentView";
 import Users from "../pages/superadmin/users/Users";
 import Staff from "../pages/admin/staff/Staff";
+import StaffForm from "../pages/admin/staff/StaffForm";
+import StaffView from "../pages/admin/staff/StaffView";
+
 
 import AdminClassrooms from "../pages/admin/academics/AdminClassrooms";
 import AdminSubjects from "../pages/admin/academics/AdminSubjects";
@@ -62,6 +65,10 @@ const AppRouter = () => (
           <Route path="/admin/students/:id" element={<StudentView />} />
           <Route path="/admin/students/:id/edit" element={<StudentForm />} />
           <Route path="/admin/staff" element={<Staff />} />
+          <Route path="/admin/staff/new" element={<StaffForm />} />
+          <Route path="/admin/staff/:id" element={<StaffView />} />
+          <Route path="/admin/staff/:id/edit" element={<StaffForm />} />
+
 
           <Route path="/admin/classrooms" element={<AdminClassrooms />} />
           <Route path="/admin/subjects" element={<AdminSubjects />} />
@@ -107,6 +114,10 @@ const AppRouter = () => (
           <Route path="/superadmin/students/:id" element={<StudentView />} />
           <Route path="/superadmin/students/:id/edit" element={<StudentForm />} />
           <Route path="/superadmin/staff" element={<Staff />} />
+          <Route path="/superadmin/staff/new" element={<StaffForm />} />
+          <Route path="/superadmin/staff/:id" element={<StaffView />} />
+          <Route path="/superadmin/staff/:id/edit" element={<StaffForm />} />
+
           {/* superadmin/admins, etc. */}
         </Route>
       </Route>

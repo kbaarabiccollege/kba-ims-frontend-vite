@@ -5,14 +5,14 @@
 // the app don't each reimplement it.
 //
 // Styling lives in Modal.css and is fully self-contained — it does not
-// rely on any page's CSS file (AdminUsers.css, AdminBatches.css, etc.)
+// rely on any page's CSS file (Users.css, AdminBatches.css, etc.)
 // so it renders identically, in both themes, no matter which page
 // mounts it.
 
 import { useEffect, useRef } from "react";
 import "../../styles/Modal.css";
 
-const Modal = ({ title, onClose, children, width = 480 }) => {
+const Modal = ({ title, header, onClose, children, width = 480 }) => {
   const panelRef = useRef(null);
 
   useEffect(() => {
@@ -40,12 +40,12 @@ const Modal = ({ title, onClose, children, width = 480 }) => {
         aria-modal="true"
         aria-label={title}
       >
-        <div className="modal-header">
-          <h2>{title}</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
-            &times;
-          </button>
-        </div>
+            <div className="modal-header">
+              {header || <h2>{title}</h2>}
+              <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
+                &times;
+              </button>
+            </div>
         <div className="modal-body">{children}</div>
       </div>
     </div>

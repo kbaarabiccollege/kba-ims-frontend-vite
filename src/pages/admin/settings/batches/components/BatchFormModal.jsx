@@ -6,8 +6,13 @@
 import { useEffect, useState } from "react";
 import Modal from "../../../../../components/common/Modal";
 import SearchableDropdown from "../../../../../components/common/SearchableDropdown";
-import { COURSE_OPTIONS } from "../constants";
-import { capitalizeFirst } from "../../../../../components/common/formatError";
+import { COURSES } from "../../../../../utils/courses";
+import { capitalizeFirst } from "../../../../../utils/textHelpers";
+
+const COURSE_OPTIONS = Object.entries(COURSES).map(([id, label]) => ({
+  value: Number(id),
+  label,
+}));
 
 const emptyForm = {
   batch_name: "",
@@ -129,8 +134,8 @@ const BatchFormModal = ({
             label=""
             allLabel="Select course"
             options={COURSE_OPTIONS.map((c) => ({ id: c.value, label: c.label }))}
-            value={form.course || "all"}
-            onChange={(v) => setDropdownField("course")(v === "all" ? "" : v)}
+            value={form.course}
+            onChange={setDropdownField("course")}
           />
           {fieldError("course") && <span className="bm-field-error">{fieldError("course")}</span>}
         </div>

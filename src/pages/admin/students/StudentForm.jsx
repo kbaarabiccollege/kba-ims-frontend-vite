@@ -9,14 +9,15 @@ import SearchableDropdown from "../../../components/common/SearchableDropdown";
 import PasswordInput from "../../../components/common/PasswordInput";
 import { TrashIcon, PlusIcon } from "../../../components/common/Icons";
 import { DriveFolderButton } from "../../../components/common/Badges";
-import { SECTIONS, ROLE_BASE_PATHS, GENDER_OPTIONS, BLOOD_GROUP_OPTIONS, 
-  RELIGION_OPTIONS, CASTE_OPTIONS, SOCIAL_CATEGORY_OPTIONS, MADHAB_OPTIONS, 
-  FAMILY_ROWS, QUALIFICATION_ROWS, ADDRESS_ROWS, QUALIFICATION_LEVELS, 
-  ACADEMIC_STATUS_OPTIONS, DRIVE_FOLDERS, ADDRESS_TYPES, emptyAddress, 
-  emptyQualification, } from "./constants";
+import { SECTIONS, ROLE_BASE_PATHS, CASTE_OPTIONS, SOCIAL_CATEGORY_OPTIONS, 
+  MADHAB_OPTIONS, FAMILY_ROWS, QUALIFICATION_ROWS, QUALIFICATION_LEVELS, 
+  ACADEMIC_STATUS_OPTIONS, emptyQualification, } from "./studentConstants";
+import { GENDER_OPTIONS, BLOOD_GROUP_OPTIONS, RELIGION_OPTIONS, 
+  ADDRESS_ROWS, ADDRESS_TYPES, emptyAddress } from "../../../utils/userConstants";
+import { STUDENT_DRIVE_FOLDERS } from "../../../utils/driveFolders";
 import { useToast } from "../../../context/ToastContext";
 import { crudMessage } from "../../../utils/toastMessages";
-import "../../../styles/Students.css";
+import "../../../styles/UserList.css";
 import "../../../styles/StudentForm.css";
 
 const initialState = () => ({
@@ -709,7 +710,7 @@ const StudentForm = () => {
                           onChange={(e) => setField("personal", "photo_url", e.target.value)}
                         />
                         <DriveFolderButton
-                          folderUrl={DRIVE_FOLDERS.studentPhotos}
+                          folderUrl={STUDENT_DRIVE_FOLDERS.studentPhotos}
                           label="Open student photos Drive folder"
                         />
                       </div>
@@ -882,7 +883,7 @@ const StudentForm = () => {
                           value={form.account.password}
                           placeholder="Password"
                           onChange={(e) => handlePasswordChange(e.target.value)}
-                          defaultVisible
+                          defaultvisible="true"
                         />
                       </div>
                     )}
@@ -1291,7 +1292,7 @@ const StudentForm = () => {
                         value={q.cert_url}
                         onChange={(e) => updateExtraQualification(idx, "cert_url", e.target.value)}
                       />
-                      <DriveFolderButton folderUrl={DRIVE_FOLDERS.certificates} label="Open certificates Drive folder" />
+                      <DriveFolderButton folderUrl={STUDENT_DRIVE_FOLDERS.certificates} label="Open certificates Drive folder" />
                     </div>
                   </div>
                   <div className="sf-row-remove-wrap">
@@ -1405,7 +1406,7 @@ const StudentForm = () => {
                         value={l.url}
                         onChange={(e) => updateRelatedLink(idx, "url", e.target.value)}
                       />
-                      <DriveFolderButton folderUrl={DRIVE_FOLDERS.documents} label="Open documents Drive folder" />
+                      <DriveFolderButton folderUrl={STUDENT_DRIVE_FOLDERS.documents} label="Open documents Drive folder" />
                     </div>
                   </div>
                   <div className="sf-row-remove-wrap">

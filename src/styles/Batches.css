@@ -1,5 +1,5 @@
 /* src/styles/Batches.css
-   Mirrors AdminUsers.css token-for-token (um- -> bm-).
+   Mirrors Users.css token-for-token (um- -> bm-).
    No status field — batches have no status on the backend. */
 
    .bm-page {

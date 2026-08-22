@@ -37,30 +37,6 @@ export const BULK_ACTION = {
 // ---- StudentForm dropdown option sets ----
 // id = value sent to backend, label = what's shown in the UI.
 
-export const GENDER_OPTIONS = [
-  { id: 1, label: "Male" },
-  { id: 2, label: "Female" },
-  { id: 3, label: "Others" },
-];
-
-export const BLOOD_GROUP_OPTIONS = [
-  { id: 1, label: "A+" },
-  { id: 2, label: "A−" },
-  { id: 3, label: "B+" },
-  { id: 4, label: "B−" },
-  { id: 5, label: "AB+" },
-  { id: 6, label: "AB−" },
-  { id: 7, label: "O+" },
-  { id: 8, label: "O−" },
-];
-
-export const RELIGION_OPTIONS = [
-  { id: 1, label: "Muslim" },
-  { id: 2, label: "Hindu" },
-  { id: 3, label: "Christian" },
-  { id: 4, label: "Other" },
-];
-
 export const CASTE_OPTIONS = [
   { id: 1, label: "Lebbai" },
   { id: 2, label: "Rawther" },
@@ -103,24 +79,6 @@ export const QUALIFICATION_ROWS = [
   { key: "school_address", label: "School Address", textarea: true },
 ];
 
-export const ADDRESS_ROWS = [
-  { key: "door_no", label: "Door No" },
-  { key: "street", label: "Street", textarea: true },
-  { key: "area", label: "Area" },
-  { key: "city", label: "City" },
-  { key: "district", label: "District" },
-  { key: "state", label: "State" },
-  { key: "country", label: "Country" },
-  { key: "pin_code", label: "Pin Code" },
-];
-
-// address_type per student_tables.sql: 0=Present 1=Permanent
-export const ADDRESS_TYPES = [
-  { id: 0, key: "present", label: "Present Address" },
-  { id: 1, key: "permanent", label: "Permanent Address" },
-];
-
-
 export const QUALIFICATION_LEVELS = ["10th", "11th", "12th"];
 
 // Generic id -> label lookup for any option array above (GENDER_OPTIONS,
@@ -135,18 +93,6 @@ export const optionLabel = (options, id) =>
 // keyed by ADDRESS_TYPES / QUALIFICATION_LEVELS above. Shared by
 // StudentForm and reusable by the view page for normalizing partial
 // records the same way.
-export const emptyAddress = (typeId) => ({
-  address_type: typeId,
-  door_no: "",
-  street: "",
-  area: "",
-  city: "",
-  district: "",
-  state: "",
-  country: "",
-  pin_code: "",
-});
-
 export const emptyQualification = (level) => ({
   level,
   school_name: "",
@@ -168,12 +114,3 @@ export const ACADEMIC_STATUS_OPTIONS = [
   { id: "transferred", label: "Transferred" },
   { id: "suspended", label: "Suspended" },
 ];
-
-// TODO: point these at your real Google Drive folders (per-purpose, or one
-// shared folder). The folder icon next to Photo URL / cert URL / related
-// link fields opens whichever of these applies.
-export const DRIVE_FOLDERS = {
-  studentPhotos: "https://drive.google.com/drive/folders/REPLACE_ME_PHOTOS",
-  certificates: "https://drive.google.com/drive/folders/REPLACE_ME_CERTS",
-  documents: "https://drive.google.com/drive/folders/REPLACE_ME_DOCS",
-};

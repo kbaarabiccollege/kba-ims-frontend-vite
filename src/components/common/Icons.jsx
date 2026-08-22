@@ -261,3 +261,101 @@ export const IconChevronRight = () => (
     <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+
+export const PersonIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+    <circle
+      cx="10"
+      cy="6.5"
+      r="3.5"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    />
+    <path
+      d="M3.5 17c1-3.5 4-5 6.5-5s5.5 1.5 6.5 5"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+export const BriefcaseIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+    <rect
+      x="3"
+      y="7"
+      width="14"
+      height="9"
+      rx="1.5"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    />
+    <path
+      d="M7 7V5.5A1.5 1.5 0 0 1 8.5 4h3A1.5 1.5 0 0 1 13 5.5V7"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    />
+  </svg>
+);
+
+export const GraduationIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+    <path
+      d="M2 8l8-4 8 4-8 4-8-4z"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M5.5 10v3.5c0 1.1 2 2 4.5 2s4.5-.9 4.5-2V10"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    />
+  </svg>
+);
+
+export const HomeIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+    <path
+      d="M3 9.5L10 4l7 5.5"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M5 8.5V16h10V8.5"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const IdCardIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+    <rect
+      x="2.5"
+      y="4.5"
+      width="15"
+      height="11"
+      rx="1.5"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    />
+    <circle
+      cx="7"
+      cy="10"
+      r="1.6"
+      stroke="currentColor"
+      strokeWidth="1.4"
+    />
+    <path
+      d="M11 9h4M11 11.5h4"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    />
+  </svg>
+);

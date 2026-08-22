@@ -25,8 +25,10 @@
 // the options below are a reasonable placeholder — adjust to match the
 // backend's actual values.
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import SearchableDropdown from "../../../../components/common/SearchableDropdown";
+import Modal from "../../../../components/common/Modal";
+import { BulkStatusConfirmModal } from "../../../../components/common/ListPageModals";
 
 const MADHAB_OPTIONS = [
   { id: 1, label: "Hanafi" },
@@ -74,83 +76,46 @@ const BulkActionsModal = ({
   const [madrasCourse, setMadrasCourse] = useState("");
   const [madrasJoiningYear, setMadrasJoiningYear] = useState("");
 
-  const panelRef = useRef(null);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape" && !submitting) onClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, submitting]);
-
-  // Ref/contains-based outside-click close (not stopPropagation) so
-  // SearchableDropdown's own document-level "click outside" listener
-  // still fires and closes its menu correctly.
-  const handleOverlayMouseDown = (e) => {
-    if (submitting) return;
-    if (panelRef.current && !panelRef.current.contains(e.target)) {
-      onClose();
-    }
-  };
-
-  const isUpdate = action === "update";
   const isActivate = action === "activate";
 
-  const title = isUpdate
-    ? "Bulk Update Students"
-    : isActivate
-    ? "Mark Students as Active"
-    : "Mark Students as Inactive";
+  // "activate"/"deactivate" are just a plain confirm — hand off entirely
+  // to the shared status-confirm modal instead of duplicating markup here.
+  if (action === "activate" || action === "deactivate") {
+    return (
+      <BulkStatusConfirmModal
+        action={action}
+        count={count}
+        itemLabel="student"
+        onClose={onClose}
+        onConfirm={() => onConfirm({ status: isActivate ? "active" : "inactive" })}
+        submitting={submitting}
+        error={error}
+      />
+    );
+  }
 
   const handleConfirm = () => {
-    if (isUpdate) {
-      const changes = {};
-      if (batchId !== "all") changes.batch_id = Number(batchId);
-      if (classroomId !== "all") changes.classroom_id = Number(classroomId);
-      if (academicStatus !== "all") changes.academic_status = academicStatus;
-      if (hostel !== "all") changes.is_hostel = hostel === "yes";
-      if (madhabId !== "all") changes.madhab_id = Number(madhabId);
-      if (yoj.trim() !== "") changes.yoj = Number(yoj);
-      if (madrasCourse.trim() !== "") changes.madras_course = madrasCourse.trim();
-      if (madrasJoiningYear.trim() !== "") changes.madras_joining_year = Number(madrasJoiningYear);
-      onConfirm(changes);
-    } else {
-      onConfirm({ status: isActivate ? "active" : "inactive" });
-    }
+    const changes = {};
+    if (batchId !== "all") changes.batch_id = Number(batchId);
+    if (classroomId !== "all") changes.classroom_id = Number(classroomId);
+    if (academicStatus !== "all") changes.academic_status = academicStatus;
+    if (hostel !== "all") changes.is_hostel = hostel === "yes";
+    if (madhabId !== "all") changes.madhab_id = Number(madhabId);
+    if (yoj.trim() !== "") changes.yoj = Number(yoj);
+    if (madrasCourse.trim() !== "") changes.madras_course = madrasCourse.trim();
+    if (madrasJoiningYear.trim() !== "") changes.madras_joining_year = Number(madrasJoiningYear);
+    onConfirm(changes);
   };
 
   return (
-    <div className="st-modal-overlay" role="presentation" onMouseDown={handleOverlayMouseDown}>
-      <div
-        className="st-modal-panel st-modal-panel-wide"
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-      >
-        <div className="st-modal-header">
-          <h2>{title}</h2>
-          <button
-            type="button"
-            className="st-modal-close"
-            aria-label="Close"
-            onClick={onClose}
-            disabled={submitting}
-          >
-            ×
-          </button>
-        </div>
+    <Modal title="Bulk Update Students" onClose={submitting ? () => {} : onClose} width={620}>
+      <p className="st-modal-subtext">
+        This will apply to <strong>{count}</strong> selected student{count === 1 ? "" : "s"}.
+      </p>
 
-        <div className="st-modal-body">
-          <p className="st-modal-subtext">
-            This will apply to <strong>{count}</strong> selected student{count === 1 ? "" : "s"}.
-          </p>
+      {error && <div className="st-error-banner">{error}</div>}
 
-          {error && <div className="st-error-banner">{error}</div>}
-
-          {isUpdate ? (
-            <div className="st-bulk-form st-bulk-form-grid">
+      <div className="st-bulk-form st-bulk-form-grid">
               <div className="st-field">
                 <label htmlFor="bulk-batch">Batch</label>
                 <SearchableDropdown
@@ -257,32 +222,17 @@ const BulkActionsModal = ({
                   placeholder=""
                 />
               </div>
-            </div>
-          ) : (
-            <p className="st-modal-confirm-text">
-              Are you sure you want to mark these students as{" "}
-              <strong>{isActivate ? "active" : "inactive"}</strong>?
-            </p>
-          )}
-
-          <div className="st-modal-actions">
-            <button type="button" className="st-btn st-btn-ghost" onClick={onClose} disabled={submitting}>
-              Cancel
-            </button>
-            <button
-              type="button"
-              className={
-                !isUpdate && !isActivate ? "st-btn st-btn-danger" : "st-btn st-btn-primary"
-              }
-              onClick={handleConfirm}
-              disabled={submitting}
-            >
-              {submitting ? "Saving…" : isUpdate ? "Update" : isActivate ? "Mark as Active" : "Mark as Inactive"}
-            </button>
-          </div>
-        </div>
       </div>
-    </div>
+
+      <div className="st-modal-actions">
+        <button type="button" className="st-btn st-btn-ghost" onClick={onClose} disabled={submitting}>
+          Cancel
+        </button>
+        <button type="button" className="st-btn st-btn-primary" onClick={handleConfirm} disabled={submitting}>
+          {submitting ? "Saving…" : "Update"}
+        </button>
+      </div>
+    </Modal>
   );
 };
 

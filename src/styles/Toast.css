@@ -158,7 +158,7 @@
   }
 
   /* dark theme — swap solid saturated fills for muted rgba tints,
-   same pattern as the role/status badges in AdminUsers.css */
+   same pattern as the role/status badges in Users.css */
 [data-theme="dark"] .toast-success {
   border-left-color: #5fd399;
 }

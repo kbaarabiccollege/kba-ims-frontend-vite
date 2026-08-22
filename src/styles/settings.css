@@ -3,7 +3,7 @@
    (--color-primary, --font-heading/body, --radius-*, --shadow-*) plus
    the header/sidebar tokens from layout.css (--header-bg, --header-text,
    --sidebar-*), and follows the same [data-theme="dark"] convention as
-   LoginPage.jsx / AdminUsers.css. */
+   LoginPage.jsx / Users.css. */
 
    .settings-shell {
     --st-bg-page: #eef2f9;

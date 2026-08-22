@@ -61,9 +61,27 @@ export async function updateUserPassword(id, password) {
   return data;
 }
 
+/**
+ * Bulk-update status (active/inactive) for a set of users.
+ * POST /api/users/bulk
+ * body: { user_ids: number[], status: 'active' | 'inactive' }
+ * response: { success, message, data: { updated_count, user_ids } }
+ *
+ * @param {Array<number|string>} ids
+ * @param {string} status
+ */
+export async function bulkUpdateUserStatus(ids, status) {
+  const { data } = await axiosInstance.patch(`${BASE}/bulk`, {
+    user_ids: ids,
+    status,
+  });
+  return data;
+}
+
 export default {
   getUsers,
   createUser,
   updateUser,
   updateUserPassword,
+  bulkUpdateUserStatus,
 };

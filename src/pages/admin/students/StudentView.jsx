@@ -16,15 +16,17 @@ import { getStudent } from "../../../api/studentsApi";
 import { getBatches } from "../../../api/batchesApi";
 import { getClassroom } from "../../../api/classroomsApi";
 import { getClassrooms } from "../../../api/classroomsApi";
+import { CASTE_OPTIONS, SOCIAL_CATEGORY_OPTIONS, MADHAB_OPTIONS, 
+  ACADEMIC_STATUS_OPTIONS, optionLabel,
+} from "./studentConstants";
 import { GENDER_OPTIONS, BLOOD_GROUP_OPTIONS, RELIGION_OPTIONS, 
-  CASTE_OPTIONS, SOCIAL_CATEGORY_OPTIONS, MADHAB_OPTIONS, 
-  ACADEMIC_STATUS_OPTIONS, ADDRESS_TYPES, optionLabel,
-} from "./constants";
+  ADDRESS_TYPES,
+} from "../../../utils/userConstants";
 import { EditIcon, ExternalLinkIcon, IconPersonal, IconOther, 
   IconCap, IconFamily, IconAddress, IconAdmission, IconLinks,
   IconClassroom, IconBatch, IconUserId, IconChevronRight
 } from "../../../components/common/Icons";
-import "../../../styles/Students.css";
+import "../../../styles/UserList.css";
 import "../../../styles/StudentForm.css";
 import "../../../styles/StudentView.css";
 

@@ -52,8 +52,7 @@
 //   /admin/students/:id/edit   -> edit
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../context/AuthContext";
+import { useModuleNav } from "../../../hooks/useListPageKit";
 import {
   getStudents,
   deleteStudent,
@@ -65,23 +64,24 @@ import { getBatches } from "../../../api/batchesApi";
 import { useToast } from "../../../context/ToastContext";
 import { crudMessage } from "../../../utils/toastMessages";
 import useDebouncedValue from "../../../hooks/useDebouncedValue";
-import { STATUS_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
+import { STATUS_FILTER_OPTIONS } from "./studentConstants";
 import BulkActionsModal from "./components/BulkActionsModal";
 import BulkAddModal from "./components/BulkAddModal";
 import PasswordModal from "../../superadmin/users/components/PasswordModal";
 import { updateUserPassword } from "../../../api/usersApi";
 import SearchableDropdown from "../../../components/common/SearchableDropdown";
-import { getCourseLabel } from "../../../components/common/courses";
-import { EditIcon, EyeIcon, KeyIcon, TrashIcon } from "../../../components/common/Icons";
-import "../../../styles/Students.css";
-
-const initials = (name) =>
-  (name || "")
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase())
-    .join("") || "?";
+import { getCourseLabel } from "../../../utils/courses";
+import {
+  AvatarCell,
+  SelectAllCheckbox,
+  SelectableRowCell,
+  ActionButtonsCell,
+  ListPageHeader,
+  Pagination,
+} from "../../../components/common/ListPageControls";
+import { PhotoPreviewModal, BulkStatusConfirmModal, DeleteConfirmModal } from "../../../components/common/ListPageModals";
+import { PAGE_SIZE_OPTIONS } from "../../../utils/userConstants";
+import "../../../styles/UserList.css";
 
 const FilterFunnelIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -95,21 +95,9 @@ const FilterFunnelIcon = () => (
   </svg>
 );
 
-// Maps the logged-in user's role to the portal path this page is
-// mounted under, so navigation to create/view/edit stays correct
-// whether Students is rendered inside the Admin or Super Admin portal.
-// Add an entry here whenever this page gets wired up under a new portal.
-const ROLE_BASE_PATHS = {
-  admin: "/admin",
-  superadmin: "/superadmin",
-  dev: "/superadmin",
-};
-
 const Students = () => {
-  const navigate = useNavigate();
-  const { role: authRole } = useAuth();
+  const { goToCreate, goToView, goToEdit } = useModuleNav("students");
   const toast = useToast();
-  const basePath = ROLE_BASE_PATHS[authRole] || "/admin";
 
   // ---- list state ----
   const [students, setStudents] = useState([]);
@@ -315,14 +303,6 @@ const Students = () => {
     setRefreshing(false);
   };
 
-  // ---- create / view / edit navigation ----
-  // basePath comes from the user's role (see ROLE_BASE_PATHS above), so
-  // this works correctly whether the page is mounted under /admin or
-  // /superadmin.
-  const goToCreate = () => navigate(`${basePath}/students/new`);
-  const goToView = (student) => navigate(`${basePath}/students/${student.id}`);
-  const goToEdit = (student) => navigate(`${basePath}/students/${student.id}/edit`);
-
   // ---- row delete ----
   const openDeleteConfirm = (student) => {
     setDeleteError("");
@@ -409,29 +389,13 @@ const Students = () => {
 
   return (
     <div className="st-page">
-      <div className="st-page-header">
-        <div className="st-title-block">
-          <h1>Students</h1>
-          <p className="st-title-meta">{total} total</p>
-        </div>
-
-        <div className="st-header-actions">
-          <button
-            type="button"
-            className={`st-icon-btn st-refresh-btn${refreshing ? " st-refresh-spinning" : ""}`}
-            aria-label="Refresh list"
-            title="Refresh list"
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            ↻
-          </button>
-
-          <button type="button" className="st-btn st-btn-primary st-btn-add" onClick={goToCreate}>
-            <span aria-hidden="true">+</span>
-            <span>New</span>
-          </button>
-
+      <ListPageHeader
+        title="Students"
+        total={total}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+        onCreate={goToCreate}
+        extra={
           <div className="st-menu-wrap" ref={menuRef}>
             <button
               type="button"
@@ -468,8 +432,8 @@ const Students = () => {
               </div>
             )}
           </div>
-        </div>
-      </div>
+        }
+      />
 
       <div className="st-card">
         <div className="st-toolbar">
@@ -583,14 +547,11 @@ const Students = () => {
             <thead>
               <tr>
                 <th className="st-col-num">
-                  <input
-                    type="checkbox"
-                    aria-label="Select all students on this page"
+                  <SelectAllCheckbox
                     checked={allOnPageSelected}
-                    ref={(el) => {
-                      if (el) el.indeterminate = someOnPageSelected;
-                    }}
+                    indeterminate={someOnPageSelected}
                     onChange={toggleSelectAll}
+                    label="Select all students on this page"
                   />
                 </th>
                 <th className="st-col-left">Student</th>
@@ -618,67 +579,16 @@ const Students = () => {
                   const isInactive = student.status === "inactive";
                   return (
                     <tr key={student.id} className={isInactive ? "st-row-inactive" : ""}>
-                      <td
-                        className={`st-col-num${
-                          selectedIds.has(student.id) ? " st-col-num-selected" : ""
-                        }`}
-                        onClick={() => toggleSelectOne(student.id)}
-                        role="button"
-                        tabIndex={0}
-                        aria-pressed={selectedIds.has(student.id)}
-                        aria-label={
-                          selectedIds.has(student.id)
-                            ? `Deselect ${student.name}`
-                            : `Select ${student.name}`
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            toggleSelectOne(student.id);
-                          }
-                        }}
-                      >
-                        {selectedIds.has(student.id) ? (
-                          <span className="st-col-num-check" aria-hidden="true">
-                            ✓
-                          </span>
-                        ) : (
-                          (page - 1) * limit + idx + 1
-                        )}
-                      </td>
+                      <SelectableRowCell
+                        id={student.id}
+                        index={(page - 1) * limit + idx + 1}
+                        selected={selectedIds.has(student.id)}
+                        onToggle={toggleSelectOne}
+                        name={student.name}
+                      />
                       <td className="st-col-left">
                         <div className="st-student-cell">
-                          <div
-                            className="st-student-avatar"
-                            role="button"
-                            tabIndex={0}
-                            aria-label={`Preview photo of ${student.name}`}
-                            onClick={() => setPreviewStudent(student)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                setPreviewStudent(student);
-                              }
-                            }}
-                          >
-                            {student.photo_url ? (
-                              <img
-                                className="st-student-photo"
-                                src={student.photo_url}
-                                alt={student.name}
-                                onError={(e) => {
-                                  e.currentTarget.style.display = "none";
-                                  e.currentTarget.nextSibling.style.display = "flex";
-                                }}
-                              />
-                            ) : null}
-                            <div
-                              className="st-student-photo-fallback"
-                              style={{ display: student.photo_url ? "none" : "flex" }}
-                            >
-                              {initials(student.name)}
-                            </div>
-                          </div>
+                          <AvatarCell name={student.name} photoUrl={student.photo_url} onPreview={() => setPreviewStudent(student)} />
                           <div className="st-student-text">
                             <span className="st-student-name">{student.name || "—"}</span>
                             <span className="st-student-roll">{student.roll_number || "—"}</span>
@@ -690,44 +600,13 @@ const Students = () => {
                       <td>{batchesIndex[student.batch_id] || "—"}</td>
                       <td>{classroomsIndex[student.classroom_id] || "—"}</td>
                       <td>
-                        <div className="st-actions">
-                          <button
-                            type="button"
-                            className="st-icon-btn"
-                            title="View student"
-                            aria-label={`View ${student.name}`}
-                            onClick={() => goToView(student)}
-                          >
-                            <EyeIcon />
-                          </button>
-                          <button
-                            type="button"
-                            className="st-icon-btn"
-                            title="Edit student"
-                            aria-label={`Edit ${student.name}`}
-                            onClick={() => goToEdit(student)}
-                          >
-                            <EditIcon />
-                          </button>
-                          <button
-                            type="button"
-                            className="st-icon-btn st-icon-btn-key"
-                            title="Change password"
-                            aria-label={`Change password for ${student.name}`}
-                            onClick={() => openPasswordModal(student)}
-                          >
-                            <KeyIcon />
-                          </button>
-                          <button
-                            type="button"
-                            className="st-icon-btn st-icon-btn-danger"
-                            title="Delete student"
-                            aria-label={`Delete ${student.name}`}
-                            onClick={() => openDeleteConfirm(student)}
-                          >
-                            <TrashIcon />
-                          </button>
-                        </div>
+                        <ActionButtonsCell
+                          name={student.name}
+                          onView={() => goToView(student)}
+                          onEdit={() => goToEdit(student)}
+                          onPassword={() => openPasswordModal(student)}
+                          onDelete={() => openDeleteConfirm(student)}
+                        />
                       </td>
                     </tr>
                   );
@@ -737,50 +616,17 @@ const Students = () => {
           </table>
         </div>
 
-        <div className="st-pagination">
-          <span className="st-pagination-summary">
-            {total === 0 ? "No results" : `Showing ${rangeStart}-${rangeEnd} of ${total}`}
-          </span>
-
-          <div className="st-pagination-controls">
-            <label className="st-per-page">
-              Per page:
-              <select
-                value={limit}
-                onChange={(e) => {
-                  setLimit(Number(e.target.value));
-                  setPage(1);
-                }}
-              >
-                {PAGE_SIZE_OPTIONS.map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <button
-              type="button"
-              className="st-page-nav"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              aria-label="Previous page"
-            >
-              ‹
-            </button>
-            <span className="st-page-current">{page}</span>
-            <button
-              type="button"
-              className="st-page-nav"
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              aria-label="Next page"
-            >
-              ›
-            </button>
-          </div>
-        </div>
+        <Pagination
+          page={page}
+          setPage={setPage}
+          limit={limit}
+          setLimit={setLimit}
+          total={total}
+          totalPages={totalPages}
+          rangeStart={rangeStart}
+          rangeEnd={rangeEnd}
+          pageSizeOptions={PAGE_SIZE_OPTIONS}
+        />
       </div>
 
       {bulkModal && (
@@ -809,53 +655,16 @@ const Students = () => {
       )}
 
       {deleteTarget && (
-        <div className="st-modal-overlay" role="presentation" onClick={deleteSubmitting ? undefined : closeDeleteConfirm}>
-          <div
-            className="st-modal-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Delete student"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="st-modal-header">
-              <h2>Delete Student</h2>
-              <button
-                type="button"
-                className="st-modal-close"
-                aria-label="Close"
-                onClick={closeDeleteConfirm}
-                disabled={deleteSubmitting}
-              >
-                ×
-              </button>
-            </div>
-            <div className="st-modal-body">
-              <p className="st-modal-confirm-text">
-                Are you sure you want to delete <strong>{deleteTarget.name}</strong>? This can't be
-                undone.
-              </p>
-              {deleteError && <div className="st-error-banner">{deleteError}</div>}
-              <div className="st-modal-actions">
-                <button
-                  type="button"
-                  className="st-btn st-btn-ghost"
-                  onClick={closeDeleteConfirm}
-                  disabled={deleteSubmitting}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="st-btn st-btn-danger-solid"
-                  onClick={handleDeleteConfirm}
-                  disabled={deleteSubmitting}
-                >
-                  {deleteSubmitting ? "Deleting…" : "Delete"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <DeleteConfirmModal
+          variant="st"
+          title="Delete Student"
+          itemName={deleteTarget.name}
+          itemLabel="student"
+          onClose={closeDeleteConfirm}
+          onConfirm={handleDeleteConfirm}
+          submitting={deleteSubmitting}
+          error={deleteError}
+        />
       )}
 
       {passwordModal && (
@@ -870,47 +679,7 @@ const Students = () => {
       )}
 
       {previewStudent && (
-        <div
-          className="st-modal-overlay st-preview-overlay"
-          role="presentation"
-          onClick={() => setPreviewStudent(null)}
-        >
-          <div
-            className="st-preview-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-label={`Photo of ${previewStudent.name}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              className="st-modal-close st-preview-close"
-              aria-label="Close preview"
-              onClick={() => setPreviewStudent(null)}
-            >
-              ×
-            </button>
-            {previewStudent.photo_url ? (
-              <img
-                className="st-preview-photo"
-                src={previewStudent.photo_url}
-                alt={previewStudent.name}
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  e.currentTarget.nextSibling.style.display = "flex";
-                }}
-              />
-            ) : null}
-            <div
-              className="st-preview-photo-fallback"
-              style={{ display: previewStudent.photo_url ? "none" : "flex" }}
-            >
-              {initials(previewStudent.name)}
-            </div>
-            <div className="st-preview-name">{previewStudent.name || "—"}</div>
-            <div className="st-preview-roll">{previewStudent.roll_number || "—"}</div>
-          </div>
-        </div>
+        <PhotoPreviewModal item={previewStudent} onClose={() => setPreviewStudent(null)} subtitle={previewStudent.roll_number} />
       )}
     </div>
   );

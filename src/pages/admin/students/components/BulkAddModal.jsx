@@ -22,12 +22,13 @@
 // Self-contained overlay (mirrors BulkActionsModal's pattern) rather than
 // the shared Modal.jsx, so spacing/icons can match the design exactly.
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SearchableDropdown from "../../../../components/common/SearchableDropdown";
+import Modal from "../../../../components/common/Modal";
 import { getClassrooms } from "../../../../api/classroomsApi";
 import { getBatches } from "../../../../api/batchesApi";
 import { bulkCreateStudents } from "../../../../api/studentsApi";
-import { COURSES } from "../../../../components/common/courses";
+import { COURSES } from "../../../../utils/courses";
 import { useToast } from "../../../../context/ToastContext";
 
 const COURSE_OPTIONS = Object.entries(COURSES).map(([id, label]) => ({ id, label }));
@@ -131,29 +132,6 @@ const BulkAddModal = ({ onClose, onCreated }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const panelRef = useRef(null);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape" && !submitting) onClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, submitting]);
-
-  // Close only when the mousedown actually started outside the panel,
-  // checked via ref.contains() rather than calling stopPropagation() on
-  // the panel. stopPropagation() was swallowing the native mousedown
-  // before it ever reached the document-level "click outside" listener
-  // SearchableDropdown uses to close its own open menu — which is why
-  // the Class/Batch dropdowns weren't closing when clicked away from.
-  const handleOverlayMouseDown = (e) => {
-    if (submitting) return;
-    if (panelRef.current && !panelRef.current.contains(e.target)) {
-      onClose();
-    }
-  };
-
   // ---- classroom search, scoped to the currently selected course ----
   const searchClassrooms = useCallback(
     async (q) => {
@@ -254,35 +232,21 @@ const BulkAddModal = ({ onClose, onCreated }) => {
     }
   };
 
-  return (
-    <div className="ba-overlay" role="presentation" onMouseDown={handleOverlayMouseDown}>
-      <div
-        className="ba-panel"
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Bulk Add Students"
-      >
-        <div className="ba-header">
-          <div className="ba-header-icon">
-            <PeopleIcon />
-          </div>
-          <div className="ba-header-text">
-            <h2>Bulk Add Students</h2>
-            <p>Quickly create multiple students</p>
-          </div>
-          <button
-            type="button"
-            className="ba-close"
-            aria-label="Close"
-            onClick={onClose}
-            disabled={submitting}
-          >
-            ×
-          </button>
-        </div>
+  const header = (
+    <div className="ba-header-inner">
+      <div className="ba-header-icon">
+        <PeopleIcon />
+      </div>
+      <div className="ba-header-text">
+        <h2>Bulk Add Students</h2>
+        <p>Quickly create multiple students</p>
+      </div>
+    </div>
+  );
 
-        <div className="ba-body">
+  return (
+    <Modal header={header} onClose={submitting ? () => {} : onClose} width={720}>
+      <div className="ba-body">
           {error && <div className="st-error-banner">{error}</div>}
 
           <div className="ba-fields-row">
@@ -414,8 +378,7 @@ const BulkAddModal = ({ onClose, onCreated }) => {
             {submitting ? "Creating…" : "Create Students"}
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };
 

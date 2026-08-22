@@ -1,4 +1,4 @@
-/* src/styles/AdminUsers.css
+/* src/styles/Users.css
    Built on top of the global tokens defined in index.css
    (--color-primary, --font-heading, --font-body, --radius-*, --shadow-*).
    Adds a small set of page-local tokens for badges/status colors.
@@ -53,7 +53,6 @@
   
     font-family: var(--font-body, "Inter", sans-serif);
     color: var(--um-text-body);
-    padding: 2rem;
     max-width: 1400px;
     margin: 0 auto;
     transition: color 0.25s ease;

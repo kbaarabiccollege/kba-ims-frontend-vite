@@ -1,5 +1,5 @@
 /* src/styles/StudentForm.css
-   Layered on top of AdminStudents.css (imported alongside it), reusing
+   Layered on top of AdminUserList.css (imported alongside it), reusing
    the same design tokens (--st-* vars, --color-primary, --radius-*).
    Prefixed "sf-" so it never collides with the "st-" list-page classes. */
 
@@ -16,7 +16,7 @@
   }
 
   /* This page's footer sits at the bottom of a viewport-height card —
-     remove any generic page bottom padding/margin that Students.css
+     remove any generic page bottom padding/margin that UserList.css
      applies, so there's no grey gap below the footer. */
   .st-page.sf-page {
     padding-bottom: 0;
@@ -406,13 +406,13 @@
   .sf-login-box {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 1rem;
+    justify-content: flex-start;
+    gap: 0.75rem;
     padding: 1rem;
     border: 1px solid var(--st-border);
     border-radius: var(--radius-md, 10px);
     background: var(--st-row-hover, #f8fafc);
-    flex: 1 1 auto;
+    flex: 0 0 auto;
   }
   
   .sf-login-box-title {

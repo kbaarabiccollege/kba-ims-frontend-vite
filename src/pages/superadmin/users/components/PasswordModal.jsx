@@ -7,7 +7,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../../../../components/common/Modal";
 import PasswordInput from "../../../../components/common/PasswordInput";
-import { capitalizeFirst } from "../../../../components/common/formatError";
+import { capitalizeFirst } from "../../../../utils/textHelpers";
 
 const PasswordModal = ({ user, onClose, onSubmit, submitting, serverError, serverFieldErrors }) => {
   const [password, setPassword] = useState("");

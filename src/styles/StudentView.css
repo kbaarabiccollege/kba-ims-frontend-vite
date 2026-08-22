@@ -1,5 +1,5 @@
 /* src/styles/StudentView.css
-   View-only presentation layer, built on top of AdminStudents.css and
+   View-only presentation layer, built on top of AdminUserList.css and
    StudentForm.css tokens/classes (--st-*, .sf-tabs, .sf-section, etc).
    "sv-" prefixed so it never collides with either. */
 

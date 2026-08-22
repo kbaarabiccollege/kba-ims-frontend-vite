@@ -9,12 +9,22 @@ import { useCallback, useEffect, useState } from "react";
 import { getBatches, createBatch, updateBatch } from "../../../../api/batchesApi";
 import useDebouncedValue from "../../../../hooks/useDebouncedValue";
 import SearchableDropdown from "../../../../components/common/SearchableDropdown";
-import { COURSE_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
+import { COURSES } from "../../../../utils/courses";
 import { CourseBadge } from "./components/BatchBadges";
 import BatchFormModal from "./components/BatchFormModal";
-import DeleteConfirmModal from "../../../../components/common/DeleteConfirmModal";
+import { DeleteConfirmModal } from "../../../../components/common/ListPageModals";
 import { EditIcon, TrashIcon } from "../../../../components/common/Icons";
 import "../../../../styles/Batches.css";
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+
+const COURSE_FILTER_OPTIONS = [
+  { value: "all", label: "All Courses" },
+  ...Object.entries(COURSES).map(([id, label]) => ({
+    value: Number(id),
+    label,
+  })),
+];
 
 const Batches = () => {
   // ---- list state ----

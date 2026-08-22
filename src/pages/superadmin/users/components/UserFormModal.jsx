@@ -10,7 +10,7 @@ import Modal from "../../../../components/common/Modal";
 import SearchableDropdown from "../../../../components/common/SearchableDropdown";
 import { ROLE_OPTIONS, STATUS_OPTIONS } from "../constants";
 import PasswordInput from "../../../../components/common/PasswordInput";
-import { capitalizeFirst } from "../../../../components/common/formatError";
+import { capitalizeFirst } from "../../../../utils/textHelpers";
 
 const emptyForm = {
   user_id: "",

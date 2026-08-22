@@ -1,4 +1,4 @@
-// src/components/common/courses.js
+// src/utils/courses.js
 //
 // Shared course-code lookup. The classrooms API returns `course` as a
 // number (1, 2, ...), not a label — this maps that number to the
