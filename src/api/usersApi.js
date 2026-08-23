@@ -1,4 +1,4 @@
-// src/api/usersApi.jsx
+// src/api/usersApi.js
 //
 // Thin, typed wrapper around the /users endpoints.
 // Keeping all endpoint strings + param shaping in one place means

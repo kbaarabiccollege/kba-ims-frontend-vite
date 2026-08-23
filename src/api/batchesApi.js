@@ -1,6 +1,6 @@
-// src/api/batchesApi.jsx
+// src/api/batchesApi.js
 //
-// Thin wrapper around the /batches endpoints, mirroring usersApi.jsx.
+// Thin wrapper around the /batches endpoints, mirroring usersApi.js.
 // NOTE: status is not a backend field for batches — no status param,
 // no status endpoint. If it's added to the backend later, reintroduce
 // getBatches({ status }) and an updateBatchStatus() call here.

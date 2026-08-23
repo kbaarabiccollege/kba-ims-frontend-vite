@@ -16,7 +16,7 @@ import {
   EMPLOYMENT_PLACE_OPTIONS,
   DESIGNATION_OPTIONS,
   // STAFF_DRIVE_FOLDERS,
-} from "./staffConstants";
+} from "../../../utils/staffConstants";
 import {
   GENDER_OPTIONS,
   BLOOD_GROUP_OPTIONS,

@@ -24,8 +24,7 @@ import {
   EMPLOYMENT_PLACE_LABELS,
   DESIGNATION_OPTIONS,
   DESIGNATION_LABELS,
-  STAFF_STATUS_OPTIONS,
-} from "./staffConstants";
+} from "../../../utils/staffConstants";
 import { useToast } from "../../../context/ToastContext";
 import { crudMessage } from "../../../utils/toastMessages";
 import SearchableDropdown from "../../../components/common/SearchableDropdown";
@@ -39,7 +38,8 @@ import {
   Pagination,
 } from "../../../components/common/ListPageControls";
 import { PhotoPreviewModal, BulkStatusConfirmModal, DeleteConfirmModal } from "../../../components/common/ListPageModals";
-import { PAGE_SIZE_OPTIONS } from "../../../utils/userConstants";
+import {  STATUS_FILTER_OPTIONS } from "../../../utils/constants";
+import { PAGE_SIZE_OPTIONS } from "../../../utils/constants";
 import "../../../styles/UserList.css";
 
 const Staff = () => {
@@ -79,10 +79,10 @@ const Staff = () => {
     []
   );
 
-  const statusAllOption = useMemo(() => STAFF_STATUS_OPTIONS.find((s) => s.value === "all"), []);
+  const statusAllOption = useMemo(() => STATUS_FILTER_OPTIONS.find((s) => s.value === "all"), []);
   const statusOptions = useMemo(
     () =>
-      STAFF_STATUS_OPTIONS.filter((s) => s.value !== "all").map((s) => ({
+      STATUS_FILTER_OPTIONS.filter((s) => s.value !== "all").map((s) => ({
         id: s.value,
         label: s.label,
       })),

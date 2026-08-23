@@ -1,6 +1,6 @@
 // src/components/common/Badges.jsx
 
-import { roleLabel, statusLabel } from "../../pages/superadmin/users/constants";
+import { roleLabel, statusLabel } from "../../utils/constants";
 import { FolderIcon } from "./Icons";
 
 export const RoleBadge = ({ role }) => (

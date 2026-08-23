@@ -1,7 +1,7 @@
-// src/api/staffApi.jsx
+// src/api/staffApi.js
 //
 // Thin, typed wrapper around the /staff endpoints.
-// Follows the same shape/pattern as studentsApi.jsx / usersApi.jsx.
+// Follows the same shape/pattern as studentsApi.js / usersApi.js.
 
 import axiosInstance from "./axiosInstance";
 
@@ -26,24 +26,24 @@ const BASE = "/staff";
  * @param {string} [params.status]           'all' | 'active' | 'inactive'
  */
 export async function getStaff({
-q,
-page = 1,
-limit = 25,
-staffType,
-employmentPlace,
-designation,
-status,
+  q,
+  page = 1,
+  limit = 25,
+  staffType,
+  employmentPlace,
+  designation,
+  status,
 } = {}) {
-const params = { page, limit };
+  const params = { page, limit };
 
-if (q && q.trim()) params.q = q.trim();
-if (staffType && staffType !== "all") params.staff_type = staffType;
-if (employmentPlace && employmentPlace !== "all") params.employment_place = employmentPlace;
-if (designation && designation !== "all") params.designation = designation;
-if (status && status !== "all") params.status = status;
+  if (q && q.trim()) params.q = q.trim();
+  if (staffType && staffType !== "all") params.staff_type = staffType;
+  if (employmentPlace && employmentPlace !== "all") params.employment_place = employmentPlace;
+  if (designation && designation !== "all") params.designation = designation;
+  if (status && status !== "all") params.status = status;
 
-const { data } = await axiosInstance.get(`${BASE}/list`, { params });
-return data;
+  const { data } = await axiosInstance.get(`${BASE}/list`, { params });
+  return data;
 }
 
 /**
@@ -103,16 +103,16 @@ export async function deleteStaff(id) {
  * body: { staff_ids, status }
  */
 export async function bulkUpdateStaffStatus(ids, status) {
-const body = { staff_ids: ids, status };
-const { data } = await axiosInstance.patch(`${BASE}/bulk`, body);
-return data;
+  const body = { staff_ids: ids, status };
+  const { data } = await axiosInstance.patch(`${BASE}/bulk`, body);
+  return data;
 }
 
 export default {
-getStaff,
-createStaff,
-updateStaff,
-getStaffMember,
-deleteStaff,
-bulkUpdateStaffStatus,
+  getStaff,
+  createStaff,
+  updateStaff,
+  getStaffMember,
+  deleteStaff,
+  bulkUpdateStaffStatus,
 };

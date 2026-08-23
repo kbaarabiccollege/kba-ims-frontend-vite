@@ -11,7 +11,7 @@ import { TrashIcon, PlusIcon } from "../../../components/common/Icons";
 import { DriveFolderButton } from "../../../components/common/Badges";
 import { SECTIONS, ROLE_BASE_PATHS, CASTE_OPTIONS, SOCIAL_CATEGORY_OPTIONS, 
   MADHAB_OPTIONS, FAMILY_ROWS, QUALIFICATION_ROWS, QUALIFICATION_LEVELS, 
-  ACADEMIC_STATUS_OPTIONS, emptyQualification, } from "./studentConstants";
+  ACADEMIC_STATUS_OPTIONS, emptyQualification, } from "../../../utils/studentConstants";
 import { GENDER_OPTIONS, BLOOD_GROUP_OPTIONS, RELIGION_OPTIONS, 
   ADDRESS_ROWS, ADDRESS_TYPES, emptyAddress } from "../../../utils/userConstants";
 import { STUDENT_DRIVE_FOLDERS } from "../../../utils/driveFolders";

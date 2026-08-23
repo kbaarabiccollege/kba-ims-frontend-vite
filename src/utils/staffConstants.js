@@ -42,12 +42,6 @@ export const DESIGNATION_LABELS = DESIGNATION_OPTIONS.reduce((acc, o) => {
   return acc;
 }, {});
 
-export const STAFF_STATUS_OPTIONS = [
-  { value: "all", label: "All Status" },
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
-];
-
 // Static id->label lookups — used the same way classroomsIndex/batchesIndex
 // are used on the Students page (e.g. to render a value in the table cell).
 export const STAFF_TYPE_LABELS = STAFF_TYPE_OPTIONS.filter(

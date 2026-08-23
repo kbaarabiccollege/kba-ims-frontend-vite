@@ -1,7 +1,7 @@
-// src/api/studentsApi.jsx
+// src/api/studentsApi.js
 //
 // Thin, typed wrapper around the /students endpoints.
-// Follows the same shape/pattern as usersApi.jsx.
+// Follows the same shape/pattern as usersApi.js.
 
 import axiosInstance from "./axiosInstance";
 

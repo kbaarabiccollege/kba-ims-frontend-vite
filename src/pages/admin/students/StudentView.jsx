@@ -18,7 +18,7 @@ import { getClassroom } from "../../../api/classroomsApi";
 import { getClassrooms } from "../../../api/classroomsApi";
 import { CASTE_OPTIONS, SOCIAL_CATEGORY_OPTIONS, MADHAB_OPTIONS, 
   ACADEMIC_STATUS_OPTIONS, optionLabel,
-} from "./studentConstants";
+} from "../../../utils/studentConstants";
 import { GENDER_OPTIONS, BLOOD_GROUP_OPTIONS, RELIGION_OPTIONS, 
   ADDRESS_TYPES,
 } from "../../../utils/userConstants";

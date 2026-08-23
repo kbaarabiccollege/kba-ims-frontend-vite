@@ -19,7 +19,7 @@ import {
   EMPLOYMENT_NATURE_OPTIONS,
   STAFF_TYPE_OPTIONS,
   EMPLOYMENT_PLACE_OPTIONS,
-} from "./staffConstants";
+} from "../../../utils/staffConstants";
 import {
   GENDER_OPTIONS,
   BLOOD_GROUP_OPTIONS,

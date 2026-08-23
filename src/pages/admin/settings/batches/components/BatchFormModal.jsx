@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../../../../../components/common/Modal";
 import SearchableDropdown from "../../../../../components/common/SearchableDropdown";
-import { COURSES } from "../../../../../utils/courses";
+import { COURSES } from "../../../../../utils/constants";
 import { capitalizeFirst } from "../../../../../utils/textHelpers";
 
 const COURSE_OPTIONS = Object.entries(COURSES).map(([id, label]) => ({

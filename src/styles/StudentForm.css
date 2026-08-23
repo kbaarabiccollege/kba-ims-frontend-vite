@@ -265,7 +265,7 @@
   
   .sf-input,
   select.sf-input {
-    padding: 0.45rem 0.65rem;
+    padding: 0.6rem 0.9rem;
     border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--color-input-border, #d7dfea);
     background: var(--color-input-bg, #f2f5f9);

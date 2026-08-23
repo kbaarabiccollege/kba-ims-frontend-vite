@@ -5,18 +5,21 @@
 //
 // NOTE: no status anywhere — it's not a backend field for batches.
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { getBatches, createBatch, updateBatch } from "../../../../api/batchesApi";
-import useDebouncedValue from "../../../../hooks/useDebouncedValue";
+import { useListPage } from "../../../../hooks/useListPageKit";
 import SearchableDropdown from "../../../../components/common/SearchableDropdown";
-import { COURSES } from "../../../../utils/courses";
-import { CourseBadge } from "./components/BatchBadges";
+import { COURSES } from "../../../../utils/constants";
 import BatchFormModal from "./components/BatchFormModal";
 import { DeleteConfirmModal } from "../../../../components/common/ListPageModals";
 import { EditIcon, TrashIcon } from "../../../../components/common/Icons";
+import { PAGE_SIZE_OPTIONS } from "../../../../utils/constants";
 import "../../../../styles/Batches.css";
 
-const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+export const CourseBadge = ({ course }) => {
+  const label = COURSES[course] ?? "—";
+  return <span className="bm-badge bm-course-badge">{label}</span>;
+};
 
 const COURSE_FILTER_OPTIONS = [
   { value: "all", label: "All Courses" },
@@ -27,19 +30,6 @@ const COURSE_FILTER_OPTIONS = [
 ];
 
 const Batches = () => {
-  // ---- list state ----
-  const [batches, setBatches] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  // ---- filters ----
-  const [search, setSearch] = useState("");
-  const [course, setCourse] = useState("all");
-  const debouncedSearch = useDebouncedValue(search, 400);
-
   // ---- popups ----
   const [formModal, setFormModal] = useState(null); // { mode: 'create' | 'edit', batch? }
   const [deleteModal, setDeleteModal] = useState(null); // batch
@@ -47,41 +37,23 @@ const Batches = () => {
   const [modalError, setModalError] = useState("");
   const [modalFieldErrors, setModalFieldErrors] = useState({});
 
-  const fetchBatches = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await getBatches({ q: debouncedSearch, page, limit, course });
-      setBatches(res?.data ?? res?.batches ?? []);
-      setTotal(
-        res?.pagination?.total ??
-          res?.total ??
-          res?.count ??
-          (res?.data ?? res?.batches ?? []).length
-      );
-    } catch (err) {
-      setError(
-        err?.response?.data?.message || "Couldn't load batches. Please try again in a moment."
-      );
-      setBatches([]);
-      setTotal(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedSearch, page, limit, course]);
+  // ---- list state (search, course filter, pagination, fetch lifecycle) ----
+  const fetchFn = useCallback(
+    (params) =>
+      getBatches({
+        q: params.q,
+        page: params.page,
+        limit: params.limit,
+        course: params.course,
+      }),
+    []
+  );
 
-  useEffect(() => {
-    fetchBatches();
-  }, [fetchBatches]);
-
-  // Reset to page 1 whenever a filter changes (not on page/limit changes themselves)
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, course]);
-
-  const totalPages = Math.max(1, Math.ceil(total / limit));
-  const rangeStart = total === 0 ? 0 : (page - 1) * limit + 1;
-  const rangeEnd = Math.min(page * limit, total);
+  const list = useListPage({
+    fetchFn,
+    initialLimit: 10,
+    initialFilters: { course: "all" },
+  });
 
   // ---- create / edit ----
   const openCreateModal = () => {
@@ -112,7 +84,7 @@ const Batches = () => {
         await createBatch(payload);
       }
       setFormModal(null);
-      fetchBatches();
+      list.refetch();
     } catch (err) {
       const data = err?.response?.data;
       setModalError(
@@ -142,7 +114,7 @@ const Batches = () => {
             </span>
             Batches
           </h1>
-          <p className="bm-title-meta">{total} total</p>
+          <p className="bm-title-meta">{list.total} total</p>
         </div>
         <button type="button" className="bm-btn bm-btn-primary bm-btn-add" onClick={openCreateModal}>
           <span aria-hidden="true">+</span>
@@ -159,8 +131,8 @@ const Batches = () => {
             </span>
             <input
               type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={list.search}
+              onChange={(e) => list.setSearch(e.target.value)}
               placeholder="Search by batch name…"
               aria-label="Search batches"
             />
@@ -176,17 +148,17 @@ const Batches = () => {
                   id: c.value,
                   label: c.label,
                 }))}
-                value={course}
-                onChange={setCourse}
+                value={list.filters.course}
+                onChange={(v) => list.setFilter("course", v)}
                 aria-label="Filter by course"
               />
             </div>
 
-            <span className="bm-result-count">{total} batches</span>
+            <span className="bm-result-count">{list.total} batches</span>
           </div>
         </div>
 
-        {error && <div className="bm-error-banner">{error}</div>}
+        {list.error && <div className="bm-error-banner">{list.error}</div>}
 
         <div className="bm-table-wrap">
           <table className="bm-table">
@@ -200,22 +172,22 @@ const Batches = () => {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
+              {list.loading ? (
                 <tr>
                   <td colSpan={5} className="bm-state-cell">
                     Loading batches…
                   </td>
                 </tr>
-              ) : batches.length === 0 ? (
+              ) : list.items.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="bm-state-cell">
                     No batches match your search or filters.
                   </td>
                 </tr>
               ) : (
-                batches.map((batch, idx) => (
+                list.items.map((batch, idx) => (
                   <tr key={batch.id}>
-                    <td className="bm-col-num">{(page - 1) * limit + idx + 1}</td>
+                    <td className="bm-col-num">{(list.page - 1) * list.limit + idx + 1}</td>
                     <td className="bm-batch-name">{batch.batch_name || "—"}</td>
                     <td>
                       {batch.start_year && batch.end_year
@@ -256,17 +228,19 @@ const Batches = () => {
 
         <div className="bm-pagination">
           <span className="bm-pagination-summary">
-            {total === 0 ? "No results" : `Showing ${rangeStart}-${rangeEnd} of ${total}`}
+            {list.total === 0
+              ? "No results"
+              : `Showing ${list.rangeStart}-${list.rangeEnd} of ${list.total}`}
           </span>
 
           <div className="bm-pagination-controls">
             <label className="bm-per-page">
               Per page:
               <select
-                value={limit}
+                value={list.limit}
                 onChange={(e) => {
-                  setLimit(Number(e.target.value));
-                  setPage(1);
+                  list.setLimit(Number(e.target.value));
+                  list.setPage(1);
                 }}
               >
                 {PAGE_SIZE_OPTIONS.map((n) => (
@@ -280,18 +254,18 @@ const Batches = () => {
             <button
               type="button"
               className="bm-page-nav"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={list.page <= 1}
+              onClick={() => list.setPage((p) => Math.max(1, p - 1))}
               aria-label="Previous page"
             >
               ‹
             </button>
-            <span className="bm-page-current">{page}</span>
+            <span className="bm-page-current">{list.page}</span>
             <button
               type="button"
               className="bm-page-nav"
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={list.page >= list.totalPages}
+              onClick={() => list.setPage((p) => Math.min(list.totalPages, p + 1))}
               aria-label="Next page"
             >
               ›

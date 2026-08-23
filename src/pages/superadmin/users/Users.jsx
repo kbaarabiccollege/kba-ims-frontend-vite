@@ -25,7 +25,7 @@ import { getUsers, createUser, updateUser, updateUserPassword, bulkUpdateUserSta
 import useDebouncedValue from "../../../hooks/useDebouncedValue";
 import { useAuth } from "../../../context/AuthContext";
 import SearchableDropdown from "../../../components/common/SearchableDropdown";
-import { ROLE_FILTER_OPTIONS, STATUS_FILTER_OPTIONS, PAGE_SIZE_OPTIONS } from "./constants";
+import { PAGE_SIZE_OPTIONS, STATUS_FILTER_OPTIONS, ROLE_FILTER_OPTIONS } from "../../../utils/constants";
 import { RoleBadge, StatusPill } from "../../../components/common/Badges";
 import UserFormModal from "./components/UserFormModal";
 import PasswordModal from "./components/PasswordModal";

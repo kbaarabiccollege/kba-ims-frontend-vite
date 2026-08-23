@@ -1,7 +1,5 @@
 // src/utils/userConstants.js
 
-export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
-
 export const ADDRESS_ROWS = [
     { key: "door_no", label: "Door No" },
     { key: "street", label: "Street", textarea: true },

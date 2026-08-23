@@ -209,16 +209,6 @@
     flex-wrap: wrap;
   }
   
-  .bm-filters select {
-    padding: 0.6rem 2rem 0.6rem 0.9rem;
-    border-radius: var(--radius-sm, 8px);
-    border: 1px solid var(--color-input-border, #d7dfea);
-    background: var(--color-input-bg, #f2f5f9);
-    color: var(--color-input-text, #1e2f4a);
-    font-size: 0.85rem;
-    cursor: pointer;
-  }
-  
   .bm-result-count {
     font-size: 0.85rem;
     color: var(--bm-text-muted);
@@ -451,8 +441,7 @@
     color: var(--color-error, #b91c1c);
   }
   
-  .bm-field input,
-  .bm-field select {
+  .bm-field input {
     padding: 0.65rem 0.85rem;
     border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--color-input-border, #d7dfea);
@@ -465,8 +454,7 @@
     color: var(--color-input-placeholder, #a8b5c8);
   }
   
-  .bm-field input:focus,
-  .bm-field select:focus {
+  .bm-field input:focus {
     outline: none;
     background: var(--color-input-bg-focus, #eef3fa);
     border-color: var(--color-primary, #214b86);

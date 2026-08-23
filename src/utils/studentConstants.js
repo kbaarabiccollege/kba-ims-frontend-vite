@@ -1,6 +1,6 @@
 // src/pages/admin/students/constants.js
 
-import { IconPersonal, IconOther, IconCap, IconFamily, IconAddress, IconAdmission, IconLinks } from "../../../components/common/Icons";
+import { IconPersonal, IconOther, IconCap, IconFamily, IconAddress, IconAdmission, IconLinks } from "../components/common/Icons";
 
 export const ROLE_BASE_PATHS = { admin: "/admin", superadmin: "/superadmin", dev: "/superadmin" };
 
@@ -14,18 +14,6 @@ export const SECTIONS = [
   { key: "admission", label: "Admission", Icon: IconAdmission },
   { key: "links", label: "Related Links", Icon: IconLinks },
 ];
-
-// Mirrors the `status` field on the students table (active/inactive).
-export const STATUS_OPTIONS = [
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
-];
-export const STATUS_FILTER_OPTIONS = [{ value: "all", label: "All Status" }, ...STATUS_OPTIONS];
-
-export const PAGE_SIZE_OPTIONS = [10, 25, 50];
-
-export const statusLabel = (status) =>
-  STATUS_OPTIONS.find((s) => s.value === status)?.label ?? status ?? "—";
 
 // Row-level bulk actions shown once one or more students are selected.
 export const BULK_ACTION = {

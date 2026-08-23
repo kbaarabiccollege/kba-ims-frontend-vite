@@ -1,4 +1,4 @@
-// src/api/classroomsApi.jsx
+// src/api/classroomsApi.js
 //
 // Thin wrapper around GET /api/classrooms — used to populate the
 // "Classroom" filter dropdown on the Students page.
