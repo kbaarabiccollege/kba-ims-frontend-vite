@@ -1,5 +1,6 @@
 // src/pages/admin/AdminDashboard.jsx
 
+import usePageTitle from "../../hooks/usePageTitle";
 import '../../styles/dashboard.css';
 
 import {
@@ -85,6 +86,7 @@ const dateStr = now.toLocaleDateString("en-US", { day: "2-digit", month: "long",
 const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 
 const AdminDashboard = () => {
+  usePageTitle("Home");
   const { user } = useAuth();
 
   return (

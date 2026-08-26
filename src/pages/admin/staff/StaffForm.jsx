@@ -35,6 +35,7 @@ import {
   } from "../../../components/common/Icons";
 import { useToast } from "../../../context/ToastContext";
 import { crudMessage } from "../../../utils/toastMessages";
+import usePageTitle from "../../../hooks/usePageTitle";
 // Reuses the generic "st-" list-page styles + the "sf-" form styles that
 // were built for StudentForm.jsx — both are style-agnostic (not
 // Student-specific class names), so no separate StaffForm.css needed.
@@ -105,6 +106,8 @@ const StaffForm = () => {
   const [loadError, setLoadError] = useState("");
   const [saveError, setSaveError] = useState("");
   const [sectionErrors, setSectionErrors] = useState({});
+
+  usePageTitle(isEdit ? ["Edit", "Staff"] : ["Add New", "Staff"]);
 
   // ---- staff type / employment place options (static enums, same
   // ones the Staff list page uses) ----

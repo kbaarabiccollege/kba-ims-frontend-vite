@@ -17,6 +17,7 @@ import { GENDER_OPTIONS, BLOOD_GROUP_OPTIONS, RELIGION_OPTIONS,
 import { STUDENT_DRIVE_FOLDERS } from "../../../utils/driveFolders";
 import { useToast } from "../../../context/ToastContext";
 import { crudMessage } from "../../../utils/toastMessages";
+import usePageTitle from "../../../hooks/usePageTitle";
 import "../../../styles/UserList.css";
 import "../../../styles/StudentForm.css";
 
@@ -114,6 +115,8 @@ const StudentForm = () => {
   const [batchesIndex, setBatchesIndex] = useState({});
   const [batchesLoading, setBatchesLoading] = useState(false);
   const [batchesLoaded, setBatchesLoaded] = useState(false);
+
+  usePageTitle(isEdit ? ["Edit", "Students"] : ["Add New", "Students"]);
 
   const searchBatches = useCallback(async (q) => {
     setBatchesLoading(true);

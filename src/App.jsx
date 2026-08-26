@@ -3,6 +3,7 @@
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import AppRouter from "./routes/AppRouter";
+import SessionExpiredModal from "./components/common/SessionExpiredModal";
 
 import "./App.css";
 
@@ -11,6 +12,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <AppRouter />
+        <SessionExpiredModal />
       </AuthProvider>
     </ThemeProvider>
   );

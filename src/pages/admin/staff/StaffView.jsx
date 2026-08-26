@@ -40,6 +40,7 @@ import {
   IconUserId,
   IconChevronRight,
 } from "../../../components/common/Icons";
+import usePageTitle from "../../../hooks/usePageTitle";
 import "../../../styles/UserList.css";
 import "../../../styles/StudentForm.css";
 import "../../../styles/StudentView.css";
@@ -179,6 +180,7 @@ const StatItem = ({ Icon, label, value, className = "" }) => (
 );
 
 const StaffView = () => {
+  usePageTitle("View Staff");
   const { id } = useParams();
   const navigate = useNavigate();
   const { role: authRole } = useAuth();

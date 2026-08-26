@@ -14,6 +14,7 @@ import BatchFormModal from "./components/BatchFormModal";
 import { DeleteConfirmModal } from "../../../../components/common/ListPageModals";
 import { EditIcon, TrashIcon } from "../../../../components/common/Icons";
 import { PAGE_SIZE_OPTIONS } from "../../../../utils/constants";
+import usePageTitle from "../../../../hooks/usePageTitle";
 import "../../../../styles/Batches.css";
 
 export const CourseBadge = ({ course }) => {
@@ -32,6 +33,8 @@ const COURSE_FILTER_OPTIONS = [
 const Batches = () => {
   // ---- popups ----
   const [formModal, setFormModal] = useState(null); // { mode: 'create' | 'edit', batch? }
+  usePageTitle( formModal ? formModal.mode === "edit" ? ["Edit", "Batche"] 
+    : ["Add New", "Batche"] : "Batches");
   const [deleteModal, setDeleteModal] = useState(null); // batch
   const [submitting, setSubmitting] = useState(false);
   const [modalError, setModalError] = useState("");

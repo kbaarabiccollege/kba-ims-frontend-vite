@@ -26,6 +26,7 @@ import { EditIcon, ExternalLinkIcon, IconPersonal, IconOther,
   IconCap, IconFamily, IconAddress, IconAdmission, IconLinks,
   IconClassroom, IconBatch, IconUserId, IconChevronRight
 } from "../../../components/common/Icons";
+import usePageTitle from "../../../hooks/usePageTitle";
 import "../../../styles/UserList.css";
 import "../../../styles/StudentForm.css";
 import "../../../styles/StudentView.css";
@@ -150,6 +151,7 @@ const StatItem = ({ Icon, label, value, className = "" }) => (
 );
 
 const StudentView = () => {
+  usePageTitle("View Student");
   const { id } = useParams();
   const navigate = useNavigate();
   const { role: authRole } = useAuth();

@@ -1,6 +1,6 @@
 // src/pages/LoginPage.jsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import axiosInstance from "../../api/axiosInstance";
@@ -10,13 +10,33 @@ import PasswordInput from "../../components/common/PasswordInput";
 import '../../styles/login.css';
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, authStatus, role } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({ user_id: "", password: "" });
   
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Covers two cases with one effect:
+  // 1) landing on /login while already authenticated (e.g. typed the
+  //    URL directly, or came back via browser history)
+  // 2) sitting on /login in this tab while ANOTHER tab logs in —
+  //    AuthContext's storage listener updates authStatus/role here,
+  //    and this effect reacts by navigating away automatically.
+  useEffect(() => {
+    if (authStatus === "authenticated") {
+      navigate(getHomeForRole(role), { replace: true });
+    }
+  }, [authStatus, role, navigate]);
+
+  // While /auth/me is still resolving, render nothing rather than the
+  // login form — this is what actually stops the flash: previously
+  // isAuthenticated was false during loading too, so the form briefly
+  // showed before the effect above fired and redirected away.
+  if (authStatus === "loading") {
+    return null; // swap for a spinner/skeleton if you have a shared one
+  }
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,8 +50,11 @@ const LoginPage = () => {
     try {
       const response = await axiosInstance.post("/auth/login", formData);
       if (response.data.success) {
-        const { user, token } = response.data;
-        login(user, token);
+        // No token in the response body anymore — the server set it
+        // as an httpOnly cookie via Set-Cookie. login() only needs
+        // the user object now.
+        const { user } = response.data;
+        login(user);
         const home = getHomeForRole(user.role);
         navigate(home, { replace: true });
       } else {

@@ -1,3 +1,5 @@
+// src/hooks/useListPageKit.js
+
 // List-page hook kit: the generic list-state manager (search, filters,
 // pagination, selection, fetch lifecycle) plus the role-aware nav
 // helper. Merged into one file since every list page pulls in both.

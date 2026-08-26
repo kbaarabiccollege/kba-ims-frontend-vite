@@ -40,9 +40,11 @@ import {
 import { PhotoPreviewModal, BulkStatusConfirmModal, DeleteConfirmModal } from "../../../components/common/ListPageModals";
 import {  STATUS_FILTER_OPTIONS } from "../../../utils/constants";
 import { PAGE_SIZE_OPTIONS } from "../../../utils/constants";
+import usePageTitle from "../../../hooks/usePageTitle";
 import "../../../styles/UserList.css";
 
 const Staff = () => {
+  usePageTitle("Staff");
   const { goToCreate, goToView, goToEdit } = useModuleNav("staff");
   const toast = useToast();
 

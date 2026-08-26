@@ -43,7 +43,10 @@ import TimetableFormatSettings from "../pages/admin/settings/TimetableFormatSett
 
 // Redirects logged-in user to their portal; otherwise to login
 const RootRedirect = () => {
-  const { isAuthenticated, role } = useAuth();
+  const { isAuthenticated, role, initializing } = useAuth();
+  // Same reasoning as ProtectedRoute: wait for the /auth/me check
+  // before deciding, since the cookie can't be read synchronously.
+  if (initializing) return null;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return <Navigate to={getHomeForRole(role)} replace />;
 };

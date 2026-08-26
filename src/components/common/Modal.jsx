@@ -12,18 +12,28 @@
 import { useEffect, useRef } from "react";
 import "../../styles/Modal.css";
 
-const Modal = ({ title, header, onClose, children, width = 480 }) => {
+const Modal = ({
+  title,
+  header,
+  onClose,
+  children,
+  width = 480,
+  hideCloseButton = false,
+  disableOverlayClose = false,
+}) => {
   const panelRef = useRef(null);
 
   useEffect(() => {
+    if (disableOverlayClose) return; // Escape also disabled when overlay-close is off
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [onClose, disableOverlayClose]);
 
   const handleOverlayClick = (e) => {
+    if (disableOverlayClose) return;
     if (panelRef.current && !panelRef.current.contains(e.target)) {
       onClose();
     }
@@ -42,9 +52,11 @@ const Modal = ({ title, header, onClose, children, width = 480 }) => {
       >
             <div className="modal-header">
               {header || <h2>{title}</h2>}
-              <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
-                &times;
-              </button>
+              {!hideCloseButton && (
+                <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
+                  &times;
+                </button>
+              )}
             </div>
         <div className="modal-body">{children}</div>
       </div>

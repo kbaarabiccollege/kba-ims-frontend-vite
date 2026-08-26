@@ -81,9 +81,11 @@
   import { STATUS_FILTER_OPTIONS } from "../../../utils/constants";
 import { PAGE_SIZE_OPTIONS } from "../../../utils/constants";
 import { FilterFunnelIcon } from "../../../components/common/Icons";
+import usePageTitle from "../../../hooks/usePageTitle";
   import "../../../styles/UserList.css";
 
   const Students = () => {
+    usePageTitle("Students");
     const { goToCreate, goToView, goToEdit } = useModuleNav("students");
     const toast = useToast();
 

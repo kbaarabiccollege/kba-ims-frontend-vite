@@ -39,11 +39,15 @@ import {
 import { DeleteConfirmModal, BulkStatusConfirmModal } from "../../../components/common/ListPageModals";
 import { useToast } from "../../../context/ToastContext";
 import { crudMessage } from "../../../utils/toastMessages";
+import usePageTitle from "../../../hooks/usePageTitle";
 import "../../../styles/Users.css";
 import "../../../styles/UserList.css";
 
 const Users = () => {
   const { role: authRole } = useAuth();
+
+
+
   const isDev = authRole === "dev";
   const toast = useToast();
 
@@ -82,6 +86,8 @@ const Users = () => {
 
   // ---- popups ----
   const [formModal, setFormModal] = useState(null); // { mode: 'create' | 'edit', user? }
+  usePageTitle( formModal ? formModal.mode === "edit" ? ["Edit", "Users"] 
+    : ["Add New", "Users"] : "Users");
   const [passwordModal, setPasswordModal] = useState(null); // user
   const [deleteModal, setDeleteModal] = useState(null); // user
   const [submitting, setSubmitting] = useState(false);
