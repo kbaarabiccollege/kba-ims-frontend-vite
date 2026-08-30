@@ -76,7 +76,22 @@ export async function updateStudent(id, payload) {
  */
 export async function getStudent(id) {
   const { data } = await axiosInstance.get(`${BASE}/${id}`);
-  return data;
+return data;
+}
+
+// Lightweight variant of getStudent for FK-resolution use cases (e.g.
+// Classrooms leader lookup via useEntityCache) that only need
+// {id, name, photo_url, roll_number} instead of the full student record.
+export async function getStudentSummary(id) {
+  const { data } = await axiosInstance.get(`${BASE}/${id}`);
+  const student = data?.data || {};
+  const personal = student.personal_details || {};
+  return {
+    id,
+    name: personal.name || null,
+    photo_url: personal.photo_url || null,
+    roll_number: personal.roll_number || null,
+  };
 }
 
 /**
@@ -143,6 +158,7 @@ export default {
   createStudent,
   updateStudent,
   getStudent,
+  getStudentSummary,
   deleteStudent,
   bulkCreateStudents,
   bulkUpdateStudents,

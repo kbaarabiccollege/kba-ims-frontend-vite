@@ -74,7 +74,7 @@
     border: 1px solid var(--sd-border);
     border-radius: var(--radius-md, 10px);
     box-shadow: var(--sd-shadow-popover);
-    z-index: 30;
+    z-index: 150;
     overflow: hidden;
   }
   

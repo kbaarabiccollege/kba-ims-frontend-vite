@@ -1,0 +1,169 @@
+/* src/styles/PersonSearchDropdown.css
+   Async searchable person picker (photo + name + sub-label).
+   Namespaced "psd-" so it can be dropped into any page without
+   colliding with page-specific styles (see academic.css's header
+   comment for why namespacing matters in this codebase). */
+
+   .psd-root {
+    position: relative;
+    width: 100%;
+  }
+  
+.psd-trigger {
+width: 100%;
+height: 42px;
+min-height: 42px;
+max-height: 42px;
+box-sizing: border-box;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 0.5rem;
+padding: 0 0.7rem;
+border-radius: var(--radius-sm, 8px);
+border: 1px solid var(--color-input-border, #d7dfea);
+background: var(--color-input-bg, #f2f5f9);
+color: var(--color-input-text, #1e2f4a);
+font-size: 0.9rem;
+cursor: pointer;
+text-align: left;
+overflow: hidden;
+  }
+  
+  .psd-trigger:focus {
+    outline: none;
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .psd-disabled .psd-trigger {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .psd-placeholder {
+    color: var(--color-input-placeholder, #a8b5c8);
+  }
+  
+.psd-selected {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+min-width: 0;
+height: 100%;
+overflow: hidden;
+  }
+  
+  .psd-selected-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .psd-trigger-icons {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+  
+  .psd-clear {
+    font-size: 1.1rem;
+    line-height: 1;
+    color: var(--ac-text-muted, #8592a8);
+    padding: 0 0.15rem;
+  }
+  .psd-clear:hover { color: var(--color-error, #b91c1c); }
+  
+  .psd-caret {
+    font-size: 0.7rem;
+    color: var(--ac-text-muted, #8592a8);
+  }
+  
+  .psd-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--ac-avatar-bg, #dbe7fb);
+    flex-shrink: 0;
+  }
+  
+  .psd-avatar-fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ac-avatar-fg, #214b86);
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+  
+  .psd-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--ac-surface-raised, #fff);
+    border: 1px solid var(--ac-border, #e2e7f0);
+    border-radius: var(--radius-sm, 8px);
+    box-shadow: var(--ac-shadow-popover, 0 12px 32px rgba(20, 33, 61, 0.16));
+    overflow: hidden;
+  }
+  
+  .psd-search-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.6rem 0.75rem;
+    border: none;
+    border-bottom: 1px solid var(--ac-border, #e2e7f0);
+    background: transparent;
+    color: var(--ac-text-body, #3a4a63);
+    font-size: 0.88rem;
+  }
+  .psd-search-input:focus { outline: none; }
+  
+  .psd-results {
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  
+  .psd-state-row {
+    padding: 0.9rem 0.75rem;
+    text-align: center;
+    color: var(--ac-text-muted, #8592a8);
+    font-size: 0.85rem;
+  }
+  .psd-state-error { color: var(--color-error, #b91c1c); }
+  
+  .psd-result-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.75rem;
+    cursor: pointer;
+  }
+  .psd-result-row:hover,
+  .psd-result-row-active {
+    background: var(--ac-badge-bg, #eef2fb);
+  }
+  
+  .psd-result-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  
+  .psd-result-name {
+    font-size: 0.87rem;
+    font-weight: 600;
+    color: var(--ac-text-heading, #14213d);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .psd-result-sub {
+    font-size: 0.75rem;
+    color: var(--ac-text-muted, #8592a8);
+  }

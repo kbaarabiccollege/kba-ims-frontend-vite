@@ -1,3 +1,5 @@
+// src/components/common/ListPageControls.jsx
+
 // Stateless building blocks shared by every list page (Students, Staff,
 // and future modules): the avatar cell, header/row checkboxes, the
 // action-icon row, the page header, and pagination. Grouped in one file
@@ -159,6 +161,174 @@ export const Pagination = ({ page, setPage, limit, setLimit, total, totalPages, 
         aria-label="Next page"
       >
         ›
+      </button>
+    </div>
+  </div>
+);
+
+
+// --- Reusable card-grid list controls (Classrooms, Subjects, etc.) ---
+//
+// Styled by src/styles/academic.css. That file uses an "ac-" prefix for
+// everything defined here, except .st-icon-btn (shared, identical
+// primitive also used by ListPageModals.jsx) — don't rename that one.
+
+export const SegmentedToggle = ({ options, value, onChange, ariaLabel }) => (
+  <div className="ac-segmented" role="group" aria-label={ariaLabel}>
+    {options.map((opt) => (
+      <button
+        key={opt.value}
+        type="button"
+        className={`ac-segmented-btn${value === opt.value ? " ac-segmented-btn-active" : ""}`}
+        onClick={() => onChange(opt.value)}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+);
+
+export const SelectionBar = ({
+  total,
+  itemLabel = "items",
+  allSelected,
+  someSelected,
+  onToggleSelectAll,
+  selectedCount,
+  bulkActions = [],
+  onBulkAction,
+}) => (
+  <div className="ac-selection-bar">
+    <label className="ac-selection-bar-all">
+      <input
+        type="checkbox"
+        checked={allSelected}
+        ref={(el) => el && (el.indeterminate = someSelected && !allSelected)}
+        onChange={onToggleSelectAll}
+      />
+      Select All ({total} {itemLabel})
+    </label>
+    <div className="ac-selection-bar-actions">
+      <span className="ac-selection-bar-count">{selectedCount} selected</span>
+      <div className="ac-selection-bar-buttons">
+        {bulkActions.map((a) => (
+          <button
+            key={a.value}
+            type="button"
+            className={`st-btn st-btn-ghost${a.tone ? ` st-btn-${a.tone}` : ""}`}
+            onClick={() => onBulkAction(a.value)}
+          >
+            {a.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+export const EntityCardGrid = ({ children, loading, empty, emptyMessage = "No items match your search or filters." }) => {
+  if (loading) return <div className="ac-state-cell">Loading…</div>;
+  if (empty) return <div className="ac-state-cell">{emptyMessage}</div>;
+  return <div className="ac-card-grid">{children}</div>;
+};
+
+// Builds initials ("Zubair Ahmed" -> "ZA") for the avatar fallback
+// shown when the backend doesn't return a photo_url — never render a
+// broken-image icon.
+const getInitials = (name) => {
+  if (!name || name === "—") return "";
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+};
+
+export const EntityCard = ({
+  id,
+  title,
+  meta,
+  badges = [],
+  footerMeta,
+  people = [],
+  isInactive,
+  selected,
+  onToggleSelect,
+  onEdit,
+}) => (
+  <div className={`ac-entity-card${isInactive ? " ac-entity-card-inactive" : ""}`}>
+    <div className="ac-entity-card-header">
+      {isInactive ? (
+        <span
+          className="ac-entity-card-check ac-entity-card-check-inactive"
+          aria-hidden="true"
+          title="Inactive classroom"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+        </span>
+      ) : (
+        <input
+          type="checkbox"
+          className="ac-entity-card-check"
+          checked={selected}
+          onChange={() => onToggleSelect(id)}
+          aria-label={`Select ${title}`}
+        />
+      )}
+      {/* Full name is allowed to wrap onto multiple lines here — the
+          room-no meta line sits below it instead of competing for the
+          same row. */}
+      <span className="ac-entity-card-title">{title || "—"}</span>
+    </div>
+
+    {meta && <div className="ac-entity-card-meta">{meta}</div>}
+
+    <div className="ac-entity-card-badges">
+      {badges.map((b, i) => (
+        <span key={i} className={`ac-badge${b.tone ? ` ac-badge-${b.tone}` : ""}`}>{b.label}</span>
+      ))}
+    </div>
+
+    {footerMeta && <div className="ac-entity-card-meta ac-entity-card-meta-bottom">{footerMeta}</div>}
+
+    <div className="ac-entity-card-people">
+      {people.map((p, i) => {
+        const initials = getInitials(p.name);
+        return (
+          <div className="ac-entity-card-person" key={i}>
+            <span className="ac-entity-card-person-label">{p.label}:</span>
+            {p.avatarUrl ? (
+              <img className="ac-avatar-sm" src={p.avatarUrl} alt="" />
+            ) : (
+              <span className="ac-avatar-sm ac-avatar-fallback" aria-hidden="true">
+                {initials || "—"}
+              </span>
+            )}
+            <span className="ac-entity-card-person-name">{p.name || "—"}</span>
+          </div>
+        );
+      })}
+      {isInactive && <span className="ac-badge ac-badge-danger ac-entity-card-inactive-tag">Inactive</span>}
+    </div>
+
+    <div className="ac-entity-card-actions">
+      <button
+        type="button"
+        className="st-icon-btn"
+        onClick={onEdit}
+        aria-label={`Edit ${title}`}
+        title="Edit"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+        </svg>
       </button>
     </div>
   </div>

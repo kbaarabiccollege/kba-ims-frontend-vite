@@ -73,7 +73,22 @@ export async function updateStaff(id, payload) {
  */
 export async function getStaffMember(id) {
   const { data } = await axiosInstance.get(`${BASE}/${id}`);
-  return data;
+return data;
+}
+
+// Lightweight variant of getStaffMember for FK-resolution use cases
+// (e.g. Classrooms advisor lookup via useEntityCache) that only need
+// {id, name, photo_url, staff_uid} instead of the full staff record.
+export async function getStaffMemberSummary(id) {
+  const { data } = await axiosInstance.get(`${BASE}/${id}`);
+  const staff = data?.data || {};
+  const personal = staff.personal_details || {};
+  return {
+    id,
+    name: personal.name || null,
+    photo_url: personal.photo_url || null,
+    staff_uid: personal.staff_uid || null,
+  };
 }
 
 /**
@@ -113,6 +128,7 @@ export default {
   createStaff,
   updateStaff,
   getStaffMember,
+  getStaffMemberSummary,
   deleteStaff,
   bulkUpdateStaffStatus,
 };
