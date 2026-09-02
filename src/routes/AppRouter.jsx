@@ -36,10 +36,15 @@ import StaffView from "../pages/admin/staff/StaffView";
 import AdminClassrooms from "../pages/admin/academics/AdminClassrooms";
 import AdminSubjects from "../pages/admin/academics/AdminSubjects";
 
+import Timetable from "../pages/admin/timetable/Timetable";
+import Attendance from "../pages/admin/attendance/Attendance";
+
 import SettingsLayout from "../pages/admin/settings/SettingsLayout";
 import SettingsHome from "../pages/admin/settings/SettingsHome";
 import Batches from "../pages/admin/settings/batches/Batches";
 import TimetableFormatSettings from "../pages/admin/settings/TimetableFormatSettings";
+import TimetableFormatForm from "../pages/admin/settings/TimetableFormatForm";
+import TimetableFormatView from "../pages/admin/settings/TimetableFormatView";
 
 // Redirects logged-in user to their portal; otherwise to login
 const RootRedirect = () => {
@@ -75,6 +80,8 @@ const AppRouter = () => (
 
           <Route path="/admin/classrooms" element={<AdminClassrooms />} />
           <Route path="/admin/subjects" element={<AdminSubjects />} />
+          <Route path="/admin/timetable" element={<Timetable />} />
+          <Route path="/admin/attendance" element={<Attendance />} />
           {/* Add more admin pages here */}
         </Route>
       </Route>
@@ -86,7 +93,7 @@ const AppRouter = () => (
           true full-page view without the sidebar/header. Still wrapped in
           ProtectedRoute so auth/role checks aren't skipped. ── */}
 
-<Route element={<ProtectedRoute allowedRoles={["admin", "superadmin", "dev"]} />}>
+      <Route element={<ProtectedRoute allowedRoles={["admin", "superadmin", "dev"]} />}>
         <Route path="/admin/settings" element={<SettingsLayout />}>
           <Route index element={<SettingsHome />} />
           <Route path="batches" element={<Batches />} />
@@ -99,6 +106,9 @@ const AppRouter = () => (
           <Route index element={<SettingsHome />} />
           <Route path="batches" element={<Batches />} />
           <Route path="timetable-format" element={<TimetableFormatSettings />} />
+          <Route path="timetable-format/new" element={<TimetableFormatForm />} />
+          <Route path="timetable-format/:id/edit" element={<TimetableFormatForm />} />
+          <Route path="timetable-format/:id/view" element={<TimetableFormatView />} />
         </Route>
         <Route path="/superadmin/settings" element={<SettingsLayout />}>
           <Route index element={<SettingsHome />} />

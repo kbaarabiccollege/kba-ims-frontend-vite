@@ -1,0 +1,410 @@
+/* src/styles/TimetableFormatForm.css
+
+   Timetable Format Create/Edit form.
+
+   Layered on top of TimetableFormat.css: reuses its --tf-* color/shadow
+   tokens plus .tf-page / .tf-card / .tf-btn-primary / .tf-btn-ghost /
+   .tf-icon-btn(-danger) / .tf-error-banner / .tf-page-header /
+   .tf-title-block / .tf-state-cell as-is (import both files together,
+   TimetableFormat.css first).
+
+   Only declares what's unique to the form: the 3 stacked cards, the
+   Basic Information grid, the Days multi-select cards, the Periods
+   row-table (incl. BREAK/LUNCH tinting), and the Active toggle. Uses
+   its own "tff-" prefix so it never collides with the list page's
+   "tf-" item/list classes. */
+
+/* .tf-page is built for the fixed-height list layout (flex column,
+   height: 100vh - topbar, overflow hidden). The form is naturally
+   taller and should scroll with the rest of the page instead. */
+   .tff-page {
+    height: auto;
+    overflow: visible;
+    padding-bottom: 2rem;
+  }
+  
+  .tff-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 0 1.5rem;
+  }
+  
+  /* Override the list page's flex-fill card sizing — each form card is
+     its own self-contained, auto-height block. */
+  .tff-form .tf-card {
+    flex: none;
+    min-height: 0;
+    border-radius: var(--radius-lg, 16px);
+    padding: 1.75rem;
+  }
+  
+  .tff-card-title {
+    margin: 0 0 1.25rem 0;
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--tf-text-heading);
+  }
+  
+  /* ---------- shared field primitives ---------- */
+  
+  .tff-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+  
+  .tff-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--tf-text-heading);
+  }
+  
+  .tff-required {
+    color: #d64545;
+  }
+  
+  .tff-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f9fafc);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.9rem;
+    font-family: var(--font-body, "Inter", sans-serif);
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .tff-input::placeholder {
+    color: var(--color-input-placeholder, #a8b5c8);
+  }
+  
+  .tff-input:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .tff-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238592a8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    padding-right: 2.2rem;
+    cursor: pointer;
+  }
+  
+  .tff-field-error {
+    font-size: 0.78rem;
+    color: #d64545;
+    line-height: 1.3;
+  }
+  
+  .tff-section-error {
+    margin-bottom: 0.9rem;
+  }
+  
+  .tff-page-error {
+    margin: 0 0 1rem 0;
+  }
+  
+  /* ---------- Basic Information ---------- */
+  
+  .tff-basic-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+  
+  /* ---------- Active toggle ---------- */
+  
+  .tff-toggle-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.45rem 0 0;
+    width: fit-content;
+  }
+  
+  .tff-toggle {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--tf-border, #d7dfea);
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+  }
+  
+  .tff-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
+  }
+  
+  .tff-toggle-on {
+    background: var(--color-primary, #214b86);
+  }
+  
+  .tff-toggle-on .tff-toggle-thumb {
+    transform: translateX(18px);
+  }
+  
+  .tff-toggle-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--tf-text-heading);
+  }
+  
+  /* ---------- Days ---------- */
+  
+  .tff-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.9rem;
+  }
+  
+  .tff-day-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--tf-border);
+    background: var(--tf-surface-raised, #fff);
+    cursor: pointer;
+    font-family: var(--font-body, "Inter", sans-serif);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--tf-text-heading);
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  }
+  
+  .tff-day-card:hover {
+    border-color: var(--color-primary, #214b86);
+  }
+  
+  .tff-day-selected {
+    background: var(--tf-badge-bg, #dbe7fb);
+    border-color: var(--color-primary, #214b86);
+  }
+  
+  .tff-day-badge {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--radius-sm, 6px);
+    background: var(--tf-header-blue, #16345f);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  
+  .tff-day-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* ---------- Periods ---------- */
+  
+  .tff-periods-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .tff-periods-header .tff-card-title {
+    margin-bottom: 0;
+  }
+  
+  .tff-add-period-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-primary, #214b86);
+    background: var(--tf-surface-raised, #fff);
+    color: var(--color-primary, #214b86);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast, 0.2s ease);
+    white-space: nowrap;
+  }
+  
+  .tff-add-period-btn:hover {
+    background: var(--tf-icon-view-hover-bg, #eef3fa);
+  }
+  
+  .tff-periods-table {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tff-periods-head-row,
+  .tff-period-row {
+    display: grid;
+    grid-template-columns: 64px 130px 1fr 150px 150px 64px;
+    gap: 0.85rem;
+    align-items: center;
+  }
+  
+  .tff-periods-head-row {
+    padding: 0 0.5rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--tf-text-muted);
+  }
+  
+  .tff-head-actions {
+    text-align: center;
+  }
+  
+  .tff-period-row {
+    padding: 0.55rem 0.5rem;
+    border-radius: var(--radius-sm, 8px);
+    transition: background 0.15s ease;
+  }
+  
+  .tff-period-row + .tff-period-row {
+    margin-top: 0.35rem;
+  }
+  
+  .tff-row-break {
+    background: #e5eefc;
+  }
+  
+  .tff-row-lunch {
+    background: #fdf3d6;
+  }
+  
+  .tff-order-cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--tf-border);
+    background: var(--tf-surface-raised, #fff);
+    color: var(--tf-text-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+  
+  .tff-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+  
+  .tff-delete-btn {
+    justify-self: center;
+  }
+  
+  /* ---------- footer (Cancel / Save, inside the Periods card) ---------- */
+  
+  .tff-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--tf-border);
+  }
+  
+  /* ---------- responsive ---------- */
+  
+  @media (max-width: 1024px) {
+    .tff-basic-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .tff-days-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  
+    .tff-periods-head-row,
+    .tff-period-row {
+      grid-template-columns: 56px 110px 1fr 130px 130px 56px;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .tff-form {
+      padding: 0 1rem;
+    }
+  
+    .tff-form .tf-card {
+      padding: 1.25rem;
+    }
+  
+    .tff-basic-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .tff-days-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .tff-periods-head-row {
+      display: none;
+    }
+  
+    .tff-period-row {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "order"
+        "key"
+        "label"
+        "start"
+        "end"
+        "actions";
+      gap: 0.5rem;
+      padding: 0.85rem 0.75rem;
+      border: 1px solid var(--tf-border);
+    }
+  
+    .tff-order-cell {
+      width: fit-content;
+      padding: 0 0.75rem;
+    }
+  
+    .tff-delete-btn {
+      justify-self: flex-end;
+    }
+  
+    .tff-footer {
+      flex-direction: column-reverse;
+    }
+  
+    .tff-footer .tf-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }

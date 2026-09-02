@@ -1,0 +1,325 @@
+/* src/styles/TimetableFormatView.css
+
+   Timetable Format "View" / details page.
+
+   Standalone stylesheet ("tv-" prefixed) — this page has its own
+   full-width blue header bar per the screenshot, rather than sitting
+   inside the Settings shell like the list/form pages do, so it doesn't
+   reuse TimetableFormat.css's tokens. Colors are matched directly to
+   the screenshot instead. */
+
+   .tv-page {
+    min-height: 100vh;
+    background: #eef1f6;
+    font-family: var(--font-body, "Inter", sans-serif);
+  }
+  
+  /* ---------- top bar ---------- */
+  
+  .tv-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #1d4595;
+    padding: 1.1rem 1.5rem;
+  }
+  
+  .tv-back-btn {
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.3rem 0.4rem;
+  }
+  
+  .tv-back-btn:hover {
+    opacity: 0.85;
+  }
+  
+  .tv-topbar-title {
+    margin: 0;
+    color: #fff;
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  
+  .tv-topbar-spacer {
+    display: none;
+  }
+  
+  /* ---------- body / card ---------- */
+  
+  .tv-body {
+    padding: 2rem 2.5rem 3rem;
+  }
+  
+  .tv-card {
+    background: #ffffff;
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: var(--shadow-card, 0 1px 3px rgba(20, 33, 61, 0.08));
+    padding: 2rem 2.25rem;
+  }
+  
+  .tv-state-cell {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #8592a8;
+  }
+  
+  .tv-error-banner {
+    padding: 0.75rem 1rem;
+    background: rgba(254, 242, 242, 0.85);
+    border: 1px solid rgba(254, 202, 202, 0.8);
+    color: #b91c1c;
+    border-radius: var(--radius-sm, 8px);
+    font-size: 0.85rem;
+  }
+  
+  /* ---------- header row: icon + name/meta + edit button ---------- */
+  
+  .tv-header-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .tv-header-icon {
+    flex-shrink: 0;
+    width: 84px;
+    height: 84px;
+    border-radius: var(--radius-lg, 16px);
+    background: #e5edfc;
+    color: #1d4595;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .tv-header-main {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .tv-format-name {
+    margin: 0.35rem 0 1.1rem;
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #14213d;
+  }
+  
+  .tv-meta-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+  
+  .tv-meta-desc {
+    flex: 1 1 320px;
+    min-width: 220px;
+  }
+  
+  .tv-meta-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .tv-meta-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #4a67a8;
+  }
+  
+  .tv-meta-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #14213d;
+  }
+  
+  .tv-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: fit-content;
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  
+  .tv-status-active {
+    color: #1c8a54;
+    background: #e1f6e9;
+  }
+  
+  .tv-status-inactive {
+    color: #8592a8;
+    background: #eef1f6;
+  }
+  
+  .tv-edit-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.3rem;
+    border-radius: var(--radius-sm, 8px);
+    border: none;
+    background: #1d4595;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  
+  .tv-edit-btn:hover {
+    background: #16345f;
+  }
+  
+  /* ---------- schedule grid ---------- */
+  
+  .tv-grid-wrap {
+    overflow-x: auto;
+    border: 1px solid #e2e7f0;
+    border-radius: var(--radius-md, 12px);
+  }
+  
+  .tv-grid {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  
+  .tv-grid th,
+  .tv-grid td {
+    border: 1px solid #e2e7f0;
+  }
+  
+  .tv-grid thead th {
+    background: #f4f7fc;
+    padding: 0.85rem 0.5rem;
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  .tv-corner-cell {
+    width: 140px;
+    color: #16345f;
+    font-weight: 700;
+    font-size: 0.92rem;
+  }
+  
+  .tv-col-key {
+    display: block;
+    color: #16345f;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  
+  .tv-col-time {
+    display: block;
+    margin-top: 0.2rem;
+    color: #6b7d99;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  
+  .tv-day-cell {
+    padding: 1rem 1rem;
+    text-align: left;
+    color: #16345f;
+    font-weight: 700;
+    font-size: 0.92rem;
+    background: #fbfcfe;
+    white-space: nowrap;
+  }
+  
+  .tv-grid tbody td {
+    height: 56px;
+  }
+  
+  .tv-col-highlight {
+    background: #eef1f5;
+  }
+  
+  /* ---------- footer (created / updated) ---------- */
+  
+  .tv-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #e2e7f0;
+    font-size: 0.85rem;
+    color: #4a5a75;
+  }
+  
+  /* ---------- responsive ---------- */
+  
+  @media (max-width: 900px) {
+    .tv-body {
+      padding: 1.5rem 1rem 2.5rem;
+    }
+  
+    .tv-card {
+      padding: 1.5rem;
+    }
+  
+    .tv-header-row {
+      flex-wrap: wrap;
+    }
+  
+    .tv-edit-btn {
+      margin-left: auto;
+    }
+  
+    .tv-meta-row {
+      gap: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .tv-topbar-title {
+      font-size: 1.15rem;
+    }
+  
+    .tv-back-btn {
+      left: 1rem;
+      font-size: 0.85rem;
+    }
+  
+    .tv-header-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .tv-edit-btn {
+      margin-left: 0;
+      width: 100%;
+      justify-content: center;
+    }
+  
+    .tv-footer-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+    }
+  }
