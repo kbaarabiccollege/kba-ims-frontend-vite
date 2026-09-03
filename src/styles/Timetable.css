@@ -1,0 +1,32 @@
+/* src/styles/Timetable.css
+
+   The Timetable list page reuses every "st-" class from
+   UserList.css / Students.css as-is (same card, table, pagination,
+   filters styling as Staff). The only thing Staff.jsx didn't need is
+   an effective-period month/year picker, so this file just gives that
+   one control the same look as the other toolbar filters. */
+
+   .tt-month-filter {
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: var(--font-body, "Inter", sans-serif);
+  }
+  
+  .tt-month-filter:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  @media (max-width: 640px) {
+    .tt-month-filter {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }

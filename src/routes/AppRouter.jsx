@@ -37,6 +37,8 @@ import AdminClassrooms from "../pages/admin/academics/AdminClassrooms";
 import AdminSubjects from "../pages/admin/academics/AdminSubjects";
 
 import Timetable from "../pages/admin/timetable/Timetable";
+import TimetableForm from "../pages/admin/timetable/TimetableForm";
+
 import Attendance from "../pages/admin/attendance/Attendance";
 
 import SettingsLayout from "../pages/admin/settings/SettingsLayout";
@@ -81,6 +83,9 @@ const AppRouter = () => (
           <Route path="/admin/classrooms" element={<AdminClassrooms />} />
           <Route path="/admin/subjects" element={<AdminSubjects />} />
           <Route path="/admin/timetable" element={<Timetable />} />
+          <Route path="/admin/timetable/new" element={<TimetableForm />} />
+          <Route path="/admin/timetable/:id/edit" element={<TimetableForm />} />
+
           <Route path="/admin/attendance" element={<Attendance />} />
           {/* Add more admin pages here */}
         </Route>

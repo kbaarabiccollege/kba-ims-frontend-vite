@@ -1,0 +1,441 @@
+/* src/styles/TimetableForm.css
+
+   Create/Edit Timetable page. Reuses the color/shadow/radius tokens
+   already defined under .st-page (see Students.css) by keeping this
+   page wrapped in that same class — only the layout pieces unique to
+   this form (fields grid, preview table, period buttons, popup) get
+   their own "tf-" classes here. Buttons, the toggle switch, and the
+   subject/staff popup itself reuse .st-btn / .st-toggle / .st-modal-*
+   as-is, so they stay visually identical to the rest of the app. */
+
+   .tf-form-page {
+    /* The list pages use a fixed height + internal scroll (.st-page),
+       which doesn't suit a form the person will scroll normally. */
+    height: auto;
+    overflow: visible;
+    padding: 0;
+    align-items: center;
+  }
+  
+  .tf-outer-card {
+    width: 100%;
+    max-width: min(1600px, 96vw);
+    background: var(--st-surface, #fff);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: var(--st-shadow-card, var(--shadow-card));
+    padding: 1.75rem 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  
+  /* ---------- header ---------- */
+  .tf-header {
+    margin: 0 1.5rem;
+  }
+
+  .tf-header h1 {
+    font-family: var(--font-heading, "Playfair Display", serif);
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--st-text-heading);
+    margin: 0 0 0.3rem 0;
+  }
+  
+  .tf-header p {
+    margin: 0;
+    color: var(--st-text-muted);
+    font-size: 0.9rem;
+  }
+  
+  .tf-inset {
+    margin: 0;
+  }
+  
+  /* ---------- fields panel ---------- */
+  
+  .tf-panel {
+    border: 1px solid var(--st-border);
+    border-radius: var(--radius-md, 10px);
+    padding: 1.5rem;
+  }
+
+  .tf-details-panel {
+    margin: 0 1rem;
+  }
+  
+  .tf-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem 1.5rem;
+    align-items: start;
+  }
+  
+  .tf-field-name { grid-column: span 5; }
+  .tf-field-course { grid-column: span 3; }
+  .tf-field-classroom { grid-column: span 4; }
+  
+  .tf-field-from { grid-column: span 3; }
+  .tf-field-to { grid-column: span 3; }
+  .tf-field-notes { grid-column: span 4; }
+  .tf-field-status { grid-column: span 2; }
+  
+  .tf-field-format { grid-column: span 4; }
+  
+  .tf-required {
+    color: #d64545;
+  }
+  
+  .tf-field-error {
+    font-size: 0.75rem;
+    color: #d64545;
+  }
+  
+  /* date inputs with an overlaid calendar glyph */
+  
+  .tf-date-input {
+    position: relative;
+  }
+  
+  .tf-date-input input[type="date"] {
+    width: 100%;
+    padding: 0.65rem 2.4rem 0.65rem 0.85rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    font-family: var(--font-body, "Inter", sans-serif);
+  }
+  
+  .tf-date-input input[type="date"]:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .tf-date-icon {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 0.95rem;
+    opacity: 0.7;
+  }
+  
+  /* status toggle row */
+  
+  .tf-status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    height: 2.5rem;
+  }
+  
+  .tf-status-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--st-text-body);
+  }
+  
+  /* ---------- preview section header ---------- */
+  
+  .tf-preview-header {
+    margin: 0 1rem;
+  }
+
+  .tf-preview-header h2 {
+    margin: 0 0 0.2rem 0;
+    font-family: var(--font-body, "Inter", sans-serif);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-primary, #214b86);
+  }
+  
+  .tf-preview-header p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--st-text-muted);
+  }
+  
+  /* ---------- preview table panel ---------- */
+  
+  .tf-table-panel {
+    padding: 0;
+    overflow: hidden;
+  }
+  
+.tf-table-scroll {
+  overflow-x: auto;
+}
+
+.tf-grid-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+  
+  .tf-grid-table thead th {
+    background: var(--st-surface, #fff);
+    color: var(--st-text-heading);
+    font-weight: 700;
+    text-align: center;
+    padding: 0.7rem 0.6rem;
+    border-bottom: 1px solid var(--st-border);
+    border-left: 1px solid var(--st-border);
+    white-space: nowrap;
+  }
+  
+  .tf-grid-table thead th:first-child {
+    border-left: none;
+    text-align: left;
+  }
+  
+.tf-day-header {
+  width: 90px;
+  text-align: center !important;
+}
+
+.tf-grid-table th.tf-col-break .tf-period-num,
+.tf-grid-table th.tf-col-break .tf-period-time {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.2;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+  
+  .tf-period-num {
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  
+  .tf-period-time {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--st-text-muted);
+    margin-top: 0.15rem;
+  }
+  
+  .tf-grid-table th.tf-col-break,
+  .tf-grid-table td.tf-col-break {
+    background: var(--st-row-inactive-bg, #eef1f6);
+  }
+  
+  .tf-grid-table tbody td {
+    text-align: center;
+    padding: 0;
+    border-bottom: 1px solid var(--st-border);
+    border-left: 1px solid var(--st-border);
+    vertical-align: middle;
+    height: 72px;
+    max-height: 72px;
+  }
+  
+  .tf-grid-table tbody tr:nth-child(even) td:not(.tf-col-break) {
+    background: var(--st-row-hover, #ebeff8);
+  }
+  
+  .tf-grid-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .tf-day-cell {
+    text-align: center !important;
+    font-weight: 600;
+    color: var(--st-text-heading);
+    border-left: none !important;
+    white-space: nowrap;
+  }
+  
+  .tf-period-add {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-primary, #214b86);
+    background: var(--st-surface, #fff);
+    color: var(--color-primary, #214b86);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .tf-period-add:hover {
+    background: var(--color-primary, #214b86);
+    color: #fff;
+  }
+  
+  .tf-period-filled {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    padding: 0.3rem 0.4rem;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    border-radius: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .tf-period-filled:hover {
+    background: var(--st-icon-edit-hover-bg, #eef3fa);
+  }
+  
+  .tf-period-filled:hover .tf-period-filled-subject,
+  .tf-period-filled:hover .tf-period-filled-staff {
+    color: #fff;
+  }
+  
+  .tf-period-code {
+    font-size: 0.65em !important;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--st-text-muted);
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tf-period-filled-subject {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-primary, #214b86);
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .tf-period-filled-staff {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--st-text-muted);
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Applied via getTextSizeClass() in JS based on text length */
+  .tf-text-sm {
+    font-size: 0.85em !important;
+  }
+
+  .tf-text-xs {
+    font-size: 0.72em !important;
+  }
+  
+  /* ---------- footer ---------- */
+  
+  .tf-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--st-border);
+  }
+  
+  .tf-form-page .st-modal-overlay {
+    background: rgba(15, 23, 42, 0.45);
+  }
+  
+  .tf-form-page .st-modal-panel {
+    background: #ffffff;
+  }
+  
+  [data-theme="dark"] .tf-form-page .st-modal-panel {
+    background: var(--st-surface-raised, #131f33);
+  }
+
+  /* subject/staff popup: reuses .st-modal-* + .st-bulk-form, just needs
+     its action row to keep "Remove" pinned left of Cancel/Save */
+  .tf-cell-actions {
+    justify-content: space-between;
+  }
+  
+  .tf-cell-remove {
+    margin-right: auto;
+  }
+  
+  /* ---------- responsive ---------- */
+  
+  @media (max-width: 900px) {
+    .tf-field-name,
+    .tf-field-course,
+    .tf-field-classroom,
+    .tf-field-from,
+    .tf-field-to,
+    .tf-field-notes,
+    .tf-field-status,
+    .tf-field-format {
+      grid-column: span 6;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .tf-form-page {
+      padding: 0.75rem;
+    }
+  
+    .tf-outer-card {
+      padding: 1.25rem 1.25rem 1rem;
+    }
+  
+    .tf-panel {
+      padding: 1rem;
+    }
+  
+    .tf-fields-grid {
+      gap: 1rem;
+    }
+  
+    .tf-field-name,
+    .tf-field-course,
+    .tf-field-classroom,
+    .tf-field-from,
+    .tf-field-to,
+    .tf-field-notes,
+    .tf-field-status,
+    .tf-field-format {
+      grid-column: span 12;
+    }
+  
+    .tf-footer {
+      flex-direction: column-reverse;
+    }
+  
+    .tf-footer .st-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  
+    .tf-cell-actions {
+      flex-direction: column-reverse;
+      align-items: stretch;
+    }
+  
+    .tf-cell-remove {
+      margin-right: 0;
+    }
+  }
+  
+  [data-theme="dark"] .tf-grid-table thead th {
+    background: var(--st-surface-raised, #131f33);
+  }

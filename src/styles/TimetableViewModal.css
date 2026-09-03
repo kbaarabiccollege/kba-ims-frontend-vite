@@ -1,0 +1,219 @@
+/* src/styles/TimetableViewModal.css
+   Popup shown from the Timetable list page's "View" action. Reuses
+   .st-modal-* (Students.css) for the overlay/panel/header chrome and
+   the .tf-* grid classes (TimetableForm.css) for the timetable table
+   itself — this file only adds what's unique to the read-only popup:
+   a wider panel, the meta info row, and a static (non-interactive)
+   look for the filled period cards.
+
+   The modal is rendered via a React portal straight into
+   document.body (see TimetableViewModal.jsx) so it can't get visually
+   trapped or clipped by an ancestor with its own transform/stacking
+   context. Because of that it sits OUTSIDE the ".st-page" DOM subtree,
+   so it can't see the "--st-*" tokens Students.css defines scoped to
+   ".st-page". ".ttv-vars" redeclares the subset this modal actually
+   uses (kept in sync with Students.css) so nothing renders unstyled.
+   "display: contents" keeps it from affecting layout — only its
+   custom properties are inherited by the real modal markup inside. */
+
+.ttv-vars {
+  display: contents;
+
+  --st-surface: #ffffff;
+  --st-surface-raised: #ffffff;
+  --st-border: #e2e7f0;
+  --st-text-heading: #14213d;
+  --st-text-body: #3a4a63;
+  --st-text-muted: #8592a8;
+  --st-row-hover: #ebeff8;
+  --st-shadow-card: var(--shadow-card);
+  --st-shadow-popover: 0 12px 32px rgba(20, 33, 61, 0.16), 0 2px 8px rgba(20, 33, 61, 0.08);
+  --st-overlay-bg: rgba(15, 23, 42, 0.45);
+  --st-status-inactive-fg: #94a1b5;
+  --st-status-inactive-bg: #eef1f6;
+}
+
+[data-theme="dark"] .ttv-vars {
+  --st-surface: #0f1928;
+  --st-surface-raised: #131f33;
+  --st-border: #26344a;
+  --st-text-heading: #dbe6f5;
+  --st-text-body: #aebed6;
+  --st-text-muted: #6b82a0;
+  --st-row-hover: rgba(79, 127, 232, 0.06);
+  --st-shadow-card:
+    0 1px 0 rgba(79, 127, 232, 0.12) inset,
+    0 25px 60px rgba(0, 0, 0, 0.55),
+    0 10px 30px rgba(0, 0, 0, 0.4);
+  --st-shadow-popover: 0 16px 40px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --st-overlay-bg: rgba(0, 0, 0, 0.6);
+  --st-status-inactive-fg: #8a9bb5;
+  --st-status-inactive-bg: rgba(107, 130, 160, 0.15);
+}
+
+.ttv-overlay {
+  background: rgba(15, 23, 42, 0.55) !important;
+}
+
+.ttv-panel {
+  width: 100%;
+  max-width: min(1400px, 94vw);
+  background-color: #ffffff !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35), 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+/* .st-modal-header (Students.css) uses 1.25rem 1.5rem all round by
+   default, which stacks with .ttv-body's own top padding below and
+   reads as a big empty gap under the title — tighten just the
+   header's bottom edge for this modal. */
+.ttv-panel .st-modal-header {
+  padding-bottom: 0.85rem;
+  background-color: #eaf2fd;
+  border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0;
+}
+
+[data-theme="dark"] .ttv-panel .st-modal-header {
+  background-color: rgba(79, 127, 232, 0.12);
+}
+
+[data-theme="dark"] .ttv-panel {
+  background-color: #131f33 !important;
+}
+  
+.ttv-body {
+  max-height: 82vh;
+  overflow-y: auto;
+  padding-top: .1rem;
+}
+  
+  .ttv-inset {
+    margin: 0 0 1rem 0;
+  }
+  
+  .ttv-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    margin-bottom: .5rem;
+    border-bottom: 1px solid var(--st-border);
+  }
+  
+  .ttv-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  
+  .ttv-meta-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--st-text-muted);
+  }
+  
+  .ttv-meta-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--st-text-heading);
+  }
+  
+  .ttv-status-pill {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  
+  .ttv-status-active {
+    color: #1c8a54;
+    background: #e6f7ee;
+  }
+  
+  .ttv-status-inactive {
+    color: var(--st-status-inactive-fg);
+    background: var(--st-status-inactive-bg);
+  }
+  
+  [data-theme="dark"] .ttv-status-active {
+    color: #5fd399;
+    background: rgba(28, 138, 84, 0.18);
+  }
+  
+.ttv-meta-notes {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.ttv-meta-notes .ttv-meta-value {
+  font-weight: 500;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.ttv-meta-status {
+  margin-left: auto;
+}
+  
+  .ttv-table-panel {
+    padding: 0;
+  }
+  
+  /* Filled cells are shown, not clicked — swap the pointer cursor and
+     hover tint from TimetableForm.css for a plain static look. */
+/* Filled cells are shown, not clicked — swap the pointer cursor and
+   hover tint from TimetableForm.css for a plain static look. Also
+   cancel TimetableForm.css's hover rule that turns the subject/staff
+   text white (it assumes the matching solid-blue hover background,
+   which this view intentionally doesn't use). */
+.ttv-period-filled {
+  cursor: default;
+}
+
+.ttv-period-filled:hover {
+  background: var(--st-row-hover, #ebeff8) !important;
+}
+
+.ttv-period-filled:hover .tf-period-filled-subject {
+  color: var(--color-primary, #214b86) !important;
+}
+
+.ttv-period-filled:hover .tf-period-filled-staff {
+  color: var(--st-text-muted) !important;
+}
+
+.ttv-period-filled .tf-period-filled-staff {
+  font-size: 0.72em !important;
+  font-weight: 500;
+}
+  
+  .ttv-period-empty {
+    color: var(--st-text-muted);
+    font-size: 0.85rem;
+  }
+  
+.ttv-panel {
+  max-height: 92vh;
+}
+
+@media (max-width: 640px) {
+  .ttv-meta {
+    gap: 1rem;
+  }
+
+  .ttv-body {
+    max-height: 70vh;
+  }
+
+  .ttv-panel {
+    max-height: 94vh;
+  }
+}
