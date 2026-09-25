@@ -39,14 +39,21 @@ import AdminSubjects from "../pages/admin/academics/AdminSubjects";
 import Timetable from "../pages/admin/timetable/Timetable";
 import TimetableForm from "../pages/admin/timetable/TimetableForm";
 
+import AdditionalClass from "../pages/superadmin/additional-class/AdditionalClass";
+
 import Attendance from "../pages/admin/attendance/Attendance";
+import AttendanceForm from "../pages/admin/attendance/AttendanceForm";
+import AttendanceView from "../pages/admin/attendance/AttendanceView";
 
 import SettingsLayout from "../pages/admin/settings/SettingsLayout";
 import SettingsHome from "../pages/admin/settings/SettingsHome";
+import AcademicSessions from "../pages/admin/settings/academicSessions/AcademicSessions";
 import Batches from "../pages/admin/settings/batches/Batches";
 import TimetableFormatSettings from "../pages/admin/settings/TimetableFormatSettings";
 import TimetableFormatForm from "../pages/admin/settings/TimetableFormatForm";
 import TimetableFormatView from "../pages/admin/settings/TimetableFormatView";
+
+import AdminCalendar from "../pages/admin/calendar/AdminCalendar";
 
 // Redirects logged-in user to their portal; otherwise to login
 const RootRedirect = () => {
@@ -85,8 +92,15 @@ const AppRouter = () => (
           <Route path="/admin/timetable" element={<Timetable />} />
           <Route path="/admin/timetable/new" element={<TimetableForm />} />
           <Route path="/admin/timetable/:id/edit" element={<TimetableForm />} />
+          
+          <Route path="/admin/Additional-class" element={<AdditionalClass />} />
 
           <Route path="/admin/attendance" element={<Attendance />} />
+          <Route path="/admin/attendance/:id/view" element={<AttendanceView />} />
+          <Route path="/admin/attendance/:id/mark" element={<AttendanceForm />} />
+          <Route path="/admin/attendance/:id/edit" element={<AttendanceForm />} />
+
+          <Route path="/admin/calendar" element={<AdminCalendar />} />
           {/* Add more admin pages here */}
         </Route>
       </Route>
@@ -101,6 +115,7 @@ const AppRouter = () => (
       <Route element={<ProtectedRoute allowedRoles={["admin", "superadmin", "dev"]} />}>
         <Route path="/admin/settings" element={<SettingsLayout />}>
           <Route index element={<SettingsHome />} />
+          <Route path="academic-sessions" element={<AcademicSessions />} />
           <Route path="batches" element={<Batches />} />
           <Route path="timetable-format" element={<TimetableFormatSettings />} />
         </Route>
@@ -109,6 +124,7 @@ const AppRouter = () => (
       <Route element={<ProtectedRoute allowedRoles={["admin", "superadmin", "dev"]} />}>
         <Route path="/admin/settings" element={<SettingsLayout />}>
           <Route index element={<SettingsHome />} />
+          <Route path="academic-sessions" element={<AcademicSessions />} />
           <Route path="batches" element={<Batches />} />
           <Route path="timetable-format" element={<TimetableFormatSettings />} />
           <Route path="timetable-format/new" element={<TimetableFormatForm />} />
@@ -117,6 +133,7 @@ const AppRouter = () => (
         </Route>
         <Route path="/superadmin/settings" element={<SettingsLayout />}>
           <Route index element={<SettingsHome />} />
+          <Route path="academic-sessions" element={<AcademicSessions />} />
           <Route path="batches" element={<Batches />} />
           <Route path="timetable-format" element={<TimetableFormatSettings />} />
         </Route>

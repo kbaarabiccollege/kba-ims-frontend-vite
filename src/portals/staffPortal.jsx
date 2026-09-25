@@ -22,7 +22,6 @@ import {
         items: [
           { label: "Attendance",  path: "/staff/attendance",   icon: CalendarCheck },
           { label: "Timetable",   path: "/staff/timetable",    icon: Clock        },
-          { label: "Lesson Plan", path: "/staff/lesson-plan",  icon: FileText     },
         ],
       },
       {

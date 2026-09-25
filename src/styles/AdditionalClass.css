@@ -1,0 +1,321 @@
+/* src/styles/AdditionalClass.css
+   Only what Users.css / Students.css (st-*) don't already cover.
+   Import AFTER Users.css and UserList.css. */
+
+/* ================= toolbar / filters =================
+   Students.css forces `.st-filters { display:flex !important }` on desktop and
+   `.sd-dropdown` defaults to full width — that's what stacked the filters.
+   We override both with a grid so every filter gets an equal-width cell. */
+
+   .ac-page .st-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+  
+  .ac-page .st-search-row {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+  }
+  
+  .ac-page .ac-result-count {
+    flex-shrink: 0;
+  }
+  
+  .ac-page .st-filters .sd-dropdown,
+  .ac-page .st-filters .ac-daterange {
+    width: 100%;
+    min-width: 0;
+  }
+  
+  /* Desktop / tablet: always visible, auto-fitting grid */
+  @media (min-width: 641px) {
+    .ac-page .st-filters {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 0.75rem;
+      width: 100%;
+      flex-wrap: initial;
+    }
+  }
+  
+  /* Mobile: only search + funnel icon; filters appear when the funnel is tapped */
+  @media (max-width: 640px) {
+    .ac-page .ac-result-count {
+      display: none;
+    }
+  
+    .ac-page .st-filters {
+      display: none;
+      margin-top: 0;
+    }
+  
+    .ac-page .st-filters.st-filters-open {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      width: 100%;
+    }
+  
+    /* Course + Date range fill the row; the rest sit two per row */
+    .ac-page .st-filters.st-filters-open > :first-child,
+    .ac-page .st-filters.st-filters-open > :nth-child(2) {
+      grid-column: 1 / -1;
+    }
+  
+    .ac-page .st-search-row {
+      gap: 0.5rem;
+    }
+  
+    .ac-page .st-filter-toggle-btn {
+      width: 42px;
+      height: 42px;
+    }
+  }
+  
+  .ac-page .st-table {
+    min-width: 960px;
+  }
+  
+  .ac-page .st-table-wrap {
+    overflow-x: auto;
+  }
+  
+  /* ---------- date cell ---------- */
+  
+  .ac-date {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    align-items: center;
+  }
+  
+  .ac-date small {
+    font-size: 0.72rem;
+    color: var(--st-text-muted);
+  }
+  
+  /* ---------- class type badge ---------- */
+  
+  .ac-type-badge {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: var(--st-avatar-bg);
+    color: var(--st-avatar-fg);
+  }
+  
+  .ac-type-extra {
+    background: #dbe7fb;
+    color: #214b86;
+  }
+  .ac-type-makeup {
+    background: #e4e0fb;
+    color: #5b3fc4;
+  }
+  
+  [data-theme="dark"] .ac-type-extra {
+    background: rgba(79, 127, 232, 0.18);
+    color: #7ba3f5;
+  }
+  [data-theme="dark"] .ac-type-makeup {
+    background: rgba(91, 63, 196, 0.25);
+    color: #b9a6f0;
+  }
+  
+  /* ---------- single-field date range ---------- */
+  
+  .ac-daterange {
+    position: relative;
+  }
+  
+  .ac-daterange-trigger {
+    width: 100%;
+    box-sizing: border-box;
+    height: 100%;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.85rem;
+    font-family: var(--font-body, "Inter", sans-serif);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .ac-daterange-trigger:hover,
+  .ac-daterange-active {
+    border-color: var(--color-primary, #214b86);
+  }
+  
+  .ac-daterange-pop {
+    max-width: calc(100vw - 2rem);
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 30;
+    min-width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--st-surface-raised, #fff);
+    border: 1px solid var(--st-border);
+    border-radius: var(--radius-md, 10px);
+    box-shadow: var(--st-shadow-popover);
+  }
+  
+  .ac-daterange-pop label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--st-text-heading);
+  }
+  
+  .ac-daterange-pop input[type="date"] {
+    padding: 0.55rem 0.7rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.85rem;
+    color-scheme: light;
+  }
+  
+  [data-theme="dark"] .ac-daterange-pop input[type="date"] {
+    color-scheme: dark;
+  }
+  
+  .ac-daterange-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  
+  /* ---------- modal form bits ---------- */
+  
+  .ac-seg {
+    display: inline-flex;
+    padding: 3px;
+    gap: 3px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--color-input-bg, #f2f5f9);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    align-self: flex-start;
+  }
+  
+  .ac-seg-btn {
+    padding: 0.5rem 1.4rem;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--st-text-body, #3a4a63);
+    font-family: var(--font-body, "Inter", sans-serif);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast, 0.2s ease);
+  }
+  
+  .ac-seg-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  .ac-seg-btn-on {
+    background: var(--color-primary, #214b86);
+    color: #fff;
+    box-shadow: var(--shadow-button);
+  }
+  
+  .ac-row-3 {
+    grid-template-columns: 1.3fr 1fr 1fr;
+  }
+  
+  .ac-textarea {
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--color-input-border, #d7dfea);
+    background: var(--color-input-bg, #f2f5f9);
+    color: var(--color-input-text, #1e2f4a);
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  
+  .ac-textarea:focus {
+    outline: none;
+    background: var(--color-input-bg-focus, #eef3fa);
+    border-color: var(--color-primary, #214b86);
+    box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
+  }
+  
+  .um-field input[type="date"],
+  .um-field input[type="time"] {
+    color-scheme: light;
+  }
+  
+  [data-theme="dark"] .um-field input[type="date"],
+  [data-theme="dark"] .um-field input[type="time"] {
+    color-scheme: dark;
+  }
+  
+  /* ---------- view modal ---------- */
+  
+  .ac-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.5rem;
+    margin: 0 0 1.25rem;
+  }
+  
+  .ac-detail dt {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--st-text-muted);
+    margin-bottom: 0.25rem;
+  }
+  
+  .ac-detail dd {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--st-text-heading);
+    word-break: break-word;
+  }
+  
+  .ac-detail-full {
+    grid-column: 1 / -1;
+  }
+  
+  .ac-status {
+    text-transform: capitalize;
+    font-weight: 600;
+  }
+  
+  @media (max-width: 640px) {
+    .ac-row-3 {
+      grid-template-columns: 1fr;
+    }
+  
+    .ac-detail-grid {
+      grid-template-columns: 1fr;
+    }
+  }

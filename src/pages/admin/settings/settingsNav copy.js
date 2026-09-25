@@ -11,16 +11,6 @@ export const SETTINGS_SECTIONS = [
     title: "Academics",
     items: [
       {
-        key: "academic-sessions",
-        label: "Academic Sessions",
-        description: "Create and manage academic sessions/terms (odd/even, current, active).",
-        // NOTE: reusing TimetableIcon as a stand-in calendar-style icon.
-        // Swap in a dedicated icon (e.g. a CalendarIcon) if one exists
-        // in Icons.jsx.
-        icon: TimetableIcon,
-        path: "academic-sessions",
-      },
-      {
         key: "batches",
         label: "Batches",
         description: "Create and manage batches/sections for your institute.",

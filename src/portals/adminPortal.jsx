@@ -29,9 +29,9 @@ const adminPortal = {
       items: [
         { label: "Attendance",   path: "/admin/attendance",   icon: CalendarCheck },
         { label: "Timetable",    path: "/admin/timetable",    icon: Clock },
+        { label: "Additional Class",    path: "/admin/Additional-class",    icon: School },
         { label: "Classrooms",   path: "/admin/classrooms",   icon: School },
         { label: "Subjects",     path: "/admin/subjects",     icon: BookOpen },
-        { label: "Lesson Plan",  path: "/admin/lesson-plan",  icon: FileText },
         { label: "Calendar",     path: "/admin/calendar",     icon: CalendarDays },
       ],
     },

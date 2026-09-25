@@ -34,6 +34,27 @@
     margin: 0 1.5rem;
   }
 
+  .tf-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .tf-header-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tf-header-status {
+    flex: 0 0 auto;
+  }
+
+  .tf-header-status .tf-status-row {
+    height: auto;
+    margin-top: 0.35rem;
+  }
+
   .tf-header h1 {
     font-family: var(--font-heading, "Playfair Display", serif);
     font-size: 1.7rem;
@@ -72,14 +93,14 @@
   }
   
   .tf-field-name { grid-column: span 5; }
-  .tf-field-course { grid-column: span 3; }
-  .tf-field-classroom { grid-column: span 4; }
-  
+  .tf-field-course { grid-column: span 2; }
+  .tf-field-academic-session { grid-column: span 5; }
+
+  .tf-field-classroom { grid-column: span 3; }
   .tf-field-from { grid-column: span 3; }
   .tf-field-to { grid-column: span 3; }
-  .tf-field-notes { grid-column: span 4; }
-  .tf-field-status { grid-column: span 2; }
-  
+  .tf-field-notes { grid-column: span 3; }
+
   .tf-field-format { grid-column: span 4; }
   
   .tf-required {
@@ -379,13 +400,17 @@
   @media (max-width: 900px) {
     .tf-field-name,
     .tf-field-course,
+    .tf-field-academic-session,
     .tf-field-classroom,
     .tf-field-from,
     .tf-field-to,
     .tf-field-notes,
-    .tf-field-status,
     .tf-field-format {
       grid-column: span 6;
+    }
+
+    .tf-header-row {
+      flex-direction: column;
     }
   }
   
@@ -408,11 +433,11 @@
   
     .tf-field-name,
     .tf-field-course,
+    .tf-field-academic-session,
     .tf-field-classroom,
     .tf-field-from,
     .tf-field-to,
     .tf-field-notes,
-    .tf-field-status,
     .tf-field-format {
       grid-column: span 12;
     }
