@@ -55,6 +55,10 @@ import TimetableFormatView from "../pages/admin/settings/TimetableFormatView";
 
 import AdminCalendar from "../pages/admin/calendar/AdminCalendar";
 
+import Reports from "../pages/admin/reports/Reports";
+import StudentWiseAttendance from "../pages/admin/reports/attendance/StudentWiseAttendance";
+import SubjectWiseAttendance from "../pages/admin/reports/attendance/SubjectWiseAttendance";
+
 // Redirects logged-in user to their portal; otherwise to login
 const RootRedirect = () => {
   const { isAuthenticated, role, initializing } = useAuth();
@@ -101,6 +105,14 @@ const AppRouter = () => (
           <Route path="/admin/attendance/:id/edit" element={<AttendanceForm />} />
 
           <Route path="/admin/calendar" element={<AdminCalendar />} />
+
+          <Route path="/admin/calendar" element={<AdminCalendar />} />
+
+<Route path="/admin/reports" element={<Reports />} />
+<Route path="/admin/reports/:categoryId" element={<Reports />} />
+<Route path="/admin/reports/attendance/student-wise-attendance" element={<StudentWiseAttendance />} />
+<Route path="/admin/reports/attendance/subject-wise-attendance" element={<SubjectWiseAttendance />} />
+{/* Add more admin pages here */}
           {/* Add more admin pages here */}
         </Route>
       </Route>
