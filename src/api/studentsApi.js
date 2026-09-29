@@ -24,6 +24,7 @@ const BASE = "/students";
  * @param {string} [params.q]             search text (name, roll_number, rrn)
  * @param {number} [params.page]          1-indexed page number
  * @param {number} [params.limit]         page size
+ * @param {string|number} [params.courseId]
  * @param {string|number} [params.classroomId]
  * @param {string|number} [params.batchId]
  * @param {string} [params.status]        'all' | 'active' | 'inactive'
@@ -33,6 +34,7 @@ export async function getStudents({
   q,
   page = 1,
   limit = 25,
+  courseId,
   classroomId,
   batchId,
   status,
@@ -41,6 +43,7 @@ export async function getStudents({
   const params = { page, limit, academic_status: academicStatus };
 
   if (q && q.trim()) params.q = q.trim();
+  if (courseId && courseId !== "all") params.course_id = courseId;
   if (classroomId && classroomId !== "all") params.classroom_id = classroomId;
   if (batchId && batchId !== "all") params.batch_id = batchId;
   if (status && status !== "all") params.status = status;

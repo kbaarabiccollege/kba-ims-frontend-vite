@@ -51,6 +51,11 @@
     border-color: var(--color-primary, #214b86);
     box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(36, 76, 134, 0.1));
   }
+
+  .sd-trigger:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
   
   .sd-trigger-label {
     overflow: hidden;

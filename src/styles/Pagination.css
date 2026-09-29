@@ -1,0 +1,215 @@
+/* src/styles/Pagination.css
+
+   Zoho-Books-style pagination pill for the <Pagination> component in
+   src/components/common/ListPageControls.jsx: "⚙ N per page" on the
+   left (its menu opens UPWARD, since this bar sits at the bottom of
+   the page and a downward menu would run off-screen), a divider, then
+   "‹ start-end ›" on the right. Self-contained under a "pg-" prefix
+   used nowhere else, so it can't collide with or be overridden by any
+   other page's styles. */
+
+   .pg-pagination {
+    --pg-border: #e2e7f0;
+    --pg-text-muted: #8592a8;
+    --pg-text-heading: #14213d;
+    --pg-surface: #ffffff;
+    --pg-menu-hover-bg: #eef3fa;
+    --pg-menu-active-bg: #e5edfa;
+    --pg-arrow: var(--color-primary, #214b86);
+    --pg-arrow-disabled: #c3cad6;
+  
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.6rem 1.5rem 0.1rem;
+    border-top: 1px solid var(--pg-border);
+    background: var(--pg-surface);
+    box-shadow: 0 -2px 8px rgba(20, 33, 61, 0.06);
+    flex-shrink: 0;
+    transition: border-color 0.25s ease, background 0.25s ease;
+  }
+  
+  [data-theme="dark"] .pg-pagination {
+    --pg-border: #26344a;
+    --pg-text-muted: #6b82a0;
+    --pg-text-heading: #dbe6f5;
+    --pg-surface: #131f33;
+    --pg-menu-hover-bg: rgba(79, 127, 232, 0.15);
+    --pg-menu-active-bg: rgba(79, 127, 232, 0.25);
+    --pg-arrow: #7ba3f5;
+    --pg-arrow-disabled: #3c4a63;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.35);
+  }
+  
+  .pg-summary {
+    font-size: 0.85rem;
+    color: var(--pg-text-muted);
+  }
+  
+  /* ---------- the pill ---------- */
+  
+  .pg-pill {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--pg-border);
+    border-radius: var(--radius-md, 8px);
+    background: var(--pg-surface);
+  }
+  
+  .pg-pill-divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--pg-border);
+    margin: 0.4rem 0;
+  }
+  
+  /* ---------- per-page trigger + menu ---------- */
+  
+  .pg-perpage-wrap {
+    position: relative;
+    display: flex;
+  }
+  
+.pg-perpage-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border: none;
+  background: none;
+  color: var(--pg-text-heading);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: var(--radius-md, 8px) 0 0 var(--radius-md, 8px);
+  transition: background 0.15s ease;
+}
+  
+  .pg-perpage-trigger:hover {
+    background: var(--pg-menu-hover-bg);
+  }
+  
+  .pg-gear {
+    color: var(--pg-text-muted);
+    flex-shrink: 0;
+  }
+  
+  /* Opens UPWARD (bottom: 100%), not downward, so it never gets clipped
+     by the viewport edge this bar normally sits against. */
+  .pg-perpage-menu {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.4rem);
+    min-width: 140px;
+    background: var(--pg-surface);
+    border: 1px solid var(--pg-border);
+    border-radius: var(--radius-md, 10px);
+    box-shadow: 0 -8px 24px rgba(20, 33, 61, 0.16), 0 -2px 8px rgba(20, 33, 61, 0.08);
+    padding: 0.35rem;
+    z-index: 20;
+  }
+  
+  [data-theme="dark"] .pg-perpage-menu {
+    box-shadow: 0 -12px 28px rgba(0, 0, 0, 0.5), 0 -2px 8px rgba(0, 0, 0, 0.35);
+  }
+  
+  .pg-perpage-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 0.7rem;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    font-size: 0.85rem;
+    color: var(--pg-text-heading);
+    cursor: pointer;
+  }
+  
+  .pg-perpage-option:hover {
+    background: var(--pg-menu-hover-bg);
+  }
+  
+  .pg-perpage-option-active {
+    background: var(--pg-menu-active-bg);
+    font-weight: 700;
+    color: var(--color-primary, #214b86);
+  }
+  
+  /* ---------- prev / range / next ---------- */
+  
+  .pg-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    border: none;
+    background: none;
+    color: var(--pg-arrow);
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  
+  .pg-arrow-prev {
+    margin-left: 0.4rem;
+  }
+  
+  .pg-arrow-next {
+    margin-right: 0.2rem;
+    border-radius: 0 var(--radius-md, 8px) var(--radius-md, 8px) 0;
+  }
+  
+  .pg-arrow:hover:not(:disabled) {
+    background: var(--pg-menu-hover-bg);
+  }
+  
+  /* Greyed out with no page to go to — normal pointer, not "not-allowed". */
+  .pg-arrow:disabled {
+    color: var(--pg-arrow-disabled);
+    cursor: default;
+  }
+  
+/* Fixed width so the pill doesn't resize as the digit count changes
+   between pages (e.g. "1-10" vs "91-100"); centered within that width. */
+.pg-range {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 65px;
+  padding: 0 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--pg-text-muted);
+  white-space: nowrap;
+}
+  
+  @media (max-width: 640px) {
+    .pg-pagination {
+      flex-wrap: nowrap;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+    }
+  
+    .pg-summary {
+      flex-shrink: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.78rem;
+    }
+  
+    .pg-perpage-trigger {
+      padding: 0.5rem 0.7rem;
+      font-size: 0.82rem;
+    }
+  
+  .pg-range {
+    min-width: 80px;
+    font-size: 0.78rem;
+  }
+  }

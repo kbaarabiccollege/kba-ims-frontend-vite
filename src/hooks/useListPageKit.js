@@ -14,7 +14,7 @@ import useDebouncedValue from "./useDebouncedValue";
 export function useListPage({
   fetchFn,
   initialFilters = {},
-  initialLimit = 25,
+  initialLimit = 10,
   searchDebounceMs = 400,
 }) {
   const [items, setItems] = useState([]);

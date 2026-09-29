@@ -1,4 +1,4 @@
-/* src/styles/Students.css
+/* src/styles/UserList.css
 
    Built on top of the global tokens defined in index.css
    (--color-primary, --font-heading, --font-body, --radius-*, --shadow-*).
@@ -9,7 +9,17 @@
    NOTE: the custom Classroom/Batch/Status dropdown markup now lives in
    the shared <SearchableDropdown> component — its styling moved out of
    this file into src/styles/SearchableDropdown.css so it can be reused
-   on other pages too. Import both stylesheets on this page. */
+   on other pages too. Import both stylesheets on this page.
+
+   NOTE on pagination: pagination styling used to live here too (as
+   ".st-pagination*"), duplicated in academic.css. Because CSS is
+   global rather than scoped to the page that imported it, whichever
+   file loaded last silently overrode the other's rules everywhere —
+   that's what made the current-page number lose its contrast in light
+   mode. Pagination has moved into its own file,
+   src/styles/Pagination.css, under a "pg-" prefix that isn't defined
+   anywhere else. Import Pagination.css wherever <Pagination /> is
+   used instead of relying on this file for it. */
 
    .st-page {
     --st-header-blue: #16345f;
@@ -83,10 +93,6 @@
 
   [data-theme="dark"] .um-btn-ghost:hover:not(:disabled) {
     background: var(--st-row-hover, rgba(79, 127, 232, 0.06));
-  }
-
-  [data-theme="dark"] .st-pagination {
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.35);
   }
 
   [data-theme="dark"] .st-page {
@@ -389,12 +395,12 @@
   
   .st-search input {
     width: 100%;
-    padding: 0.65rem 0.9rem 0.65rem 2.3rem;
+    padding: 0.5rem 0.8rem 0.5rem 2.1rem;
     border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--color-input-border, #d7dfea);
     background: var(--color-input-bg, #f2f5f9);
     color: var(--color-input-text, #1e2f4a);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     box-sizing: border-box;
     transition: var(--transition-fast, 0.2s ease);
   }
@@ -425,8 +431,9 @@
   .st-filters {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
     flex-wrap: wrap;
+    font-size: 0.82rem;
   }
 
   /* Desktop is unaffected by the mobile filter toggle: the funnel icon
@@ -471,12 +478,12 @@
   }
   
   .st-filters select {
-    padding: 0.6rem 2rem 0.6rem 0.9rem;
+    padding: 0.45rem 1.7rem 0.45rem 0.7rem;
     border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--color-input-border, #d7dfea);
     background: var(--color-input-bg, #f2f5f9);
     color: var(--color-input-text, #1e2f4a);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     cursor: pointer;
   }
   
@@ -518,12 +525,40 @@
   .st-bulk-actions {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
   }
 
   .st-bulk-actions-pair {
     display: contents;
+  }
+
+  /* Bulk-bar buttons only — scoped here so it doesn't shrink .st-btn
+     usage elsewhere on the page (e.g. the "+ New" button). */
+  .st-bulk-actions .st-btn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.82rem;
+  }
+
+  .st-btn-promote {
+    color: #6d3fc0;
+    border-color: #6d3fc0;
+    background: var(--st-surface-raised, #fff);
+  }
+
+  .st-btn-promote:hover:not(:disabled) {
+    background: #6d3fc0;
+    color: #fff;
+  }
+
+  [data-theme="dark"] .st-btn-promote {
+    color: #c6a6f7;
+    border-color: #c6a6f7;
+  }
+
+  [data-theme="dark"] .st-btn-promote:hover:not(:disabled) {
+    background: #6d3fc0;
+    color: #fff;
   }
   
   /* ---------- table ---------- */
@@ -740,6 +775,14 @@
     color: var(--st-text-muted);
   }
   
+  /* ---------- classroom cell (greyed out when classroom.is_active is 0) ---------- */
+
+  .st-classroom-tag-inactive {
+    color: var(--st-text-muted);
+    opacity: 0.7;
+    font-style: italic;
+  }
+
   /* ---------- inline "Inactive" tag (Actions cell) ---------- */
   
   .st-inactive-tag {
@@ -799,89 +842,17 @@
     color: var(--st-icon-danger-hover-fg);
   }
   
-  /* ---------- pagination ---------- */
-  
-  .st-pagination {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    padding: 0.5rem 1.5rem;
-    border-top: 1px solid var(--st-border);
-    transition: border-color 0.25s ease, background 0.25s ease;
-    flex-shrink: 0;
-    background: var(--st-surface, #fff);
-    box-shadow: 0 -2px 8px rgba(20, 33, 61, 0.06);
-  }
-  
-  .st-pagination-summary {
-    font-size: 0.85rem;
-    color: var(--st-text-muted);
-  }
-  
-  .st-pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .st-per-page {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--st-text-muted);
-  }
-  
-  .st-per-page select {
-    padding: 0.35rem 1.5rem 0.35rem 0.6rem;
-    border-radius: var(--radius-sm, 8px);
-    border: 1px solid var(--st-border);
-    background: var(--st-surface-raised, #fff);
-    color: var(--st-text-body);
-  }
-  
-  .st-page-nav {
-    width: 30px;
-    height: 30px;
-    border-radius: var(--radius-sm, 8px);
-    border: 1px solid var(--st-border);
-    background: var(--st-surface-raised, #fff);
-    color: var(--st-text-body);
-    cursor: pointer;
-    font-size: 1rem;
-  }
-  
-  .st-page-nav:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-  
-  .st-page-current {
-    min-width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    background: var(--color-primary, #214b86);
-    color: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 700;
-  }
-  
   /* ---------- bulk actions / delete modal (self-contained) ---------- */
   
   .st-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--st-overlay-bg);
-    display: flex;
+    position: fixed !important;
+    inset: 0 !important;
+    background-color: var(--st-overlay-bg, rgba(15, 23, 42, 0.55)) !important;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     padding: 1rem;
-    z-index: 100;
+    z-index: 1000 !important;
   }
   
   .st-modal-panel {
@@ -889,13 +860,21 @@
     max-width: 440px;
     max-height: 90vh;
     overflow-y: auto;
-    background: var(--st-surface-raised, #fff);
+    background-color: var(--st-surface-raised, #ffffff) !important;
+    opacity: 1 !important;
+    isolation: isolate;
+    position: relative;
+    z-index: 1;
     border-radius: var(--radius-lg, 16px);
     box-shadow: var(--st-shadow-card, var(--shadow-card));
   }
 
   .st-preview-overlay {
-    z-index: 110;
+    z-index: 1000;
+  }
+
+  .st-preview-panel {
+    isolation: isolate;
   }
 
 .st-preview-panel {
@@ -1263,45 +1242,8 @@
       min-width: 680px;
     }
   
-    .st-pagination {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: nowrap;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      overflow-x: auto;
-    }
-  
-    .st-pagination-summary {
-      text-align: left;
-      flex-shrink: 1;
-      min-width: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: 0.78rem;
-    }
-  
-    .st-pagination-controls {
-      justify-content: flex-end;
-      flex-wrap: nowrap;
-      flex-shrink: 0;
-      gap: 0.5rem;
-    }
-  
     .st-modal-panel {
       max-width: 100%;
-    }
-
-    .st-per-page {
-      font-size: 0.78rem;
-      gap: 0.3rem;
-      flex-shrink: 0;
-    }
-
-    .st-per-page select {
-      padding: 0.3rem 1.3rem 0.3rem 0.5rem;
     }
   }
 
@@ -1340,12 +1282,12 @@
   .ba-overlay {
     position: fixed;
     inset: 0;
-    background: var(--st-overlay-bg);
+    background-color: var(--st-overlay-bg, rgba(15, 23, 42, 0.55));
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 1rem;
-    z-index: 100;
+    z-index: 1000;
   }
 
   .ba-panel {
@@ -1353,7 +1295,10 @@
     max-width: 720px;
     max-height: 90vh;
     overflow-y: auto;
-    background: var(--st-surface-raised, #fff);
+    background-color: var(--st-surface-raised, #ffffff);
+    isolation: isolate;
+    position: relative;
+    z-index: 1;
     border-radius: var(--radius-lg, 16px);
     box-shadow: var(--st-shadow-card, var(--shadow-card));
   }

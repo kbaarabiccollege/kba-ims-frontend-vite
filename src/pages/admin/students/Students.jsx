@@ -59,12 +59,14 @@
     bulkUpdateStudents,
     bulkUpdateStudentStatus,
   } from "../../../api/studentsApi";
+  import { getCourses } from "../../../api/coursesApi";
   import { getClassrooms } from "../../../api/classroomsApi";
   import { getBatches } from "../../../api/batchesApi";
   import { useToast } from "../../../context/ToastContext";
   import { crudMessage } from "../../../utils/toastMessages";
   import BulkActionsModal from "./components/BulkActionsModal";
-  import BulkAddModal from "./components/BulkAddModal";
+import BulkAddModal from "./components/BulkAddModal";
+import PromoteClassModal from "./components/PromoteClassModal";
   import PasswordModal from "../../superadmin/users/components/PasswordModal";
   import { updateUserPassword } from "../../../api/usersApi";
   import SearchableDropdown from "../../../components/common/SearchableDropdown";
@@ -92,6 +94,37 @@ import usePageTitle from "../../../hooks/usePageTitle";
     // ---- classroom/batch lookups: current dropdown results + an
     // ever-growing id->label index so previously-picked values keep their
     // display name even after the dropdown's own list has moved on. ----
+    const [courseOptions, setCourseOptions] = useState([]);
+    const [coursesIndex, setCoursesIndex] = useState({});
+    const [coursesLoading, setCoursesLoading] = useState(false);
+    const [coursesLoaded, setCoursesLoaded] = useState(false);
+
+    // Mirrors the currently-selected Course filter, read (not reacted to
+    // via deps) inside searchClassrooms below, so classrooms are always
+    // fetched scoped to whichever course is picked, without having to
+    // change searchClassrooms's signature (SearchableDropdown calls it
+    // with just `q`).
+    const courseFilterRef = useRef("all");
+
+    // Guards against out-of-order responses: selecting a course fires a
+    // fetch from the course-change effect, and opening the dropdown
+    // fires another fetch on its own (SearchableDropdown re-fetches on
+    // open). If those two overlap, only the response matching the most
+    // recently *started* request is allowed to update state — otherwise
+    // a slower, stale response finishing last can leave classroomsLoading
+    // stuck true (or clobber freshly-loaded options) even though a newer
+    // request already succeeded.
+    const classroomsRequestIdRef = useRef(0);
+
+    // Same idea for courses: only apply the "select the default course"
+    // behavior once, from the very first successful load — not every
+    // time the dropdown re-fetches on open/search, or it would keep
+    // stomping on the user's own selection. defaultCourseIdRef holds the
+    // id searchCourses finds until the effect below (defined further
+    // down, after `list` exists) is ready to apply it via list.setFilter.
+    const defaultCourseAppliedRef = useRef(false);
+    const defaultCourseIdRef = useRef(null);
+
     const [classroomOptions, setClassroomOptions] = useState([]);
     const [classroomsIndex, setClassroomsIndex] = useState({});
     const [classroomsLoading, setClassroomsLoading] = useState(false);
@@ -110,6 +143,7 @@ import usePageTitle from "../../../hooks/usePageTitle";
     const [bulkSubmitting, setBulkSubmitting] = useState(false);
     const [bulkError, setBulkError] = useState("");
     const [showBulkAddModal, setShowBulkAddModal] = useState(false);
+    const [showPromoteModal, setShowPromoteModal] = useState(false);
 
     // ---- row delete confirm ----
     const [deleteTarget, setDeleteTarget] = useState(null); // student
@@ -137,11 +171,58 @@ import usePageTitle from "../../../hooks/usePageTitle";
       return () => document.removeEventListener("mousedown", handleClickAway);
     }, [menuOpen]);
 
-    // ---- classroom search (called by SearchableDropdown on open + on type) ----
+    // ---- course search (called by SearchableDropdown on open + on type) ----
+    const searchCourses = useCallback(async (q) => {
+      setCoursesLoading(true);
+      try {
+        const res = await getCourses({ is_active: 1, q });
+        const list = res?.data ?? [];
+        setCourseOptions(list.map((c) => ({ id: c.id, label: c.name })));
+        setCoursesIndex((prev) => {
+          const next = { ...prev };
+          list.forEach((c) => {
+            next[c.id] = c.name;
+          });
+          return next;
+        });
+        setCoursesLoaded(true);
+
+        // Record the default course, once only, from the very first
+        // successful load — later refetches (dropdown opened again, a
+        // search typed) must not override whatever the user has since
+        // picked. This only stashes the id; the effect below (after
+        // `list` exists) is what actually applies it.
+        if (!defaultCourseAppliedRef.current) {
+          const defaultCourse = list.find((c) => c.is_default === 1 || c.is_default === true);
+          if (defaultCourse) {
+            defaultCourseIdRef.current = String(defaultCourse.id);
+          }
+        }
+      } catch {
+        setCourseOptions([]);
+      } finally {
+        setCoursesLoading(false);
+      }
+    }, []);
+
+    // ---- classroom search (called by SearchableDropdown on open + on
+    // type). Scoped to the selected Course filter (via courseFilterRef)
+    // and always restricted to active classrooms.
+    //
+    // Guarded by classroomsRequestIdRef: if this call's response comes
+    // back after a newer call has already started, it's discarded
+    // instead of overwriting state or leaving classroomsLoading stuck. ----
     const searchClassrooms = useCallback(async (q) => {
+      const requestId = ++classroomsRequestIdRef.current;
       setClassroomsLoading(true);
       try {
-        const res = await getClassrooms({ isActive: 1, q });
+        const activeCourse = courseFilterRef.current;
+        const res = await getClassrooms({
+          isActive: 1,
+          q,
+          ...(activeCourse && activeCourse !== "all" ? { course: activeCourse } : {}),
+        });
+        if (requestId !== classroomsRequestIdRef.current) return; // stale — a newer request has since started
         const list = res?.data ?? [];
         setClassroomOptions(
           list.map((c) => ({ id: c.id, label: c.name, meta: getCourseLabel(c.course) }))
@@ -155,9 +236,9 @@ import usePageTitle from "../../../hooks/usePageTitle";
         });
         setClassroomsLoaded(true);
       } catch {
-        setClassroomOptions([]);
+        if (requestId === classroomsRequestIdRef.current) setClassroomOptions([]);
       } finally {
-        setClassroomsLoading(false);
+        if (requestId === classroomsRequestIdRef.current) setClassroomsLoading(false);
       }
     }, []);
 
@@ -183,10 +264,13 @@ import usePageTitle from "../../../hooks/usePageTitle";
       }
     }, []);
 
-    // ---- auto-load classroom + batch lists once, on page mount, so the
-    // filters are ready without needing a manual "Fetch" click. ----
+    // ---- auto-load course + batch lists once, on page mount, so the
+    // filters are ready without needing a manual "Fetch" click.
+    // Classrooms are NOT loaded here — they're loaded by the
+    // Course-filter-driven effect below (which also fires once on
+    // mount, scoped to "all"). ----
     useEffect(() => {
-      searchClassrooms("");
+      searchCourses("");
       searchBatches("");
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -212,6 +296,7 @@ import usePageTitle from "../../../hooks/usePageTitle";
           q: params.q,
           page: params.page,
           limit: params.limit,
+          courseId: params.courseId,
           classroomId: params.classroomId,
           batchId: params.batchId,
           status: params.status,
@@ -221,8 +306,33 @@ import usePageTitle from "../../../hooks/usePageTitle";
 
     const list = useListPage({
       fetchFn,
-      initialFilters: { classroomId: "all", batchId: "all", status: "all" },
+      initialFilters: { courseId: "all", classroomId: "all", batchId: "all", status: "all" },
     });
+
+    // ---- apply the default course, exactly once, as soon as it's known ----
+    // A no-op until searchCourses (above) has found a default and
+    // stashed its id in defaultCourseIdRef; fires the render after that
+    // happens (coursesLoaded flips true), then never again.
+    useEffect(() => {
+      if (defaultCourseAppliedRef.current) return;
+      if (defaultCourseIdRef.current == null) return;
+      defaultCourseAppliedRef.current = true;
+      list.setFilter("courseId", defaultCourseIdRef.current);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [coursesLoaded]);
+
+    // ---- reload classroom options (and reset the Classroom filter)
+    // whenever the Course filter changes, so only that course's active
+    // classrooms are offered. Also runs once on mount (courseId starts
+    // as "all"), which performs the initial unscoped classroom load —
+    // then runs again once the default-course effect above sets a real
+    // course id, re-scoping classrooms to it. ----
+    useEffect(() => {
+      courseFilterRef.current = list.filters.courseId;
+      searchClassrooms("");
+      list.setFilter("classroomId", "all");
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [list.filters.courseId]);
 
     // ---- row delete ----
     const openDeleteConfirm = (student) => {
@@ -388,6 +498,21 @@ import usePageTitle from "../../../hooks/usePageTitle";
             <div className={`st-filters${mobileFiltersOpen ? " st-filters-open" : ""}`}>
               <div className="st-filters-row">
                 <SearchableDropdown
+                  label="Course"
+                  allLabel="All Courses"
+                  options={courseOptions}
+                  value={list.filters.courseId}
+                  onChange={(v) => list.setFilter("courseId", v)}
+                  searchable
+                  onFetch={searchCourses}
+                  loaded={coursesLoaded}
+                  loading={coursesLoading}
+                  hideFetchButton
+                  selectedLabel={coursesIndex[list.filters.courseId]}
+                  placeholder="Search courses…"
+                />
+
+                <SearchableDropdown
                   label="Classroom"
                   allLabel="All Classrooms"
                   options={classroomOptions}
@@ -440,6 +565,13 @@ import usePageTitle from "../../../hooks/usePageTitle";
                   onClick={() => openBulkModal("update")}
                 >
                   Bulk Update
+                </button>
+                <button
+                  type="button"
+                  className="st-btn st-btn-ghost st-btn-promote"
+                  onClick={() => setShowPromoteModal(true)}
+                >
+                  Promote Class
                 </button>
                 <div className="st-bulk-actions-pair">
                   <button
@@ -519,7 +651,22 @@ import usePageTitle from "../../../hooks/usePageTitle";
                         </td>
                         <td>{student.rrn || "—"}</td>
                         <td>{batchesIndex[student.batch_id] || "—"}</td>
-                        <td>{classroomsIndex[student.classroom_id] || "—"}</td>
+                        <td>
+                          {student.classroom ? (
+                            <span
+                              className={
+                                student.classroom.is_active === 0
+                                  ? "st-classroom-tag st-classroom-tag-inactive"
+                                  : "st-classroom-tag"
+                              }
+                              title={student.classroom.is_active === 0 ? "Inactive classroom" : undefined}
+                            >
+                              {student.classroom.name}
+                            </span>
+                          ) : (
+                            "—"
+                          )}
+                        </td>
                         <td>
                           <ActionButtonsCell
                             name={student.name}
@@ -554,11 +701,6 @@ import usePageTitle from "../../../hooks/usePageTitle";
           <BulkActionsModal
             action={bulkModal}
             count={list.selectedIds.size}
-            classroomOptions={classroomOptions}
-            classroomsIndex={classroomsIndex}
-            classroomsLoading={classroomsLoading}
-            classroomsLoaded={classroomsLoaded}
-            onFetchClassrooms={searchClassrooms}
             batchOptions={batchOptions}
             batchesIndex={batchesIndex}
             batchesLoading={batchesLoading}
@@ -573,6 +715,18 @@ import usePageTitle from "../../../hooks/usePageTitle";
 
         {showBulkAddModal && (
           <BulkAddModal onClose={() => setShowBulkAddModal(false)} onCreated={list.refetch} />
+        )}
+
+        {showPromoteModal && (
+          <PromoteClassModal
+            studentIds={Array.from(list.selectedIds)}
+            onClose={() => setShowPromoteModal(false)}
+            onPromoted={() => {
+              setShowPromoteModal(false);
+              list.setSelectedIds(new Set());
+              list.refetch();
+            }}
+          />
         )}
 
         {deleteTarget && (

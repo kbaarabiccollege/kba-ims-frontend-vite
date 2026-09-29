@@ -49,6 +49,7 @@ const SearchableDropdown = ({
   loaded = true, // set to false for on-demand lists (classroom/batch) until the parent's initial load resolves
   loading = false,
   hideFetchButton = false, // true for lists the parent auto-loads on page mount (classroom/batch)
+  disabled = false, // locks the trigger closed (e.g. "pick a course first") — greyed out via CSS, click and keyboard-open both blocked
   placeholder = "Search…",
   className = "",
   searchDebounceMs = 350,
@@ -66,6 +67,12 @@ const SearchableDropdown = ({
     document.addEventListener("mousedown", handleClickAway);
     return () => document.removeEventListener("mousedown", handleClickAway);
   }, [open]);
+
+  // If this dropdown becomes disabled while its panel happens to be
+  // open (e.g. its parent selection was just cleared), close it.
+  useEffect(() => {
+    if (disabled) setOpen(false);
+  }, [disabled]);
 
   // Once the list has been loaded at least once (via the Fetch/Refresh
   // button), keep it live-searched as the person types. Before that
@@ -98,9 +105,10 @@ const SearchableDropdown = ({
       <button
         type="button"
         className={`sd-trigger${open ? " sd-trigger-open" : ""}`}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => !disabled && setOpen((o) => !o)}
         aria-haspopup="true"
         aria-expanded={open}
+        disabled={disabled}
       >
         <span className="sd-trigger-label">{triggerLabel || allLabel}</span>
         <span className="sd-caret" aria-hidden="true">

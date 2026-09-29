@@ -1,10 +1,13 @@
 // src/pages/admin/students/StudentForm.jsx
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import { getStudent, createStudent, updateStudent } from "../../../api/studentsApi";
 import { getBatches } from "../../../api/batchesApi";
+import { getClassrooms } from "../../../api/classroomsApi";
+import { getAcademicYears } from "../../../api/academicYearsApi";
+import { getCourses } from "../../../api/coursesApi";
 import SearchableDropdown from "../../../components/common/SearchableDropdown";
 import PasswordInput from "../../../components/common/PasswordInput";
 import { TrashIcon, PlusIcon } from "../../../components/common/Icons";
@@ -29,6 +32,8 @@ const initialState = () => ({
     dob: "",
     gender: "",
     batch_id: "",
+    academic_year_id: "",
+    classroom_id: "",
     blood_group: "",
     mother_tongue: "",
     is_hostel: true,
@@ -110,18 +115,101 @@ const StudentForm = () => {
   const [saveError, setSaveError] = useState("");
   const [sectionErrors, setSectionErrors] = useState({});
 
+  // ---- course: UI-only reference field, used solely to scope the Batch
+  // and Classroom dropdowns below — never sent in the create/update
+  // payload (see buildPayload / buildSectionPayload, neither of which
+  // reference courseId). Kept as its own state rather than inside
+  // `form.personal` so it can't accidentally leak into a payload built
+  // with `...form.personal`. ----
+  const [courseId, setCourseId] = useState("");
+  const [courseOptions, setCourseOptions] = useState([]);
+  const [coursesIndex, setCoursesIndex] = useState({});
+  const [coursesLoading, setCoursesLoading] = useState(false);
+  const [coursesLoaded, setCoursesLoaded] = useState(false);
+
+  // Mirrors courseId, read (not reacted to via deps) inside searchBatches
+  // and searchClassrooms below, the same pattern used on the Students
+  // list page — lets those callbacks always scope to the current course
+  // without changing their call signature.
+  const courseFilterRef = useRef("");
+
+  // Apply the default Course / current Academic Year exactly once, and
+  // only in create mode — in edit mode the values loaded from the
+  // student's own record (see loadStudent) must win instead.
+  const defaultCourseAppliedRef = useRef(false);
+  const currentAcademicYearAppliedRef = useRef(false);
+
   // ---- batches (fetched the same way as the Students list page) ----
   const [batchOptions, setBatchOptions] = useState([]);
   const [batchesIndex, setBatchesIndex] = useState({});
   const [batchesLoading, setBatchesLoading] = useState(false);
   const [batchesLoaded, setBatchesLoaded] = useState(false);
 
+  // ---- academic years (same fetch pattern as batches) ----
+  const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [academicYearsIndex, setAcademicYearsIndex] = useState({});
+  const [academicYearsLoading, setAcademicYearsLoading] = useState(false);
+  const [academicYearsLoaded, setAcademicYearsLoaded] = useState(false);
+
+  // ---- classrooms (same fetch pattern as batches; NOTE: unlike the
+  // Students list page / Promote Class modal, this form has no Course
+  // filter to scope classrooms by, so every active classroom is offered
+  // here — is_active=1 only) ----
+  const [classroomOptions, setClassroomOptions] = useState([]);
+  const [classroomsIndex, setClassroomsIndex] = useState({});
+  const [classroomsLoading, setClassroomsLoading] = useState(false);
+  const [classroomsLoaded, setClassroomsLoaded] = useState(false);
+
   usePageTitle(isEdit ? ["Edit", "Students"] : ["Add New", "Students"]);
 
+  const searchCourses = useCallback(async (q) => {
+    setCoursesLoading(true);
+    try {
+      const res = await getCourses({ is_active: 1, q });
+      const list = res?.data ?? [];
+      setCourseOptions(list.map((c) => ({ id: c.id, label: c.name })));
+      setCoursesIndex((prev) => {
+        const next = { ...prev };
+        list.forEach((c) => {
+          next[c.id] = c.name;
+        });
+        return next;
+      });
+      setCoursesLoaded(true);
+
+      if (!isEdit && !defaultCourseAppliedRef.current) {
+        defaultCourseAppliedRef.current = true;
+        const defaultCourse = list.find((c) => c.is_default === 1 || c.is_default === true);
+        if (defaultCourse) setCourseId(String(defaultCourse.id));
+      }
+    } catch {
+      setCourseOptions([]);
+    } finally {
+      setCoursesLoading(false);
+    }
+  }, [isEdit]);
+
+  // Scoped by the selected Course (via courseFilterRef) — ASSUMPTION:
+  // getBatches accepts a `course` param the same way classroomsApi does
+  // elsewhere in this codebase. If batchesApi.js actually expects a
+  // different param name, adjust it below.
+  //
+  // Does NOT call the API at all until a course is selected: with no
+  // course, it just clears the list and marks it "loaded" (as empty),
+  // so the dropdown reads "No results found" instead of spinning on
+  // "Loading…" forever. The field itself is also visually disabled via
+  // the `disabled={!courseId}` prop passed in the JSX below.
   const searchBatches = useCallback(async (q) => {
+    const activeCourse = courseFilterRef.current;
+    if (!activeCourse) {
+      setBatchOptions([]);
+      setBatchesLoaded(true);
+      setBatchesLoading(false);
+      return;
+    }
     setBatchesLoading(true);
     try {
-      const res = await getBatches({ limit: 100, q });
+      const res = await getBatches({ limit: 100, q, course: activeCourse });
       const list = res?.data ?? [];
       setBatchOptions(list.map((b) => ({ id: b.id, label: b.batch_name })));
       setBatchesIndex((prev) => {
@@ -139,10 +227,98 @@ const StudentForm = () => {
     }
   }, []);
 
+  const searchAcademicYears = useCallback(async (q) => {
+    setAcademicYearsLoading(true);
+    try {
+      const res = await getAcademicYears({ q });
+      const list = res?.data ?? [];
+      // ASSUMPTION: SearchableDropdown's `label` is plain text, so
+      // "(Current)" can't be styled smaller/differently without seeing
+      // that component's source — it just renders inline as part of the
+      // label string here. If SearchableDropdown supports a rich
+      // label/render-option prop, this can be upgraded to a proper
+      // small badge instead.
+      // `meta` is SearchableDropdown's built-in small/muted secondary
+      // label (already styled via .sd-option-meta in
+      // SearchableDropdown.css) — this is what actually renders
+      // "Current" small and greyed next to the year name in the list.
+      // The index below keeps a plain-text "(Current)" suffix too,
+      // since that's what shows in the trigger button / table (neither
+      // of which render `meta`).
+      setAcademicYearOptions(
+        list.map((y) => ({
+          id: y.id,
+          label: y.name,
+          meta: y.is_current ? "Current" : undefined,
+        }))
+      );
+      setAcademicYearsIndex((prev) => {
+        const next = { ...prev };
+        list.forEach((y) => {
+          next[y.id] = y.is_current ? `${y.name} (Current)` : y.name;
+        });
+        return next;
+      });
+      setAcademicYearsLoaded(true);
+
+      if (!isEdit && !currentAcademicYearAppliedRef.current) {
+        currentAcademicYearAppliedRef.current = true;
+        const currentYear = list.find((y) => y.is_current === 1 || y.is_current === true);
+        if (currentYear) setField("personal", "academic_year_id", String(currentYear.id));
+      }
+    } catch {
+      setAcademicYearOptions([]);
+    } finally {
+      setAcademicYearsLoading(false);
+    }
+  }, [isEdit]);
+
+  const searchClassrooms = useCallback(async (q) => {
+    const activeCourse = courseFilterRef.current;
+    if (!activeCourse) {
+      setClassroomOptions([]);
+      setClassroomsLoaded(true);
+      setClassroomsLoading(false);
+      return;
+    }
+    setClassroomsLoading(true);
+    try {
+      const res = await getClassrooms({ isActive: 1, q, course: activeCourse });
+      const list = res?.data ?? [];
+      setClassroomOptions(list.map((c) => ({ id: c.id, label: c.name })));
+      setClassroomsIndex((prev) => {
+        const next = { ...prev };
+        list.forEach((c) => {
+          next[c.id] = c.name;
+        });
+        return next;
+      });
+      setClassroomsLoaded(true);
+    } catch {
+      setClassroomOptions([]);
+    } finally {
+      setClassroomsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
+    searchCourses("");
     searchBatches("");
+    searchAcademicYears("");
+    searchClassrooms("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ---- reload Batch + Classroom options (and reset both selections)
+  // whenever the Course reference field changes ----
+  useEffect(() => {
+    courseFilterRef.current = courseId;
+    searchBatches("");
+    searchClassrooms("");
+    setField("personal", "batch_id", "");
+    setField("personal", "classroom_id", "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId]);
 
   // ---- load existing student in edit mode (also reused by the refresh button) ----
   const loadStudent = useCallback(
@@ -185,6 +361,15 @@ const StudentForm = () => {
             dob: toDateInput(d.personal_details?.dob),
             gender: d.personal_details?.gender ?? "",
             batch_id: d.personal_details?.batch_id ?? "",
+            // ASSUMPTION — no sample GET /students/:id response was shared
+            // that includes these, so this guesses they come back at the
+            // top level of `d` (d.classroom_id / d.academic_year_id),
+            // mirroring where classroom_id is sent in the create payload
+            // below. If the real response nests them differently (e.g.
+            // under d.classroom.id, like the list-page response does),
+            // adjust this line.
+            classroom_id: d.classroom_id ?? d.classroom?.id ?? "",
+            academic_year_id: d.academic_year_id ?? "",
             blood_group: d.personal_details?.blood_group ?? "",
             mother_tongue: d.personal_details?.mother_tongue ?? "",
             is_hostel: Boolean(d.personal_details?.is_hostel),
@@ -380,7 +565,8 @@ const StudentForm = () => {
       }));
 
     return {
-      classroom_id: null,
+      classroom_id: num(form.personal.classroom_id),
+      academic_year_id: num(form.personal.academic_year_id),
       account: {
         user_id: form.account.user_id.trim(),
         email: form.account.email.trim(),
@@ -390,6 +576,8 @@ const StudentForm = () => {
       },
       personal_details: {
         ...form.personal,
+        classroom_id: undefined, // sent at the top level instead — see above
+        academic_year_id: undefined, // sent at the top level instead — see above
         gender: num(form.personal.gender),
         batch_id: num(form.personal.batch_id),
         blood_group: num(form.personal.blood_group),
@@ -434,6 +622,8 @@ const StudentForm = () => {
     switch (section) {
       case "personal":
         return {
+          classroom_id: num(form.personal.classroom_id),
+          academic_year_id: num(form.personal.academic_year_id),
           account: {
             user_id: form.account.user_id.trim(),
             email: form.account.email.trim(),
@@ -441,6 +631,8 @@ const StudentForm = () => {
           },
           personal_details: {
             ...form.personal,
+            classroom_id: undefined, // sent at the top level instead — see above
+            academic_year_id: undefined, // sent at the top level instead — see above
             gender: num(form.personal.gender),
             batch_id: num(form.personal.batch_id),
             blood_group: num(form.personal.blood_group),
@@ -769,7 +961,9 @@ const StudentForm = () => {
                     </div>
                   </div>
 
-                  {/* Row 3: Blood Group, Mother Tongue, Batch */}
+                  {/* Row 3: Blood Group, Mother Tongue, Course (reference
+                      only — scopes Batch/Classroom below, never sent to
+                      the API) */}
                   <div className="sf-grid sf-grid-3">
                     <div className="sf-field">
                       <label className="sf-label" htmlFor="sf-blood-group">Blood Group</label>
@@ -792,9 +986,32 @@ const StudentForm = () => {
                       />
                     </div>
                     <div className="sf-field">
-                      <label className="sf-label">Batch</label>
+                      <label className="sf-label" htmlFor="sf-course">Course *</label>
                       <SearchableDropdown
-                        allLabel="Select batch"
+                        id="sf-course"
+                        label=""
+                        allLabel="Select course"
+                        options={courseOptions}
+                        value={courseId || "all"}
+                        onChange={(v) => setCourseId(v === "all" ? "" : v)}
+                        searchable
+                        onFetch={searchCourses}
+                        loaded={coursesLoaded}
+                        loading={coursesLoading}
+                        hideFetchButton
+                        selectedLabel={coursesIndex[courseId]}
+                        placeholder="Search courses…"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 3.5: Batch, Academic Year, Classroom — Batch and
+                      Classroom are both scoped to the Course picked above */}
+                  <div className="sf-grid sf-grid-3">
+                    <div className="sf-field">
+                      <label className="sf-label">Batch *</label>
+                      <SearchableDropdown
+                        allLabel={courseId ? "Select batch" : "Select a course first"}
                         options={batchOptions}
                         value={form.personal.batch_id || "all"}
                         onChange={(v) => setField("personal", "batch_id", v === "all" ? "" : v)}
@@ -803,8 +1020,46 @@ const StudentForm = () => {
                         loaded={batchesLoaded}
                         loading={batchesLoading}
                         hideFetchButton
+                        disabled={!courseId}
                         selectedLabel={batchesIndex[form.personal.batch_id]}
                         placeholder="Search batches…"
+                      />
+                    </div>
+                    <div className="sf-field">
+                      <label className="sf-label" htmlFor="sf-academic-year">Academic Year *</label>
+                      <SearchableDropdown
+                        id="sf-academic-year"
+                        label=""
+                        allLabel="Select academic year"
+                        options={academicYearOptions}
+                        value={form.personal.academic_year_id || "all"}
+                        onChange={(v) => setField("personal", "academic_year_id", v === "all" ? "" : v)}
+                        searchable
+                        onFetch={searchAcademicYears}
+                        loaded={academicYearsLoaded}
+                        loading={academicYearsLoading}
+                        hideFetchButton
+                        selectedLabel={academicYearsIndex[form.personal.academic_year_id]}
+                        placeholder="Search academic years…"
+                      />
+                    </div>
+                    <div className="sf-field">
+                      <label className="sf-label" htmlFor="sf-classroom">Classroom *</label>
+                      <SearchableDropdown
+                        id="sf-classroom"
+                        label=""
+                        allLabel={courseId ? "Select classroom" : "Select a course first"}
+                        options={classroomOptions}
+                        value={form.personal.classroom_id || "all"}
+                        onChange={(v) => setField("personal", "classroom_id", v === "all" ? "" : v)}
+                        searchable
+                        onFetch={searchClassrooms}
+                        loaded={classroomsLoaded}
+                        loading={classroomsLoading}
+                        hideFetchButton
+                        disabled={!courseId}
+                        selectedLabel={classroomsIndex[form.personal.classroom_id]}
+                        placeholder="Search classrooms…"
                       />
                     </div>
                   </div>
@@ -821,7 +1076,7 @@ const StudentForm = () => {
                       />
                     </div>
                       <div className="sf-field">
-                        <label className="sf-label" htmlFor="sf-academic-status">Academic Status</label>
+                        <label className="sf-label" htmlFor="sf-academic-status">Academic Status *</label>
                         <SearchableDropdown
                           id="sf-academic-status"
                           label=""

@@ -4,18 +4,9 @@
 // and future modules): the avatar cell, header/row checkboxes, the
 // action-icon row, the page header, and pagination. Grouped in one file
 // since they're always used together and none carries independent logic.
-//
-// NOTE on Pagination's styling: it used to be duplicated as
-// ".st-pagination*" in both Students.css and academic.css, which is
-// what previously made the current-page number invisible in light
-// mode (see the comment at the top of Pagination.css for why). It now
-// has its own file, src/styles/Pagination.css, imported below — no
-// page needs to carry pagination CSS itself anymore.
 
-import { useEffect, useRef, useState } from "react";
 import { initials } from "../../utils/textHelpers";
 import { EditIcon, EyeIcon, KeyIcon, TrashIcon } from "./Icons";
-import "../../styles/Pagination.css";
 
 // ---- avatar (photo-or-initials) with click-to-preview ----
 export const AvatarCell = ({ name, photoUrl, onPreview }) => (
@@ -145,93 +136,35 @@ export const ListPageHeader = ({ title, total, refreshing, onRefresh, onCreate, 
   </div>
 );
 
-// ---- per-page + prev/next range pill, Zoho-Books style ----
-//
-// A single bordered pill: "⚙ N per page" on the left (opens its own
-// small menu ABOVE the bar, since this control sits at the bottom of
-// the page), a divider, then "‹ start-end ›" on the right. Built as a
-// self-contained dropdown rather than reusing <SearchableDropdown> —
-// squeezing that component into this narrow a space was clipping its
-// own toggle and swallowing clicks.
-export const Pagination = ({ page, setPage, limit, setLimit, total, totalPages, rangeStart, rangeEnd, pageSizeOptions }) => {
-  const [perPageOpen, setPerPageOpen] = useState(false);
-  const perPageRef = useRef(null);
-
-  useEffect(() => {
-    if (!perPageOpen) return undefined;
-    const handleClickAway = (e) => {
-      if (perPageRef.current && !perPageRef.current.contains(e.target)) setPerPageOpen(false);
-    };
-    document.addEventListener("mousedown", handleClickAway);
-    return () => document.removeEventListener("mousedown", handleClickAway);
-  }, [perPageOpen]);
-
-  return (
-    <div className="pg-pagination">
-      <span className="pg-summary">{total === 0 ? "No results" : `Total: ${total}`}</span>
-
-      <div className="pg-pill">
-        <div className="pg-perpage-wrap" ref={perPageRef}>
-          <button
-            type="button"
-            className="pg-perpage-trigger"
-            onClick={() => setPerPageOpen((o) => !o)}
-            aria-haspopup="true"
-            aria-expanded={perPageOpen}
-          >
-            <svg className="pg-gear" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-            </svg>
-            <span>{limit} per page</span>
-          </button>
-
-          {perPageOpen && (
-            <div className="pg-perpage-menu" role="menu">
-              {pageSizeOptions.map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  role="menuitem"
-                  className={`pg-perpage-option${n === limit ? " pg-perpage-option-active" : ""}`}
-                  onClick={() => {
-                    setLimit(n);
-                    setPage(1);
-                    setPerPageOpen(false);
-                  }}
-                >
-                  {n} per page
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <span className="pg-pill-divider" aria-hidden="true" />
-
-        <button
-          type="button"
-          className="pg-arrow pg-arrow-prev"
-          disabled={page <= 1}
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          aria-label="Previous page"
-        >
-          ‹
-        </button>
-        <span className="pg-range">{rangeStart}-{rangeEnd}</span>
-        <button
-          type="button"
-          className="pg-arrow pg-arrow-next"
-          disabled={page >= totalPages}
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          aria-label="Next page"
-        >
-          ›
-        </button>
-      </div>
+// ---- per-page select + prev/next + range summary ----
+export const Pagination = ({ page, setPage, limit, setLimit, total, totalPages, rangeStart, rangeEnd, pageSizeOptions }) => (
+  <div className="st-pagination">
+    <span className="st-pagination-summary">
+      {total === 0 ? "No results" : `Showing ${rangeStart}-${rangeEnd} of ${total}`}
+    </span>
+    <div className="st-pagination-controls">
+      <label className="st-per-page">
+        Per page:
+        <select value={limit} onChange={(e) => { setLimit(Number(e.target.value)); setPage(1); }}>
+          {pageSizeOptions.map((n) => <option key={n} value={n}>{n}</option>)}
+        </select>
+      </label>
+      <button type="button" className="st-page-nav" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} aria-label="Previous page">
+        ‹
+      </button>
+      <span className="st-page-current">{page}</span>
+      <button
+        type="button"
+        className="st-page-nav"
+        disabled={page >= totalPages}
+        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+        aria-label="Next page"
+      >
+        ›
+      </button>
     </div>
-  );
-};
+  </div>
+);
 
 
 // --- Reusable card-grid list controls (Classrooms, Subjects, etc.) ---
