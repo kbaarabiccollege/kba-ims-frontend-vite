@@ -13,9 +13,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import { getStudent } from "../../../api/studentsApi";
-import { getBatches } from "../../../api/batchesApi";
-import { getClassroom } from "../../../api/classroomsApi";
-import { getClassrooms } from "../../../api/classroomsApi";
+
+
 import { CASTE_OPTIONS, SOCIAL_CATEGORY_OPTIONS, MADHAB_OPTIONS, 
   ACADEMIC_STATUS_OPTIONS, optionLabel,
 } from "../../../utils/studentConstants";
@@ -138,14 +137,16 @@ const Accordion = ({ id, Icon, title, defaultOpen, openPanels, setOpenPanels, ch
   );
 };
 
-const StatItem = ({ Icon, label, value, className = "" }) => (
+const StatItem = ({ Icon, label, value, className = "", valueStyle }) => (
   <div className={`sv-stat-item${className ? ` ${className}` : ""}`}>
     <span className="sv-stat-icon">
       <Icon />
     </span>
     <div className="sv-stat-text">
       <span className="sv-stat-label">{label}</span>
-      <span className="sv-stat-value">{value || value === 0 ? value : "—"}</span>
+      <span className="sv-stat-value" style={valueStyle}>
+        {value || value === 0 ? value : "—"}
+      </span>
     </div>
   </div>
 );
@@ -164,17 +165,9 @@ const StudentView = () => {
   const [openPanels, setOpenPanels] = useState({});
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  // Resolve batch_id -> batch_name for the quick-stats strip, the same
-  // way StudentForm's SearchableDropdown does.
-  const [batchesIndex, setBatchesIndex] = useState({});
 
-  // Single classroom record, resolved from personal_details.classroom_id
-  // via GET /api/classrooms/:id.
-  const [classroom, setClassroom] = useState(null);
 
-  // Resolve classroom_id -> classroom name for the quick-stats strip,
-  // the same way batches are resolved below.
-  const [classroomsIndex, setClassroomsIndex] = useState({});
+
 
   useEffect(() => {
     let cancelled = false;
@@ -197,68 +190,9 @@ const StudentView = () => {
     };
   }, [id]);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await getBatches({ limit: 100 });
-        const list = res?.data ?? [];
-        if (cancelled) return;
-        const index = {};
-        list.forEach((b) => {
-          index[b.id] = b.batch_name;
-        });
-        setBatchesIndex(index);
-      } catch {
-        // quick-stats batch label just falls back to "—"
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
-  const classroomId = data?.personal_details?.classroom_id ?? data?.classroom_id;
 
-  useEffect(() => {
-    let cancelled = false;
-    if (!classroomId) {
-      setClassroom(null);
-      return undefined;
-    }
-    (async () => {
-      try {
-        const res = await getClassroom(classroomId);
-        if (!cancelled) setClassroom(res?.data || null);
-      } catch {
-        if (!cancelled) setClassroom(null);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [classroomId]);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await getClassrooms({ isActive: null });
-        const list = res?.data ?? [];
-        if (cancelled) return;
-        const index = {};
-        list.forEach((c) => {
-          index[c.id] = c.name;
-        });
-        setClassroomsIndex(index);
-      } catch {
-        // quick-stats classroom label just falls back to "—"
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   if (loading) {
     return (
@@ -300,9 +234,10 @@ const StudentView = () => {
   const isActive = (acc.status || "").toLowerCase() === "active";
   const photoOk = Boolean(p.photo_url && /^https?:\/\//.test(p.photo_url));
 
-  const batchLabel = batchesIndex[p.batch_id] || (p.batch_id ? `Batch #${p.batch_id}` : "—");
-  const classroomLabel =
-    classroom?.name || (p.classroom_id ? `Classroom #${p.classroom_id}` : "—");
+  const batchLabel = p.batch?.batch_name || "—";
+  const classroom = data.classroom || null;
+  const classroomLabel = classroom?.name || "—";
+  const classroomInactive = Boolean(classroom) && Number(classroom.is_active) === 0;
 
   return (
     <div className="st-page sf-page">
@@ -354,8 +289,8 @@ const StudentView = () => {
 
           <div className="sv-pill-row sv-pill-row-center">
             <Pill tone={isActive ? "success" : "muted"}>{isActive ? "Active" : "Inactive"}</Pill>
+            {p.roll_number ? <Pill tone="warn">Roll No: {p.roll_number}</Pill> : null}
             {admission.hafiz ? <Pill tone="info">Hafiz</Pill> : null}
-            {other.is_orphan ? <Pill tone="warn">Orphan</Pill> : null}
           </div>
 
           <div className="sv-sidebar-quickstats">
@@ -699,7 +634,13 @@ const StudentView = () => {
 
           {/* ---------------- Persistent quick-stats strip ---------------- */}
           <div className="st-card sv-stats-bar">
-            <StatItem Icon={IconClassroom} label="Classroom" value={classroomLabel} className="sv-stat-classroom" />
+            <StatItem
+              Icon={IconClassroom}
+              label="Classroom"
+              value={classroomLabel}
+              className="sv-stat-classroom"
+              valueStyle={classroomInactive ? { color: "#9ca3af", fontStyle: "italic" } : undefined}
+            />
             <StatItem Icon={IconBatch} label="Batch" value={batchLabel} className="sv-stat-batch" />
             <StatItem Icon={IconUserId} label="User ID" value={acc.user_id} className="sv-stat-userid" />
             <StatItem

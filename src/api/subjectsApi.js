@@ -33,8 +33,9 @@ const BASE = "/subjects";
  * @param {number|string} [params.sem]     1-8 (skip when 'all')
  * @param {number|string} [params.course]  course id (skip when 'all')
  * @param {string} [params.status]         'all' | 'active' | 'inactive'
+ * @param {number|string} [params.classroom_id]  classroom id (skip when 'all')
  */
-export async function getSubjects({ q, page, limit, term, sem, course, status } = {}) {
+export async function getSubjects({ q, page, limit, term, sem, course, status, classroom_id } = {}) {
   const params = {};
 
   if (page !== undefined) params.page = page;
@@ -45,8 +46,11 @@ export async function getSubjects({ q, page, limit, term, sem, course, status } 
   if (course !== undefined && course !== null && course !== "" && course !== "all") {
     params.course = course;
   }
-  if (status !== undefined && status !== "all") {
-    params.is_active = status === "active" ? 1 : 0;
+if (status !== undefined && status !== "all") {
+params.is_active = status === "active" ? 1 : 0;
+  }
+if (classroom_id !== undefined && classroom_id !== null && classroom_id !== "" && classroom_id !== "all") {
+params.classroom_id = classroom_id;
   }
 
   const { data } = await axiosInstance.get(BASE, { params });

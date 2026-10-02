@@ -25,6 +25,7 @@
   
   .sf-page-error {
     margin: 0 1.5rem 1rem;
+    flex: 0 0 auto;
   }
 
   /* ---------- header action buttons (Refresh + Back) ---------- */

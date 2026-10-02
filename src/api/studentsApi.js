@@ -33,7 +33,7 @@ const BASE = "/students";
 export async function getStudents({
   q,
   page = 1,
-  limit = 25,
+  limit = 10,
   courseId,
   classroomId,
   batchId,

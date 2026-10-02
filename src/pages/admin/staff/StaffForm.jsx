@@ -274,6 +274,7 @@ const StaffForm = () => {
     }
     setSectionErrors(errs);
     if (Object.keys(errs).length > 0) {
+      setSaveError("");
       setActiveSection(Object.keys(errs)[0]);
       return false;
     }
@@ -529,8 +530,6 @@ const StaffForm = () => {
           {/* ---------------- Personal Information ---------------- */}
           {activeSection === "personal" && (
             <section className="sf-section">
-              {sectionErrors.personal && <div className="st-error-banner">{sectionErrors.personal}</div>}
-
               <div className="sf-grid sf-grid-personal">
                 <div className="sf-personal-fields">
                   <div className="sf-grid sf-grid-3">
@@ -1037,7 +1036,11 @@ const StaffForm = () => {
           )}
         </div>
 
-        {saveError && <div className="st-error-banner sf-page-error">{saveError}</div>}
+        {(saveError || Object.keys(sectionErrors).length > 0) && (
+          <div className="st-error-banner sf-page-error">
+            {saveError || Object.values(sectionErrors).join(" ")}
+          </div>
+        )}
 
         <div className="sf-footer">
           <div className="sf-footer-actions">

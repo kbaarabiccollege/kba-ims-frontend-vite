@@ -201,7 +201,7 @@ const StudentForm = () => {
   // the `disabled={!courseId}` prop passed in the JSX below.
   const searchBatches = useCallback(async (q) => {
     const activeCourse = courseFilterRef.current;
-    if (!activeCourse) {
+    if (!activeCourse && !isEdit) {
       setBatchOptions([]);
       setBatchesLoaded(true);
       setBatchesLoading(false);
@@ -209,7 +209,11 @@ const StudentForm = () => {
     }
     setBatchesLoading(true);
     try {
-      const res = await getBatches({ limit: 100, q, course: activeCourse });
+      const res = await getBatches({
+        limit: 100,
+        q,
+        ...(activeCourse ? { course: activeCourse } : {}),
+      });
       const list = res?.data ?? [];
       setBatchOptions(list.map((b) => ({ id: b.id, label: b.batch_name })));
       setBatchesIndex((prev) => {
@@ -225,7 +229,7 @@ const StudentForm = () => {
     } finally {
       setBatchesLoading(false);
     }
-  }, []);
+  }, [isEdit]);
 
   const searchAcademicYears = useCallback(async (q) => {
     setAcademicYearsLoading(true);
@@ -302,10 +306,14 @@ const StudentForm = () => {
   }, []);
 
   useEffect(() => {
-    searchCourses("");
     searchBatches("");
-    searchAcademicYears("");
-    searchClassrooms("");
+    // Course, Academic Year and Classroom fields only exist on the
+    // create form, so there's no need to fetch them when editing.
+    if (!isEdit) {
+      searchCourses("");
+      searchAcademicYears("");
+      searchClassrooms("");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -313,6 +321,7 @@ const StudentForm = () => {
   // whenever the Course reference field changes ----
   useEffect(() => {
     courseFilterRef.current = courseId;
+    if (isEdit) return;
     searchBatches("");
     searchClassrooms("");
     setField("personal", "batch_id", "");
@@ -360,7 +369,7 @@ const StudentForm = () => {
             roll_number: d.personal_details?.roll_number ?? "",
             dob: toDateInput(d.personal_details?.dob),
             gender: d.personal_details?.gender ?? "",
-            batch_id: d.personal_details?.batch_id ?? "",
+            batch_id: d.personal_details?.batch?.id ?? "",
             // ASSUMPTION — no sample GET /students/:id response was shared
             // that includes these, so this guesses they come back at the
             // top level of `d` (d.classroom_id / d.academic_year_id),
@@ -416,8 +425,11 @@ const StudentForm = () => {
           })),
         });
         setCredsTouched(true); // don't clobber a loaded user_id via autofill
-        if (d.personal_details?.batch_id) {
-          setBatchesIndex((prev) => ({ ...prev }));
+        // Seed the label index so the Batch dropdown shows the saved
+        // batch name immediately, even before the options list loads.
+        if (d.personal_details?.batch?.id) {
+          const b = d.personal_details.batch;
+          setBatchesIndex((prev) => ({ ...prev, [b.id]: b.batch_name }));
         }
       } catch (err) {
         setLoadError(
@@ -531,13 +543,21 @@ const StudentForm = () => {
   const validate = () => {
     const errs = {};
     if (!isEdit || activeSection === "personal") {
-      if (!form.personal.name.trim()) errs.personal = "Full name is required.";
-      if (!form.personal.roll_number.trim()) errs.personal = "Roll number is required.";
-      if (!form.account.user_id.trim()) errs.personal = "User ID is required.";
-      if (!isEdit && !form.account.password.trim()) errs.personal = "Password is required.";
+      const missing = [];
+      if (!form.personal.name.trim()) missing.push("Full name");
+      if (!form.personal.roll_number.trim()) missing.push("Roll number");
+      if (!form.account.email.trim()) missing.push("Email");
+      if (!form.personal.batch_id) missing.push("Batch");
+      if (!isEdit && !form.personal.academic_year_id) missing.push("Academic year");
+      if (!isEdit && !form.personal.classroom_id) missing.push("Classroom");
+      if (!form.personal.academic_status) missing.push("Academic status");
+      if (!form.account.user_id.trim()) missing.push("User ID");
+      if (!isEdit && !form.account.password.trim()) missing.push("Password");
+      if (missing.length) errs.personal = `Required: ${missing.join(", ")}.`;
     }
     setSectionErrors(errs);
     if (Object.keys(errs).length > 0) {
+      setSaveError("");
       setActiveSection(Object.keys(errs)[0]);
       return false;
     }
@@ -546,42 +566,66 @@ const StudentForm = () => {
 
   const buildPayload = () => {
     const num = (v) => (v === "" || v === null || v === undefined ? null : Number(v));
+    // "" / whitespace -> null (used for date & URL fields the API can't accept as "")
+    const nullable = (v) => {
+      const t = String(v ?? "").trim();
+      return t === "" ? null : t;
+    };
 
+    const email = form.account.email.trim();
+
+    // Address rows: drop empty rows, strip any `id`, keep 0 = Present, 1 = Permanent
     const addresses = form.addresses
       .filter((a) =>
-        Object.entries(a).some(([k, v]) => k !== "address_type" && String(v || "").trim())
+        Object.entries(a).some(
+          ([k, v]) => k !== "address_type" && k !== "id" && String(v || "").trim()
+        )
       )
-      .map((a) => ({ ...a, address_type: Number(a.address_type) })); // 0 = Present, 1 = Permanent
+      .map(({ id: _id, ...a }) => ({ ...a, address_type: Number(a.address_type) }));
 
+    // Qualification rows: drop empty rows, strip any `id`, numeric fields as numbers
     const qualifications = form.qualifications
       .filter((q) =>
-        Object.entries(q).some(([k, v]) => k !== "level" && String(v || "").trim())
+        Object.entries(q).some(
+          ([k, v]) => k !== "level" && k !== "id" && String(v || "").trim()
+        )
       )
-      .map((q) => ({
+      .map(({ id: _id, ...q }) => ({
         ...q,
         passing_year: num(q.passing_year),
-        marks: q.marks === "" ? null : Number(q.marks),
-        total_marks: q.total_marks === "" ? null : Number(q.total_marks),
+        marks: num(q.marks),
+        total_marks: num(q.total_marks),
       }));
+
+    // classroom_id & academic_year_id go at the top level, not inside personal_details
+    const {
+      classroom_id: _classroomId,
+      academic_year_id: _academicYearId,
+      dob: _dob,
+      gender: _gender,
+      ...personal
+    } = form.personal;
 
     return {
       classroom_id: num(form.personal.classroom_id),
       academic_year_id: num(form.personal.academic_year_id),
       account: {
         user_id: form.account.user_id.trim(),
-        email: form.account.email.trim(),
-        ...(form.account.password ? { password: form.account.password } : {}),
+        email,
         role: "student",
         status: form.account.status,
+        ...(form.account.password ? { password: form.account.password } : {}),
       },
       personal_details: {
-        ...form.personal,
-        classroom_id: undefined, // sent at the top level instead — see above
-        academic_year_id: undefined, // sent at the top level instead — see above
-        gender: num(form.personal.gender),
+        ...personal,
+        name: form.personal.name.trim(),
+        roll_number: form.personal.roll_number.trim(),
+        ...(form.personal.dob ? { dob: form.personal.dob } : {}),
+        ...(form.personal.gender ? { gender: num(form.personal.gender) } : {}),
         batch_id: num(form.personal.batch_id),
         blood_group: num(form.personal.blood_group),
         is_hostel: Boolean(form.personal.is_hostel),
+        photo_url: nullable(form.personal.photo_url),
       },
       other_details: {
         ...form.other,
@@ -604,14 +648,19 @@ const StudentForm = () => {
       },
       address: addresses,
       qualifications,
-      extra_qualifications: form.extraQualifications.filter((q) => q.course_name.trim()),
+      extra_qualifications: form.extraQualifications
+        .filter((q) => q.course_name.trim())
+        .map((q) => ({ course_name: q.course_name.trim(), cert_url: q.cert_url.trim() })),
       admission_details: {
         ...form.admission,
-        entrance_mark: form.admission.entrance_mark === "" ? null : Number(form.admission.entrance_mark),
+        admission_date: nullable(form.admission.admission_date),
+        entrance_mark: num(form.admission.entrance_mark),
         entrance_rank: num(form.admission.entrance_rank),
         hafiz: Boolean(form.admission.hafiz),
       },
-      related_links: form.relatedLinks.filter((l) => l.description.trim() && l.url.trim()),
+      related_links: form.relatedLinks
+        .filter((l) => l.description.trim() && l.url.trim())
+        .map((l) => ({ description: l.description.trim(), url: l.url.trim() })),
     };
   };
 
@@ -622,8 +671,6 @@ const StudentForm = () => {
     switch (section) {
       case "personal":
         return {
-          classroom_id: num(form.personal.classroom_id),
-          academic_year_id: num(form.personal.academic_year_id),
           account: {
             user_id: form.account.user_id.trim(),
             email: form.account.email.trim(),
@@ -731,6 +778,7 @@ const StudentForm = () => {
       setSaveError(
         err?.response?.data?.message || "Couldn't save this student. Please check the form and try again."
       );
+      toast.error(crudMessage("update", "Student", "error"));
     } finally {
       setButtonLoading(false);
     }
@@ -748,11 +796,10 @@ const StudentForm = () => {
       toast.success(crudMessage("create", "Student", "success"));
       navigate(`${basePath}/students`);
     } catch (err) {
-      const fallback = crudMessage("create", "Student", "error");
       setSaveError(
         err?.response?.data?.message || "Couldn't save this student. Please check the form and try again."
       );
-      toast.error(err?.response?.data?.message || fallback);
+      toast.error(crudMessage("create", "Student", "error"));
     } finally {
       setSavingSave(false);
     }
@@ -767,6 +814,28 @@ const StudentForm = () => {
   const photoPreviewOk = useMemo(
     () => Boolean(form.personal.photo_url && /^https?:\/\//.test(form.personal.photo_url)),
     [form.personal.photo_url]
+  );
+
+  // Rendered in a different spot depending on mode: next to Mother Tongue
+  // on edit, in the Course/Batch/Classroom row on create.
+  const batchField = (
+    <div className="sf-field">
+      <label className="sf-label">Batch *</label>
+      <SearchableDropdown
+        allLabel={isEdit || courseId ? "Select batch" : "Select a course first"}
+        options={batchOptions}
+        value={form.personal.batch_id || "all"}
+        onChange={(v) => setField("personal", "batch_id", v === "all" ? "" : v)}
+        searchable
+        onFetch={searchBatches}
+        loaded={batchesLoaded}
+        loading={batchesLoading}
+        hideFetchButton
+        disabled={!isEdit && !courseId}
+        selectedLabel={batchesIndex[form.personal.batch_id]}
+        placeholder="Search batches…"
+      />
+    </div>
   );
 
   if (loading) {
@@ -868,8 +937,6 @@ const StudentForm = () => {
           {/* ---------------- Personal Information ---------------- */}
           {activeSection === "personal" && (
             <section className="sf-section">
-              {sectionErrors.personal && <div className="st-error-banner">{sectionErrors.personal}</div>}
-
               <div className="sf-grid sf-grid-personal">
                 <div className="sf-personal-fields">
                   {/* Row 1: Full Name, Email, Photo URL moved to end on mobile
@@ -885,7 +952,7 @@ const StudentForm = () => {
                       />
                     </div>
                     <div className="sf-field">
-                      <label className="sf-label">Email</label>
+                      <label className="sf-label">Email *</label>
                       <input
                         type="email"
                         className="sf-input"
@@ -961,9 +1028,9 @@ const StudentForm = () => {
                     </div>
                   </div>
 
-                  {/* Row 3: Blood Group, Mother Tongue, Course (reference
-                      only — scopes Batch/Classroom below, never sent to
-                      the API) */}
+                                    {/* Row 3: Blood Group, Mother Tongue, then Batch (edit)
+                      or Course (create). Course is reference-only — scopes
+                      Batch/Classroom, never sent to the API. */}
                   <div className="sf-grid sf-grid-3">
                     <div className="sf-field">
                       <label className="sf-label" htmlFor="sf-blood-group">Blood Group</label>
@@ -985,84 +1052,73 @@ const StudentForm = () => {
                         onChange={(e) => setField("personal", "mother_tongue", e.target.value)}
                       />
                     </div>
-                    <div className="sf-field">
-                      <label className="sf-label" htmlFor="sf-course">Course *</label>
-                      <SearchableDropdown
-                        id="sf-course"
-                        label=""
-                        allLabel="Select course"
-                        options={courseOptions}
-                        value={courseId || "all"}
-                        onChange={(v) => setCourseId(v === "all" ? "" : v)}
-                        searchable
-                        onFetch={searchCourses}
-                        loaded={coursesLoaded}
-                        loading={coursesLoading}
-                        hideFetchButton
-                        selectedLabel={coursesIndex[courseId]}
-                        placeholder="Search courses…"
-                      />
-                    </div>
+                    {isEdit ? (
+                      batchField
+                    ) : (
+                      <div className="sf-field">
+                        <label className="sf-label" htmlFor="sf-course">Course *</label>
+                        <SearchableDropdown
+                          id="sf-course"
+                          label=""
+                          allLabel="Select course"
+                          options={courseOptions}
+                          value={courseId || "all"}
+                          onChange={(v) => setCourseId(v === "all" ? "" : v)}
+                          searchable
+                          onFetch={searchCourses}
+                          loaded={coursesLoaded}
+                          loading={coursesLoading}
+                          hideFetchButton
+                          selectedLabel={coursesIndex[courseId]}
+                          placeholder="Search courses…"
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  {/* Row 3.5: Batch, Academic Year, Classroom — Batch and
-                      Classroom are both scoped to the Course picked above */}
-                  <div className="sf-grid sf-grid-3">
-                    <div className="sf-field">
-                      <label className="sf-label">Batch *</label>
-                      <SearchableDropdown
-                        allLabel={courseId ? "Select batch" : "Select a course first"}
-                        options={batchOptions}
-                        value={form.personal.batch_id || "all"}
-                        onChange={(v) => setField("personal", "batch_id", v === "all" ? "" : v)}
-                        searchable
-                        onFetch={searchBatches}
-                        loaded={batchesLoaded}
-                        loading={batchesLoading}
-                        hideFetchButton
-                        disabled={!courseId}
-                        selectedLabel={batchesIndex[form.personal.batch_id]}
-                        placeholder="Search batches…"
-                      />
+                  {/* Row 3.5 (create only): Batch, Academic Year, Classroom */}
+                  {!isEdit && (
+                    <div className="sf-grid sf-grid-3">
+                      {batchField}
+                      <div className="sf-field">
+                        <label className="sf-label" htmlFor="sf-academic-year">Academic Year *</label>
+                        <SearchableDropdown
+                          id="sf-academic-year"
+                          label=""
+                          allLabel="Select academic year"
+                          options={academicYearOptions}
+                          value={form.personal.academic_year_id || "all"}
+                          onChange={(v) => setField("personal", "academic_year_id", v === "all" ? "" : v)}
+                          searchable
+                          onFetch={searchAcademicYears}
+                          loaded={academicYearsLoaded}
+                          loading={academicYearsLoading}
+                          hideFetchButton
+                          selectedLabel={academicYearsIndex[form.personal.academic_year_id]}
+                          placeholder="Search academic years…"
+                        />
+                      </div>
+                      <div className="sf-field">
+                        <label className="sf-label" htmlFor="sf-classroom">Classroom *</label>
+                        <SearchableDropdown
+                          id="sf-classroom"
+                          label=""
+                          allLabel={courseId ? "Select classroom" : "Select a course first"}
+                          options={classroomOptions}
+                          value={form.personal.classroom_id || "all"}
+                          onChange={(v) => setField("personal", "classroom_id", v === "all" ? "" : v)}
+                          searchable
+                          onFetch={searchClassrooms}
+                          loaded={classroomsLoaded}
+                          loading={classroomsLoading}
+                          hideFetchButton
+                          disabled={!courseId}
+                          selectedLabel={classroomsIndex[form.personal.classroom_id]}
+                          placeholder="Search classrooms…"
+                        />
+                      </div>
                     </div>
-                    <div className="sf-field">
-                      <label className="sf-label" htmlFor="sf-academic-year">Academic Year *</label>
-                      <SearchableDropdown
-                        id="sf-academic-year"
-                        label=""
-                        allLabel="Select academic year"
-                        options={academicYearOptions}
-                        value={form.personal.academic_year_id || "all"}
-                        onChange={(v) => setField("personal", "academic_year_id", v === "all" ? "" : v)}
-                        searchable
-                        onFetch={searchAcademicYears}
-                        loaded={academicYearsLoaded}
-                        loading={academicYearsLoading}
-                        hideFetchButton
-                        selectedLabel={academicYearsIndex[form.personal.academic_year_id]}
-                        placeholder="Search academic years…"
-                      />
-                    </div>
-                    <div className="sf-field">
-                      <label className="sf-label" htmlFor="sf-classroom">Classroom *</label>
-                      <SearchableDropdown
-                        id="sf-classroom"
-                        label=""
-                        allLabel={courseId ? "Select classroom" : "Select a course first"}
-                        options={classroomOptions}
-                        value={form.personal.classroom_id || "all"}
-                        onChange={(v) => setField("personal", "classroom_id", v === "all" ? "" : v)}
-                        searchable
-                        onFetch={searchClassrooms}
-                        loaded={classroomsLoaded}
-                        loading={classroomsLoading}
-                        hideFetchButton
-                        disabled={!courseId}
-                        selectedLabel={classroomsIndex[form.personal.classroom_id]}
-                        placeholder="Search classrooms…"
-                      />
-                    </div>
-                  </div>
+                  )}
 
                   {/* Row 4: Mobile Number, Academic Status, Hostel Student */}
                   <div className="sf-grid sf-grid-3">
@@ -1684,7 +1740,11 @@ const StudentForm = () => {
           )}
         </div>
 
-        {saveError && <div className="st-error-banner sf-page-error">{saveError}</div>}
+        {(saveError || Object.keys(sectionErrors).length > 0) && (
+          <div className="st-error-banner sf-page-error">
+            {saveError || Object.values(sectionErrors).join(" ")}
+          </div>
+        )}
 
         <div className="sf-footer">
           <div className="sf-footer-actions">

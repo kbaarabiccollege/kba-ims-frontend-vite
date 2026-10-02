@@ -65,8 +65,8 @@
   import { useToast } from "../../../context/ToastContext";
   import { crudMessage } from "../../../utils/toastMessages";
   import BulkActionsModal from "./components/BulkActionsModal";
-import BulkAddModal from "./components/BulkAddModal";
-import PromoteClassModal from "./components/PromoteClassModal";
+  import BulkAddModal from "./components/BulkAddModal";
+  import PromoteClassModal from "./components/PromoteClassModal";
   import PasswordModal from "../../superadmin/users/components/PasswordModal";
   import { updateUserPassword } from "../../../api/usersApi";
   import SearchableDropdown from "../../../components/common/SearchableDropdown";
@@ -81,9 +81,9 @@ import PromoteClassModal from "./components/PromoteClassModal";
   } from "../../../components/common/ListPageControls";
   import { PhotoPreviewModal, BulkStatusConfirmModal, DeleteConfirmModal } from "../../../components/common/ListPageModals";
   import { STATUS_FILTER_OPTIONS } from "../../../utils/constants";
-import { PAGE_SIZE_OPTIONS } from "../../../utils/constants";
-import { FilterFunnelIcon } from "../../../components/common/Icons";
-import usePageTitle from "../../../hooks/usePageTitle";
+  import { PAGE_SIZE_OPTIONS } from "../../../utils/constants";
+  import { FilterFunnelIcon } from "../../../components/common/Icons";
+  import usePageTitle from "../../../hooks/usePageTitle";
   import "../../../styles/UserList.css";
 
   const Students = () => {
